@@ -29,9 +29,11 @@
  *
  * @param	$WarnInfoNode
  * @param	$warncellid
+ * @return	array
  */
 
 function getWarnAreaNameFromCAP($WarnInfoNode, $warncellid) {
+	global $optFehlerMail;
 	try {
 		if (! isset($WarnInfoNode->{"area"})) {
 			// Keine Area-Nodes gefunden
@@ -54,6 +56,11 @@ function getWarnAreaNameFromCAP($WarnInfoNode, $warncellid) {
 					throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'areaDesc'-Node.");
 				} else {
 					$currentAreaDesc = (string)$area->{"areaDesc"};
+				}
+
+				// Falls sich Polygon-Informationen vorhanden sind, den nächsten Eintrag verarbeiten
+				if (isset($area->{"polygon"})) {
+					continue;
 				}
 
 				// Speichere Höhenangaben
@@ -110,7 +117,7 @@ function getWarnAreaNameFromCAP($WarnInfoNode, $warncellid) {
 	} catch (Exception $e) {
 		// Fehler-Handling
 		$message = $e->getFile() . "(" . $e->getLine() . "): " . $e->getMessage();
-		sendErrorMessage($message);
+		sendErrorMessage($optFehlerMail, $message);
 	}
 }
 
@@ -218,9 +225,10 @@ function parseWetterWarnung($config, $optFehlerMail) {
 		// Lege Array an für die ermittelten Warnungen;
 		$aktuelleWarnungen = array();
 
+
 		// Verarbeite jede einzelne XML Datei
 		foreach ($localXmlFiles as $xmlFile) {
-			echo ("* Verarbeite Wetterwarnung-Datei " . $tmpFolder . DIRECTORY_SEPARATOR . $xmlFile . ": ");
+			echo ("* Verarbeite Wetterwarnung-Datei " . $tmpFolder . DIRECTORY_SEPARATOR . $xmlFile . ": " . PHP_EOL);
 
 			// Prüfe ob XML Datei geöffnet werden kann
 			$filename = $tmpFolder . DIRECTORY_SEPARATOR . $xmlFile;
@@ -248,7 +256,7 @@ function parseWetterWarnung($config, $optFehlerMail) {
 			// Verarbeite XML Datei, da Typ "Alert" ist
 			if (strtolower($msgType) == "alert") {
 				// Verarbeite Inhalt der XML Datei
-				echo ("Art der Warnung: " . $msgType . PHP_EOL);
+				echo ("\t-> Warn-Typ: " . $msgType . PHP_EOL);
 
 				// Prüfe ob Info-Node existiert
 				if (! isset($xml->{"info"})) {
@@ -299,9 +307,10 @@ function parseWetterWarnung($config, $optFehlerMail) {
 			} else if (strtolower($msgType) == "cancel") {
 				// Da es sich um eine Cancel-Nachricht handelt, diese einfach ignorieren
 				// -> Bei Cancel existieren in der Regel keine Wetterwarnungen für Deutschland
-				echo ("Cancel -> nicht vearbeiten" . PHP_EOL);
+				echo ("\t->Warn-Typ: Cancel -> nicht vearbeiten" . PHP_EOL);
 			} else {
 				// Sichere XML Datei zu Debug-Zwecken, da es sich um ein unbekannter Warn-Typ handelt
+				echo ("\t->Warn-Typ: Unbekannt". PHP_EOL);
 				if(array_key_exists("localDebugFolder", $config)) {
 					echo ("Update -> zu Debug-Zwecken speichern" . PHP_EOL);
 					if (! file_exists($config["localDebugFolder"] . DIRECTORY_SEPARATOR . basename($filename))) {
@@ -423,14 +432,14 @@ function parseWetterWarnung($config, $optFehlerMail) {
 									$severity = "Extreme Unwetterwarnung";
 									$warnstufe = 4;
 									break;
-								case "Minor":
+								default:
 									$severity = "Unbekannt";
 									$warnstufe = 0;
 							}
 						}
 
-						// Prüfe ob es sich ausschließlich um eine Vorhersage handelt (Urgency == Future)
-						if ($urgency == "Future") {
+						// Im Fall einer Vorhersage (Urgency == Future oder OnSet-Zeitpunkt in der Zukunft)
+						if ($urgency == "Future") { // || $dateOnset->getTimestamp() >= $dateCurrent->getTimestamp()) {
 							$warnstufe = 0;
 						}
 
@@ -482,25 +491,25 @@ function parseWetterWarnung($config, $optFehlerMail) {
 						// MD5Hash erzeugen aus Angaben der Wetterwarnung
 						$md5Hash = md5($warnstufe . $event . $dateOnset->getTimestamp() . $dateExpires->getTimestamp() . $areaDesc . $headline . $description . $instruction);
 
-						// Füge ales in Array zusammen
+						// Füge alles in Array zusammen
 						$tempWarnArray = array( "hash" => $md5Hash,
-												"severity" => $severity,
-												"urgency" => $urgency,
-												"warnstufe" => $warnstufe,
-												"startzeit" => serialize($dateOnset),
-												"endzeit" => serialize($dateExpires),
-												"headline" => $headline,
-												"area" => $areaDesc,
-												"stateShort" => $state,
-												"stateLong" => getNameFromState($state),
-												"altutude" => $altitude,
-												"ceiling" => $ceiling,
-												"hoehenangabe" => $hoehenangabe,
-												"description" => $description,
-												"instruction" => $instruction,
-												"event" => $event,
-												"sender" => $senderName
-											);
+							"severity" => $severity,
+							"urgency" => $urgency,
+							"warnstufe" => $warnstufe,
+							"startzeit" => serialize($dateOnset),
+							"endzeit" => serialize($dateExpires),
+							"headline" => $headline,
+							"area" => $areaDesc,
+							"stateShort" => $state,
+							"stateLong" => getNameFromState($state),
+							"altutude" => $altitude,
+							"ceiling" => $ceiling,
+							"hoehenangabe" => $hoehenangabe,
+							"description" => $description,
+							"instruction" => $instruction,
+							"event" => $event,
+							"sender" => $senderName
+						);
 
 						// Wetterwarnung übergeben
 						$arrWetterWarnungenJson[$md5Hash] = $tempWarnArray;
@@ -627,7 +636,7 @@ function cleanupUnwetterDaten($config, $remoteFiles) {
 		// Ermittle anhand der Local/Remote-Dateilisten welche lokal vorhandenen
 		// Dateien nicht mehr auf dem DWD FTP Server vorhanden sind
 		$obsoletFiles = array_diff($localFiles, array(
-				$remoteFiles
+			$remoteFiles
 		));
 
 		foreach ($obsoletFiles as $filename) {
@@ -694,10 +703,10 @@ function fetchUnwetterDaten($config, $conn_id) {
 		if (count($arrFTPContent) > 0) {
 			echo (PHP_EOL . "Erzeuge Download-Liste für " . ftp_pwd($conn_id) . ":" . PHP_EOL);
 			foreach ($arrFTPContent as $filename) {
-				// Filtere nach Landkreis-Array
+				// Filtere nach den Wetterwarnungen vom heutigen Tag
 				if (strpos($filename, $fileFilter) !== false) {
 					// Übernehme Datei in zu-bearbeiten Liste
-					if (preg_match('/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})(?<Postfix>_\w{3}_STATUS)(?<Extension>.zip)$/', $filename, $regs)) {
+					if (preg_match('/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})(?<Postfix>_\w{3}_STATUS_AREA_UNION)(?<Extension>\.zip)$/', $filename, $regs)) {
 						$dateFileM = DateTime::createFromFormat("YmdHis", $regs['Datum'], new DateTimeZone("UTC"));
 						if ($dateFileM === false) {
 							$dateFileM->setTimezone(new DateTimeZone("Europe/Berlin"));
@@ -777,5 +786,3 @@ function fetchUnwetterDaten($config, $conn_id) {
 		return array();
 	}
 }
-
-?>

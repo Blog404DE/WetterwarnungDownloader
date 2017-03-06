@@ -34,7 +34,7 @@ $ftp["username"]    = "********************";
 $ftp["password"]    = "********************";
 
 // Array mit den zu verarbeiteten Landkreisen
-// - siehe: Warngebiets-Liste in legend_warnings.pdf / Spalte "WarnCellId ab Ende 2015 (cap)"
+// - siehe Erklärung in: README.md
 // - Beispiel: Landkreis und Stadt Karlsruhe
 $unwetterConfig["WarnCellId"]      = "908215999";
 
@@ -46,13 +46,13 @@ $unwetterConfig["localFolder"]		= "/pfad/zum/speicherordner/fuer/wetterWarnungen
 //$unwetterConfig["localDebugFolder"]	= $unwetterConfig["localFolder"] . "/debug";
 
 // Pfad zu den XML Wetterdaten auf dem DWD FTP Server
-$unwetterConfig["remoteFolder"] = "/gds/gds/specials/alerts/cap/GER/status";
+$unwetterConfig["remoteFolder"] = "/gds/gds/specials/alerts/cap/GER/community_status_geometry";
 
 /* Sonstige Konfigurationsparameter */
 
 /* Konfiguration für das zusenden von E-Mails sofern der Cronjob nicht komplett durchläuft (optional) */
-$optFehlerMail		= array("empfaenger" => "deine.email@example.org",										//Empfänger der Fehler-Mail
-	"absender"	 => "deine.email@example.org");										//Absender der Fehler-Mail
+$optFehlerMail		= [ "empfaenger" => "deine.email@example.org",										//Empfänger der Fehler-Mail
+						"absender"	 => "deine.email@example.org" ];										//Absender der Fehler-Mail
 
 // Locals und Zeitzone setzen
 setlocale(LC_TIME, "de_DE.UTF-8");
