@@ -1,7 +1,7 @@
 <?php
 /*
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
- * Version 2.0
+ * Version 2.0-dev
  * 05.03.2017
  * (c) tf-network.de Jens Dutzi 2012-2017
  *
