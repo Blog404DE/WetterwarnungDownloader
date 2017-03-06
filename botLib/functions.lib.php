@@ -1,7 +1,7 @@
 <?php
 /*
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
- * Version 2.0
+ * Version 2.0-dev
  * 05.03.2017
  * (c) tf-network.de Jens Dutzi 2012-2017
  *
@@ -25,7 +25,7 @@
  */
 
 /**
- * Umwandeln des Länerkürzel in den vollen Namen des Bundeslandes
+ * Umwandeln des Länder-Code in den vollen Namen des Bundesland
  *
  * @param string $state
  * @return string
@@ -33,7 +33,7 @@
 function getNameFromState($state) {
 	switch ($state) {
 		case "BW":
-			$stateLong = "Baden-Würtemberg";
+			$stateLong = "Baden-Württemberg";
 			break;
 		case "BY":
 			$stateLong = "Bayern";
@@ -97,37 +97,37 @@ function getNameFromState($state) {
  * @return string
  */
 function getZipErrorMessage($errCode) {
-    switch ($errCode) {
-        case ZipArchive::ER_EXISTS:
-            return "File already exists.";
-            break;
-        case ZipArchive::ER_INCONS:
-            return "Zip archive inconsistent.";
-            break;
-        case ZipArchive::ER_INVAL:
-            return "Invalid argument.";
-            break;
-        case ZipArchive::ER_MEMORY:
-            return "Malloc failure.";
-            break;
-        case ZipArchive::ER_NOENT:
-            return "No such file.";
-            break;
-        case ZipArchive::ER_NOZIP:
-            return "Not a zip archive.";
-            break;
-        case ZipArchive::ER_OPEN:
-            return "Can't open file.";
-            break;
-        case ZipArchive::ER_READ:
-            return "Read error.";
-            break;
-        case ZipArchive::ER_SEEK:
-            return "Seek error.";
-            break;
-        default:
-            return "Unknown error.";
-    }
+	switch ($errCode) {
+		case ZipArchive::ER_EXISTS:
+			return "File already exists.";
+			break;
+		case ZipArchive::ER_INCONS:
+			return "Zip archive inconsistent.";
+			break;
+		case ZipArchive::ER_INVAL:
+			return "Invalid argument.";
+			break;
+		case ZipArchive::ER_MEMORY:
+			return "Malloc failure.";
+			break;
+		case ZipArchive::ER_NOENT:
+			return "No such file.";
+			break;
+		case ZipArchive::ER_NOZIP:
+			return "Not a zip archive.";
+			break;
+		case ZipArchive::ER_OPEN:
+			return "Can't open file.";
+			break;
+		case ZipArchive::ER_READ:
+			return "Read error.";
+			break;
+		case ZipArchive::ER_SEEK:
+			return "Seek error.";
+			break;
+		default:
+			return "Unknown error.";
+	}
 }
 
 /**
@@ -148,10 +148,10 @@ function sendErrorMessage($optFehlerMail, $fehlerdetails) {
 			if(!empty($optFehlerMail["absender"]) && !empty($optFehlerMail["empfaenger"])) {
 				$mailBetreff = "Fehler beim Ablauf des WetterBot-Cronjobs";
 
-				$message  = "Fehler beim Ablauf des Wetter-Cronjobs. Der Cronjob wurde daher abgebrochen.\r\n" .
-							"\r\n" .
-							"Details:\r\n" .
-							$fehlerdetails;
+				$message  = "Fehler beim Ablauf des Wetterwarn-Cronjob. Der Cronjob wurde daher abgebrochen.\r\n" .
+					"\r\n" .
+					"Details:\r\n" .
+					$fehlerdetails;
 
 				sendmail($optFehlerMail["absender"], $optFehlerMail["empfaenger"], $mailBetreff, $message);
 			} else {
@@ -208,39 +208,37 @@ function sendmail($absender, $empfaenger, $betreff, $message) {
  * @return string|bool Full path to newly-created dir, or false on failure.
  */
 function tempdir($dir = null, $prefix = 'tmp_', $mode = 0700, $maxAttempts = 1000) {
-    /* Use the system temp dir by default. */
-    if (is_null($dir)) {
-        $dir = sys_get_temp_dir();
-    }
+	/* Use the system temp dir by default. */
+	if (is_null($dir)) {
+		$dir = sys_get_temp_dir();
+	}
 
-    /* Trim trailing slashes from $dir. */
-    $dir = rtrim($dir, '/');
+	/* Trim trailing slashes from $dir. */
+	$dir = rtrim($dir, '/');
 
-    /* If we don't have permission to create a directory, fail, otherwise we will
-     * be stuck in an endless loop.
-     */
-    if (!is_dir($dir) || !is_writable($dir)) {
-        return false;
-    }
+	/* If we don't have permission to create a directory, fail, otherwise we will
+	 * be stuck in an endless loop.
+	 */
+	if (!is_dir($dir) || !is_writable($dir)) {
+		return false;
+	}
 
-    /* Make sure characters in prefix are safe. */
-    if (strpbrk($prefix, '\\/:*?"<>|') !== false) {
-        return false;
-    }
+	/* Make sure characters in prefix are safe. */
+	if (strpbrk($prefix, '\\/:*?"<>|') !== false) {
+		return false;
+	}
 
-    /* Attenot to create a random directory until it works. Abort if we reach
-     * $maxAttempts. Something screwy could be happening with the filesystem
-     * and our loop could otherwise become endless.
-     */
-    $attempts = 0;
-    do {
-        $path = sprintf('%s/%s%s', $dir, $prefix, mt_rand(100000, mt_getrandmax()));
-    } while (
-        !mkdir($path, $mode) &&
-        $attempts++ < $maxAttempts
-    );
+	/* Attenot to create a random directory until it works. Abort if we reach
+	 * $maxAttempts. Something screwy could be happening with the filesystem
+	 * and our loop could otherwise become endless.
+	 */
+	$attempts = 0;
+	do {
+		$path = sprintf('%s/%s%s', $dir, $prefix, mt_rand(100000, mt_getrandmax()));
+	} while (
+		!mkdir($path, $mode) &&
+		$attempts++ < $maxAttempts
+	);
 
-    return $path;
+	return $path;
 }
-
-?>
