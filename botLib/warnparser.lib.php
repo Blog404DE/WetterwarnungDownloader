@@ -1,9 +1,9 @@
 <?php
 /*
- * Wetterwarn-Bot für neuthardwetter.de by Jens Dutzi
- * Version 1.0
- * 30.11.2015
- * (c) tf-network.de Jens Dutzi 2012-2015
+ * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
+ * Version 2.0
+ * 05.03.2017
+ * (c) tf-network.de Jens Dutzi 2012-2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -122,6 +122,8 @@ function getWarnAreaNameFromCAP($WarnInfoNode, $warncellid) {
  * @return 	bool
  */
 function parseWetterWarnung($config, $optFehlerMail) {
+	global $optFehlerMail;
+
 	try {
 		// Neue Wetterwarnungen vorhanden?
 		$forceWetterwarungUpdate = false;
@@ -571,7 +573,7 @@ function parseWetterWarnung($config, $optFehlerMail) {
 		return $forceWetterwarungUpdate;
 	} catch (Exception $e) {
 		// Lösche Temporär-Order
-		if(is_empty($tmpFolder)) {
+		if(!empty($tmpFolder)) {
 			array_map('unlink', glob($tmpFolder . DIRECTORY_SEPARATOR . "*.xml"));
 			if (! rmdir($tmpFolder)) {
 				$message = $e->getFile() . "(" . $e->getLine() . "): " . $e->getMessage() . " / Temporär-Ordner " . $tmpFolder . " erfolgreich gelöscht.";
@@ -583,7 +585,7 @@ function parseWetterWarnung($config, $optFehlerMail) {
 		}
 
 		// Fehler-Handling
-		sendErrorMessage($message);
+		sendErrorMessage($optFehlerMail, $message);
 
 		return false;
 	}
@@ -598,6 +600,8 @@ function parseWetterWarnung($config, $optFehlerMail) {
  * @return	bool
  */
 function cleanupUnwetterDaten($config, $remoteFiles) {
+	global $optFehlerMail;
+
 	try {
 		// Prüfe Existenz der lokalen Verzeichnisse
 		if (! is_readable($config["localFolder"])) {
@@ -638,7 +642,7 @@ function cleanupUnwetterDaten($config, $remoteFiles) {
 	} catch (Exception $e) {
 		// Fehler-Handling
 		$message = $e->getFile() . "(" . $e->getLine() . "): " . $e->getMessage();
-		sendErrorMessage($message);
+		sendErrorMessage($optFehlerMail, $message);
 	}
 }
 
@@ -650,6 +654,8 @@ function cleanupUnwetterDaten($config, $remoteFiles) {
  * @return	array
  */
 function fetchUnwetterDaten($config, $conn_id) {
+	global $optFehlerMail;
+
 	try {
 		// Prüfe Existenz der lokalen Verzeichnisse
 		if (! is_writable($config["localFolder"])) {
@@ -766,7 +772,7 @@ function fetchUnwetterDaten($config, $conn_id) {
 	} catch (Exception $e) {
 		// Fehler-Handling
 		$message = $e->getFile() . "(" . $e->getLine() . "): " . $e->getMessage();
-		sendErrorMessage($message);
+		sendErrorMessage($optFehlerMail, $message);
 
 		return array();
 	}

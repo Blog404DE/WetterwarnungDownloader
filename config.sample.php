@@ -1,9 +1,9 @@
 <?php
 /*
- * Wetterwarn-Bot für neuthardwetter.de by Jens Dutzi
- * Version 1.0
- * 30.11.2015
- * (c) tf-network.de Jens Dutzi 2012-2015
+ * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
+ * Version 2.0
+ * 05.03.2017
+ * (c) tf-network.de Jens Dutzi 2012-2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -36,7 +36,7 @@ $ftp["password"]    = "********************";
 // Array mit den zu verarbeiteten Landkreisen
 // - siehe: Warngebiets-Liste in legend_warnings.pdf / Spalte "WarnCellId ab Ende 2015 (cap)"
 // - Beispiel: Landkreis und Stadt Karlsruhe
-$unwetterConfig["WarnCellId"]      = "908215999";  				
+$unwetterConfig["WarnCellId"]      = "908215999";
 
 // Speicherpfad für JSON Datei mit den aktuellen Wetterwarnungen
 $unwetterConfig["localJsonWarnfile"]= "/pfad/zur/wetterwarnung.json";
@@ -52,7 +52,7 @@ $unwetterConfig["remoteFolder"] = "/gds/gds/specials/alerts/cap/GER/status";
 
 /* Konfiguration für das zusenden von E-Mails sofern der Cronjob nicht komplett durchläuft (optional) */
 $optFehlerMail		= array("empfaenger" => "deine.email@example.org",										//Empfänger der Fehler-Mail
-							"absender"	 => "deine.email@example.org");										//Absender der Fehler-Mail
+	"absender"	 => "deine.email@example.org");										//Absender der Fehler-Mail
 
 // Locals und Zeitzone setzen
 setlocale(LC_TIME, "de_DE.UTF-8");

@@ -4,6 +4,15 @@ WetterwarnungDownloader/config.inc.php
 # Temporär-Ordner für Tests
 tmp/
 
+# Dokumentation ausklammern
+doc/*.zip
+doc/*.pdf
+doc/*.csv
+doc/*.xls
+
+# Eigene Konfigurationsdatei
+config.local.php
+
 # Created by .ignore support plugin (hsz.mobi)
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm

@@ -2,7 +2,7 @@
 
 ## Einleitung
 
-Bei dem Wetterwarnung-Downloader handelt es sich um ein Script zum automatischen herunterladen aktueller Wetterwarnungen für eine bestimmte Warnregion. Die Wetterwarnungen werden im Rahmen der Grundversorgung des DWD bereitgestellt. Details zur Grundversorgung finden sich auf der [NeuthardWetterScripts Hauptseite](https://github.com/Blog404DE/NeuthardWetterScripts).
+Bei dem Wetterwarnung-Downloader handelt es sich um ein Script zum automatischen herunterladen aktueller Wetterwarnungen für eine bestimmte Warnregion. Die Wetterwarnungen werden im Rahmen der Grundversorgung des DWD bereitgestellt. Details zur Grundversorgung finden sich auf der [NeuthardWetterScripts Hauptseite](https://github.com/Blog404DE/NeuthardWetter-Scripts).
 
 Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch wenn das Script ausführlich getestet wurde, so kann niemand garantieren, dass keine Fehler oder Probleme auftreten. 
 
@@ -20,51 +20,34 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 
 ### Vorbereitung:
 
-1. Anmeldung für die Grundversorgungs-Daten des Deutschen Wetterdienstes (siehe Einleitung)
+1. Anmeldung für die Grundversorgungsdaten des Deutschen Wetterdienstes (siehe Einleitung)
 
-2. Download des Script-Pakets https://github.com/Blog404DE/NeuthardWetterScripts/archive/master.zip und entpacken der ZIP Datei mittels unzip.
+2. Download des Script-Pakets [https://github.com/Blog404DE/WetterwarnungDownloader/archive/master.zip](https://github.com/Blog404DE/WetterwarnungDownloader/archive/master.zip) und entpacken der ZIP Datei mittels unzip.
 
-3. Wechseln in den Ordner mit den benötigten Scripten:
-	```sh
-	cd WetterwarnungDownloader
-	```
+3. Download der Liste mit den Warngebieten (WarnCellID) des Deutschen Wetterdienstes
 
-4. Download der Liste mit den Warngebieten (WarnCellID) des Deutschen Wetterdienstes
-
-	Hierzu ist es zuerst notwendig das ShellScript *fetchManual.sh* nut einem beliebigen Editor zu öffnen und in folgenden beiden Zeilen die vom DWD übermittelten Zugangsdaten einzutragen.
-	
-	```bash
-	# Zugangsdaten zum DWD Grundversorgungs-Server
-	FTPUSER="**********"
-	FTPPASSWD="********"
-	```
-	
-	Danach führen wir das Shell-Script aus:
+	Um die WarnCellID Liste zusammen mit der Entwickler-Dokumentation zu erhalten ist es notwendig 
+	das ShellScript *fetchManual.sh* einmalig auszuführen.  
 	
 	```sh
 	./fetchManual.sh
 	```
 	
-	Nach dem ausführen des Scripts befinden sich mehrere PDF-Dateien und eine CSV Datei im aktuellen Verzeichnis. Es handelt sich dabei um verschiedene Anleitungen und eine Liste der Warn-Regionen des DWD, welche später unter anderem für die Konfiguration notwendig sind. Zusätzlich sind diese Dokumente auch interessant für eventuelle Anpassungen des Scripts.
-	
-
-> **Wichtiger Hinweis:**
-> Im Anschluss können wir das Shell-Script ```fetchManual.sh``` löschen. Kopieren Sie dieses Script *niemals auf Ihren Webserver*, da ansonsten Ihre Zugangsdaten zum DWD FTP Server herausgelesen werden können
+	Nach dem ausführen des Scripts befindet sich eine CSV-Datei, sowie mehrere PDF- und eine XLS-Datei im aktuellen Verzeichnis. Es handelt sich dabei um verschiedene Anleitungen und eine Liste der Warn-Regionen des DWD, welche später unter anderem für die Konfiguration notwendig sind. Zusätzlich sind diese Dokumente auch interessant für eventuelle Anpassungen des Scripts.
 	
 ### WarnCell ID ermitteln
 
-Wichtig für das Script ist zu ermitteln, für welche Kennung die Warnregion besitzt, für welche man die Wetterwarnungen ermitteln möchte. Eine Liste der Regionen findet sich in der im vorherigen Schritt heruntergeladenen ```legend_warnings_CAP_WarnCellsID.csv``` oder ```legend_warnings.pdf```. In der PDF Datei befindet sich die Liste ab Seite 14 und relativ ist die Spalte ```Warngebiet im DWD``` (Name des Gebiets) sowie ```WarnCellIdab Ende 2015 (cap)``` (die zwingend für die Konfiguration benötigte WarnCellID). Die CSV Datei können Sie in einer beliebigen Tabellenkalkulationsprogramm (OpenOffice, LibreOffice, Microsoft Excel oder Numbers) öffnen und relevant sind hier die Spalten ```WARNCELLID``` sowie ```NAME```. 
-
-> **Anmerkung:** Nutzen Sie ausschließlich die Nummer aus den genannten Spalten. Die Zahlen in den restlichen beiden Spalten sind für andere Warnmeldungen in einem anderen Format bzw. seit dem 10/2015 nicht mehr aktiv. Sollten Sie die falsche Nummer verwenden, so kann das Script keine Wetterwarnungen finden.
-	
+Wichtig für das Script ist zu ermitteln, für welche Kennung die Warnregion besitzt, für welche man die Wetterwarnungen ermitteln möchte. Eine Liste der Regionen findet sich in der im vorherigen Schritt heruntergeladenen ```cap_warncellids_csv.csv```. Die CSV Datei können Sie mittels 
+[LibreOffice](https://de.libreoffice.org/) bzw. OpenOffice (empfohlen) oder jedem Texteditor öffnen. Die erste Spalte beinhaltet die ```WARNCELLID``` 
+während ```NAME``` und ```KURZNAME``` den Namen der Gemeinde enthält. 
 
 ### Konfiguration des Script zum abrufen der Wetter-Warnungen:
 
-Bei dem eigentlichen Script zum abrufen der Wetter-Warnungen handelt es sich um die Datei ```WetterBot.php```. Das Script selber wird gesteuert über die ```config.inc.php``` Datei, welche sich im gleichen Verzeichnis befindet.
+Bei dem eigentlichen Script zum abrufen der Wetter-Warnungen handelt es sich um die Datei ```WetterBot.php```. Das Script selber wird gesteuert über die ```config.local.php``` Datei. Um diese Datei anzulegen, kopieren Sie bitte ```config.sample.php``` und nennen die neue Datei ```config.local.php```.
 
-Die anzupassenden Konfigurationsparameter in der *config.inc.php* lauten wie folgt:
+Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie folgt:
 
-1. Damit das Script Zugriff auf die Grundversorgungsdaten des DWD bekommt müssen zuerst die FTP Zugangsdaten hinterlegt werden:
+1. Damit das Script Zugriff auf die c des DWD bekommt müssen zuerst die FTP Zugangsdaten hinterlegt werden:
 
 	```php
 	// FTP Zugangsdaten:
@@ -250,11 +233,11 @@ Liegt aktuell keine Wetterwarnung für die aktuelle Warnregion vor, so sieht die
 | event			| Art des Wettereignisses in Kurzform ¹ |
 | sender		| Ausstellendes Rechenzentrum des DWD |
 
-¹ Bei diesen Angaben handelt es sich die direkte unveränderte Übernahme aus der Wetterwarnung des DWD. Eine Erklärung der jeweiligen Werte findet sich in der unter *Vorbereitung* heruntergeladenen Datei [legend_warnings_CAP.pdf](https://werdis.dwd.de/infos/legend_warnings_CAP.pdf).
+¹ Bei diesen Angaben handelt es sich die direkte unveränderte Übernahme aus der Wetterwarnung des DWD. Eine Erklärung der jeweiligen Werte findet sich in der unter *Vorbereitung* heruntergeladenen Datei [cap_dwd_profile_de_pdf.pdf](ttp://www.dwd.de/DE/leistungen/gds/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile&v=2).
 
 ² Die Warnstufen lauten wie folgt: 0 = Vorwarnung, 1 = Wetterwarnung, 2 = Markante Wetterwarnung, 3 = Unwetterwarnung, 4 = Extreme Unwetterwarnung
 
-³ Die Höhenangaben sind im Gegensatz zu der Orginal Wetterwarnung in Meter umgerechnet und können damit direkt verwendet werden. Zusätzliche Angaben zu den Höhenwerten findet sich ebenfalls in der [legend_warnings_CAP.pdf](https://werdis.dwd.de/infos/legend_warnings_CAP.pdf).
+³ Die Höhenangaben sind im Gegensatz zu der Orginal Wetterwarnung in Meter umgerechnet und können damit direkt verwendet werden. Zusätzliche Angaben zu den Höhenwerten findet sich ebenfalls in der [cap_dwd_profile_de_pdf.pdf](ttp://www.dwd.de/DE/leistungen/gds/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile&v=2).
 
 ⁴ Um z.B. unter PHP auf das serialisierte DateTime Objekt zugreifen zu können, muss es für die Verwendung erst mittels [unserialize](http://php.net/manual/de/function.unserialize.php) in ein DateTime-Objekt deserialisiert werden. **Hinweis:** Ist *startzeit* identisch mit der *endzeit*, dann wurde keine Endzeit vom DWD für die Warnung angegeben und sollte daher bei einer Ausgabe ignoriert werden.
 
@@ -266,5 +249,5 @@ Es handelt sich bei dem Script um eine erste Vorab-Version des Downloader. Sollt
 --
 ##### Lizenz-Information:
 
-Copyright Jens Dutzi 2015 / Stand: 04.11.2015 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
+Copyright Jens Dutzi 2015-2017 / Stand: 05.03.2017 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
 
