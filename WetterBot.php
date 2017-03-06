@@ -1,10 +1,10 @@
 #!/usr/bin/env php
 <?php
 /*
- * Wetterwarn-Bot für neuthardwetter.de by Jens Dutzi
- * Version 1.1
- * 11.03.2016
- * (c) tf-network.de Jens Dutzi 2012-2016
+ * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
+ * Version 2.0
+ * 05.03.2017
+ * (c) tf-network.de Jens Dutzi 2012-2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -28,8 +28,11 @@
 /*
  *Konfiguration für die Unwetter-Informationen
  */
-	require_once(dirname(__FILE__) . "/config.inc.php");
-
+if(file_exists(dirname(__FILE__) . "/config.local.php")) {
+	require_once(dirname(__FILE__) . "/config.local.php");
+} else {
+	die("Die Konfigurationsdatei config.local.php wurde nicht gefunden.");
+}
 
 /*
  * ======================================================
