@@ -33,6 +33,9 @@ $ftp["host"]        = "ftp-outgoing2.dwd.de";
 $ftp["username"]    = "********************";
 $ftp["password"]    = "********************";
 
+// Für passive FTP Verbindung aktivieren (falls FTP Transfer fehlschlägt)
+//$ftp["passiv"]		= false;
+
 // Array mit den zu verarbeiteten Landkreisen
 // - siehe Erklärung in: README.md
 // - Beispiel: Landkreis und Stadt Karlsruhe
@@ -50,11 +53,9 @@ $unwetterConfig["remoteFolder"] = "/gds/gds/specials/alerts/cap/GER/community_st
 
 /* Sonstige Konfigurationsparameter */
 
-/* Konfiguration für das zusenden von E-Mails sofern der Cronjob nicht komplett durchläuft (optional) */
+/* Konfiguration für das zusenden von E-Mails bzw. das loggen in eine Datei (optional) */
 $optFehlerMail		= [ "empfaenger" => "deine.email@example.org",										//Empfänger der Fehler-Mail
-						"absender"	 => "deine.email@example.org" ];										//Absender der Fehler-Mail
+						"absender"	 => "deine.email@example.org" ];									//Absender der Fehler-Mail
 
-// Locals und Zeitzone setzen
-setlocale(LC_TIME, "de_DE.UTF-8");
-date_default_timezone_set("Europe/Berlin");
+$optFehlerLogfile	= "/Volumes/DatenHDD/GitHub Projekte/Wetter/WetterwarnungDownloader/tmp/error_log";	// Log-Datei
 ?>

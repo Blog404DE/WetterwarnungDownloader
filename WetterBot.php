@@ -31,7 +31,7 @@
 if(file_exists(dirname(__FILE__) . "/config.local.php")) {
 	require_once(dirname(__FILE__) . "/config.local.php");
 } else {
-	die("Die Konfigurationsdatei config.local.php wurde nicht gefunden.");
+	throw new Exception("Die Konfigurationsdatei config.local.php wurde nicht gefunden.");
 }
 
 /*
@@ -43,8 +43,8 @@ if(file_exists(dirname(__FILE__) . "/config.local.php")) {
  */
 try {
 	// Notwendige Libs laden
-	require_once(dirname(__FILE__) . "/botLib/functions.lib.php");
-	require_once(dirname(__FILE__) . "/botLib/warnparser.lib.php");
+	require_once(dirname(__FILE__) . "/botLib/WarnParser.class.php");
+
 
 /*
  * Script-Header ausgeben
@@ -54,6 +54,35 @@ try {
 	echo("Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL);
 	echo("=====================================" . PHP_EOL);
 
+	// WarnParser laden
+	$warnBot = new \blog404de\WetterScripts\WarnParser();
+
+	// Fehlerhandling setzen
+	if(!empty($optFehlerMail)) {
+		$warnBot->setLogToMail($optFehlerMail);
+	}
+	if(!empty($optFehlerLogfile)) {
+		$warnBot->setLogToFile($optFehlerLogfile);
+	}
+
+	// Verbindung zum DWD-Server aufbauen
+	if (!empty($ftp) && array_key_exists("host", $ftp) && array_key_exists("username", $ftp) && array_key_exists("password", $ftp)) {
+		if(array_key_exists("passiv", $ftp)) {
+			$warnBot->connectToFTP($ftp["host"], $ftp["username"], $ftp["password"], $ftp["passiv"]);
+		} else {
+			$warnBot->connectToFTP($ftp["host"], $ftp["username"], $ftp["password"]);
+		}
+	} else {
+		throw new Exception("FTP-Zugangsdaten fehlen in der config.local.php");
+	}
+
+	$warnBot->updateFromFTP();
+
+	// Verbindung schließen
+	$warnBot->disconnectFromFTP();
+	$warnBot->disconnectFromFTP();
+
+	/*
 	// Wetterwarnung auf via Twitter erzwingen?
 	$forceWetterUpdate = false;
 
@@ -96,8 +125,10 @@ try {
 	echo("Verarbeite die XML Wetterwarnungen vom DWD für die eigene Homepage (JSON-Format):" . PHP_EOL);
 	$forceWetterUpdate = parseWetterWarnung($unwetterConfig, $optFehlerMail);
 	echo("... Auftrag ausgeführt!" . PHP_EOL . PHP_EOL);
+	*/
 } catch (Exception $e) {
 	// Fehler-Handling
-	sendErrorMessage($optFehlerMail, $e->getMessage());
+	fwrite(STDERR,"Fataler Fehler: " . $e->getFile() . ":" . $e->getLine() . " - " .  $e->getMessage());
+	exit(-1);
 }
 ?>
