@@ -1,6 +1,6 @@
 # Wetterwarnung Downloader Script
 
-## HINWEIS: Das Repository 'CodeRewrite' beinhaltet keine lauffähige Version des Scripts. 
+## HINWEIS: Das Repository 'CodeRewrite' beinhaltet keine lauffähige Version des Scripts. In diesem Repository wird der Wetterwarnung Downloader von Grund auf neu entwickelt.
 
 ## Einleitung
 

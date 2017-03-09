@@ -30,6 +30,9 @@ class WarnParser extends ErrorLogging {
 	/** @var string Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen */
 	private $remoteFolder = "/gds/gds/specials/alerts/cap/GER/community_status_geometry";
 
+	/** @var string Local Folder in dem die Wetterwarnungen gespeichert werden */
+	private $localFolder = "";
+
 	/** @var resource $ftpConnectionId Link identifier der FTP Verbindung */
 	private $ftpConnectionId;
 
@@ -79,7 +82,7 @@ class WarnParser extends ErrorLogging {
 			if ((!($this->ftpConnectionId)) || (!$login_result)) {
 				throw new \Exception("Verbindungsaufbau zu zu " . $host . " mit Benutzername " . $username . " fehlgeschlagen.");
 			} else {
-				echo "Verbindungsaufbau zu " . $host . " mit Benutzername " . $username . " erfolgreich" . PHP_EOL;
+				echo "-> Verbindungsaufbau zu " . $host . " mit Benutzername " . $username . " erfolgreich" . PHP_EOL;
 			}
 
 			// Auf Passive Nutzung umschalten
@@ -105,6 +108,9 @@ class WarnParser extends ErrorLogging {
 
 	public function updateFromFTP() {
 		try {
+			// Starte Verarbeitung der Dateien
+			echo PHP_EOL . "*** Verarbeite alle Dateien auf dem DWD FTP Server" . PHP_EOL;
+
 			// Prüfe ob Verbindung aktiv ist
 			if(!is_resource($this->ftpConnectionId)) {
 				throw new \Exception("FTP Verbindung steht nicht mehr zur Verfügung.");
@@ -112,19 +118,132 @@ class WarnParser extends ErrorLogging {
 
 			// Versuche, in das benötigte Verzeichnis zu wechseln
 			if (@ftp_chdir($this->ftpConnectionId, $this->remoteFolder)) {
-				echo "Wechsle in das Verzeichnis: " . ftp_pwd($this->ftpConnectionId) . PHP_EOL;
+				echo "-> Wechsle in das Verzeichnis: " . ftp_pwd($this->ftpConnectionId) . PHP_EOL;
 			} else {
 				throw new \Exception("Fehler beim Wechsel in das Verzeichnis '" . $this->remoteFolder . "' auf dem DWD FTP-Server.");
 			}
 
-			// Starte Verarbeitung der Dateien
-			echo PHP_EOL . "*** Verarbeite alle Dateien auf dem DWD FTP Server" . PHP_EOL;
+			// Verzeichnisliste auslesen und sortieren
+			$arrFTPContent = @ftp_nlist($this->ftpConnectionId, ".");
+			if ($arrFTPContent === FALSE) {
+				throw new \Exception("Fehler beim auslesen des Verezichnis " . $this->remoteFolder  . " auf dem DWD FTP-Server.");
+			} else {
+				echo("-> Liste der auf dem DWD Server vorhandenen Wetterdaten herunterladen" . PHP_EOL);
+			}
+
+			// Filtern der Dateinamen um nicht für alle den Zeitstempel ermittelen zu müssen
+			$searchTime = new \DateTime( "now", new \DateTimeZone('GMT'));
+			$fileFilter = $searchTime->format("Ymd");
+
+			// Ermittle das Datum für die Dateien
+			if (count($arrFTPContent) > 0) {
+				echo("-> Erzeuge Download-Liste für " . @ftp_pwd($this->ftpConnectionId) . ":" . PHP_EOL);
+				foreach ($arrFTPContent as $filename) {
+					// Filtere nach den Wetterwarnungen vom heutigen Tag
+					if (strpos($filename , $fileFilter) !== FALSE) {
+						// Übernehme Datei in zu-bearbeiten Liste
+						if (preg_match('/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})(?<Postfix>_\w{3}_STATUS_AREA_UNION)(?<Extension>\.zip)$/' , $filename , $regs)) {
+							$dateFileM = \DateTime::createFromFormat("YmdHis" , $regs['Datum'] , new \DateTimeZone("UTC"));
+							if ($dateFileM === FALSE) {
+								$fileDate = @ftp_mdtm($this->ftpConnectionId, $filename);
+								$detectMode = "via FTP / Lesen des Datums fehlgeschlagen";
+							} else {
+								$fileDate = $dateFileM->getTimestamp();
+								$detectMode = "via RegExp";
+							}
+						} else {
+							$fileDate = @ftp_mdtm($this->ftpConnectionId , $filename);
+							$detectMode = "via FTP / Lesen des Dateinamens fehlgeschlagen";
+						}
+						echo "\t" . $filename . " => " . date("d.m.Y H:i" , $fileDate) . " (" . $detectMode . ")" . PHP_EOL;
+						$arrDownloadList[$filename] = $fileDate;
+					}
+				}
+			}
+
+			// Dateiliste sortieren
+			arsort($arrDownloadList , SORT_NUMERIC);
+			array_splice($arrDownloadList , 1);
+
+			// Starte Download der aktuellsten Warn-Datei
+			if (count($arrDownloadList) > 0) {
+				// Beginne Download
+				echo("-> Starte den Download der aktuellsten Warn-Datei:" . PHP_EOL);
+
+				foreach ($arrDownloadList as $filename => $remoteFileMTime) {
+					$localFile = $this->localFolder . DIRECTORY_SEPARATOR . $filename;
+
+					// Ermittle Zeitpunkt der letzten Modifikation der lokalen Datei
+					$localFileMTime = @filemtime($localFile);
+
+					if ($localFileMTime === FALSE) {
+						// Da keine lokale Datei existiert, Zeitpunkt in die Vergangenheit setzen
+						$localFileMTime = -1;
+					}
+
+					if ($remoteFileMTime !== $localFileMTime) {
+						// Öffne lokale Datei
+						$localFileHandle = fopen($localFile , 'w');
+						if(!$localFileHandle) throw new \Exception("Kann " . $localFile . " nicht zum schreiben öffnen");
+
+						if (ftp_fget($this->ftpConnectionId , $localFileHandle , $filename , FTP_BINARY , 0)) {
+							if ($localFileMTime === -1) {
+								echo sprintf("\tDatei %s wurde erfolgreich heruntergeladen (Remote: %s).", $localFile, date("d.m.Y H:i:s" , $remoteFileMTime)) . PHP_EOL;
+							} else {
+								echo sprintf("\tDatei %s wurde erneut erfolgreich heruntergeladen (Lokal: %s / Remote: %s).",
+									$localFile, date("d.m.Y H:i:s" , $localFileMTime), date("d.m.Y H:i:s" , $remoteFileMTime)) . PHP_EOL;
+							}
+						} else {
+							throw new \Exception(sprintf("\tDatei %s wurde erneut erfolgreich heruntergeladen.", $localFile));
+						}
+
+						// Schließe Datei-Handle
+						@fclose($localFileHandle);
+
+						// Zeitstempel setzen mtime um identisch mit der Remote-Datei zu sein (für Cache-Funktion)
+						touch($localFile , $remoteFileMTime);
+					} else {
+						echo sprintf("\tDatei %s existiert bereits im lokalen Download-Ordner.", $localFile) . PHP_EOL;
+					}
+				}
+			}
+
+			//var_dump($arrFTPContent);
+			//var_dump($fileFilter);
+
 
 
 		} catch (\Exception $e) {
 			$this->logError($e);
 		}
 	}
+
+	/**
+	 * @return string
+	 */
+	public function getLocalFolder(): string {
+		return $this->localFolder;
+	}
+
+	/**
+	 * @param string $localFolder
+	 */
+	public function setLocalFolder(string $localFolder) {
+		try {
+			if (is_dir($localFolder)) {
+				if(is_writeable($localFolder)) {
+					$this->localFolder = $localFolder;
+				} else {
+					throw new \Exception("In den lokale Ordner " . $localFolder . " kann nicht geschrieben werden.");
+				}
+			} else {
+				throw new \Exception("In den lokale Ordner " . $localFolder . " existiert nicht.");
+			}
+		} catch (\Exception $e) {
+			$this->logError($e);
+		}
+	}
+
 
 	/**
 	 * Getter für $remoteFolder
