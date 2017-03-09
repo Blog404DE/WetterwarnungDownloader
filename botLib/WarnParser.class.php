@@ -44,7 +44,12 @@ class WarnParser extends ErrorLogging {
 
 		// Root-User Check
 		if (0 == posix_getuid()) {
-			die("Script darf nicht mit root-Rechten ausgeführt werden");
+			throw new \Exception("Script darf nicht mit root-Rechten ausgeführt werden");
+		}
+
+		// FTP Modul vorhanden?
+		if(!extension_loaded("ftp")) {
+			throw new \Exception("PHP Modul 'ftp' steht nicht zur Verfügung");
 		}
 	}
 
@@ -64,8 +69,7 @@ class WarnParser extends ErrorLogging {
 			// FTP-Verbindung aufbauen
 			$this->ftpConnectionId = ftp_connect($host);
 			if($this->ftpConnectionId === false) {
-				fwrite(STDERR, "FTP Verbindungsaufbau zu " . $host . " ist fehlgeschlagen" . PHP_EOL);
-				exit(1);
+				throw new \Exception( "FTP Verbindungsaufbau zu " . $host . " ist fehlgeschlagen" . PHP_EOL);
 			}
 
 			// Login mit Benutzername und Passwort
@@ -258,7 +262,7 @@ class ErrorLogging {
 		fwrite(STDERR, $longText);
 		fwrite(STDOUT, PHP_EOL);
 
-		exit(-1);
+		exit(1);
 	}
 
 }
