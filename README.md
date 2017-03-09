@@ -1,5 +1,7 @@
 # Wetterwarnung Downloader Script
 
+## HINWEIS: Das Repository 'CodeRewrite' beinhaltet keine lauffähige Version des Scripts. 
+
 ## Einleitung
 
 Bei dem Wetterwarnung-Downloader handelt es sich um ein Script zum automatischen herunterladen aktueller Wetterwarnungen für eine bestimmte Warnregion. Die Wetterwarnungen werden im Rahmen der Grundversorgung des DWD bereitgestellt. Details zur Grundversorgung finden sich auf der [NeuthardWetterScripts Hauptseite](https://github.com/Blog404DE/NeuthardWetter-Scripts).
@@ -15,7 +17,7 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 ### Vorraussetzungen:
 
 - Linux (unter Debian getestet)
-- PHP 5.5 (oder neuer) mit FTP-Modul einkompiliert
+- PHP 5.5 (oder neuer) inklusive FTP-Modul aktiv
 - wget
 
 ### Vorbereitung:
