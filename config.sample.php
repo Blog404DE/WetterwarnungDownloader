@@ -29,12 +29,15 @@
  */
 
 // FTP Zugangsdaten:
-$ftp["host"]        = "ftp-outgoing2.dwd.de";
-$ftp["username"]    = "********************";
-$ftp["password"]    = "********************";
+$unwetterConfig["ftp"] = [
+	"host"		=>	"ftp-outgoing2.dwd.de",
+	"username"	=>  "************",
+	"password"	=>	"************"
+];
 
 // Für passive FTP Verbindung aktivieren (falls FTP Transfer fehlschlägt)
-//$ftp["passiv"]		= false;
+$unwetterConfig["ftp"]["passiv"]		= true;
+
 
 // Array mit den zu verarbeiteten Landkreisen
 // - siehe Erklärung in: README.md
@@ -46,12 +49,8 @@ $unwetterConfig["localJsonWarnfile"]= "/pfad/zur/wetterwarnung.json";
 
 // Speicherordner für die Orginal Wetterwarnungen vom DWD (localDebugFolder = optionaler Sicherungsordner für Wetterwarnungen mit unbekanntem Nachrichten-Typ wie z.B. "update")
 $unwetterConfig["localFolder"]		= "/pfad/zum/speicherordner/fuer/wetterWarnungen";
-//$unwetterConfig["localDebugFolder"]	= $unwetterConfig["localFolder"] . "/debug";
 
-// Pfad zu den XML Wetterdaten auf dem DWD FTP Server
-$unwetterConfig["remoteFolder"] = "/gds/gds/specials/alerts/cap/GER/community_status_geometry";
-
-/* Sonstige Konfigurationsparameter */
+/* Sonstige Konfigurationsparameter für Fehler-Behandlung */
 
 /* Konfiguration für das zusenden von E-Mails bzw. das loggen in eine Datei (optional) */
 $optFehlerMail		= [ "empfaenger" => "deine.email@example.org",										//Empfänger der Fehler-Mail

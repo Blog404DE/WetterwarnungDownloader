@@ -54,32 +54,43 @@ try {
 	echo("Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL);
 	echo("=====================================" . PHP_EOL);
 
-	// WarnParser laden
+
+	// Prüfe Konfigurationsdatei auf Vollständigkeit
+	$configKeysNeeded = ["WarnCellId", "localJsonWarnfile", "localFolder", "ftp"];
+	foreach ($configKeysNeeded as $configKey) {
+		if (array_key_exists($configKey, $unwetterConfig)) {
+		} else {
+			throw new Exception("Die Konfigurationsdatei config.local.php ist unvollständig ('" . $configKey . "' ist nicht vorhanden)");
+		}
+	}
+	if (!array_key_exists("host", $unwetterConfig["ftp"]) || !array_key_exists("username", $unwetterConfig["ftp"]) || !array_key_exists("password", $unwetterConfig["ftp"])) {
+		throw new Exception("FTP-Zugangsdaten sind nicht vollständig in config.local.php");
+	}
+
+
+	/*
+	 *  WarnParser instanzieren
+	 */
 	$warnBot = new \blog404de\WetterScripts\WarnParser();
 
-	// Fehlerhandling setzen
-	if(!empty($optFehlerMail)) {
-		$warnBot->setLogToMail($optFehlerMail);
-	}
-	if(!empty($optFehlerLogfile)) {
-		$warnBot->setLogToFile($optFehlerLogfile);
-	}
+
+	// Konfiguriere Bot
+	$warnBot->setLocalFolder($unwetterConfig["localFolder"]);
+
+	if(!empty($optFehlerMail)) $warnBot->setLogToMail($optFehlerMail);
+	if(!empty($optFehlerLogfile)) $warnBot->setLogToFile($optFehlerLogfile);
+
 
 	// Verbindung zum DWD-Server aufbauen
-	if (!empty($ftp) && array_key_exists("host", $ftp) && array_key_exists("username", $ftp) && array_key_exists("password", $ftp)) {
-		if(array_key_exists("passiv", $ftp)) {
-			$warnBot->connectToFTP($ftp["host"], $ftp["username"], $ftp["password"], $ftp["passiv"]);
-		} else {
-			$warnBot->connectToFTP($ftp["host"], $ftp["username"], $ftp["password"]);
-		}
+	if(array_key_exists("passiv", $unwetterConfig["ftp"])) {
+		$warnBot->connectToFTP($unwetterConfig["ftp"]["host"], $unwetterConfig["ftp"]["username"], $unwetterConfig["ftp"]["password"], $unwetterConfig["ftp"]["passiv"]);
 	} else {
-		throw new Exception("FTP-Zugangsdaten fehlen in der config.local.php");
+		$warnBot->connectToFTP($unwetterConfig["ftp"]["host"], $unwetterConfig["ftp"]["username"], $unwetterConfig["ftp"]["password"]);
 	}
 
 	$warnBot->updateFromFTP();
 
 	// Verbindung schließen
-	$warnBot->disconnectFromFTP();
 	$warnBot->disconnectFromFTP();
 
 	/*
