@@ -93,6 +93,9 @@ try {
 	// Verbindung schließen
 	$warnBot->disconnectFromFTP();
 
+	// Cache aufräumen
+	$warnBot->cleanLocalCache();
+
 	/*
 	// Wetterwarnung auf via Twitter erzwingen?
 	$forceWetterUpdate = false;

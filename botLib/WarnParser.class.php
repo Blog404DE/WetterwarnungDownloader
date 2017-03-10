@@ -36,7 +36,6 @@ class WarnParser extends ErrorLogging {
 	/** @var resource $ftpConnectionId Link identifier der FTP Verbindung */
 	private $ftpConnectionId;
 
-
 	/**
 	 * WarnParser constructor.
 	 */
@@ -82,12 +81,12 @@ class WarnParser extends ErrorLogging {
 			if ((!($this->ftpConnectionId)) || (!$login_result)) {
 				throw new \Exception("Verbindungsaufbau zu zu " . $host . " mit Benutzername " . $username . " fehlgeschlagen.");
 			} else {
-				echo "-> Verbindungsaufbau zu " . $host . " mit Benutzername " . $username . " erfolgreich" . PHP_EOL;
+				echo "\t-> Verbindungsaufbau zu " . $host . " mit Benutzername " . $username . " erfolgreich" . PHP_EOL;
 			}
 
 			// Auf Passive Nutzung umschalten
 			if($passiv == true) {
-				echo "Schalte auf Passive Verbindung" . PHP_EOL;
+				echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
 				@ftp_pasv(($this->ftpConnectionId), true);
 			}
 		} catch (\Exception $e) {
@@ -103,6 +102,7 @@ class WarnParser extends ErrorLogging {
 		if(is_resource($this->ftpConnectionId)) {
 			echo PHP_EOL . "*** Schließe Verbindung zum DWD-FTP Server" . PHP_EOL;
 			ftp_close($this->ftpConnectionId);
+			echo "\t-> Verbindung zu erfolgreich geschlossen." . PHP_EOL;
 		}
 	}
 
@@ -200,22 +200,74 @@ class WarnParser extends ErrorLogging {
 						// Schließe Datei-Handle
 						@fclose($localFileHandle);
 
-						// Zeitstempel setzen mtime um identisch mit der Remote-Datei zu sein (für Cache-Funktion)
+						// Zeitstempel der lokalen Datei identisch zur Remote-Datei setzen (für Cache-Funktion)
 						touch($localFile , $remoteFileMTime);
 					} else {
 						echo sprintf("\tDatei %s existiert bereits im lokalen Download-Ordner.", $localFile) . PHP_EOL;
 					}
+
+
 				}
 			}
-
-			//var_dump($arrFTPContent);
-			//var_dump($fileFilter);
-
-
-
 		} catch (\Exception $e) {
 			$this->logError($e);
 		}
+	}
+
+	public function cleanLocalCache() {
+		try {
+			// Starte Verarbeitung der Dateien
+			echo PHP_EOL . "*** Räume den lokalen Cache auf:" . PHP_EOL;
+
+			// Prüfe Existenz der lokalen Verzeichnisse
+			if (!is_writeable($this->localFolder)) {
+				throw new Exception("Zugriff auf den Cache-Ordner " . $this->localFolder . " für das automatische aufräumen fehlgeschlagen.");
+			}
+
+			// Erzeuge Array mit allen bereits vorhandenen Dateien
+			$localFiles = [];
+			$handle = opendir($this->localFolder);
+			if ($handle) {
+				while (FALSE !== ($entry = readdir($handle))) {
+					if (!is_dir($this->localFolder . DIRECTORY_SEPARATOR . $entry)) {
+						$fileinfo = pathinfo($this->localFolder . DIRECTORY_SEPARATOR . $entry);
+						if ($fileinfo["extension"] == "zip") {
+							$localFileMTime = @filemtime($this->localFolder . DIRECTORY_SEPARATOR . $entry);
+							if ($localFileMTime !== FALSE) $localFiles[$localFileMTime] = $entry;
+						}
+					}
+				}
+				closedir($handle);
+			} else {
+				throw new Exception("Fehler beim aufräumen des Cache in " . $this->localFolder);
+			}
+
+			// Dateiliste sortieren
+			asort($localFiles, SORT_NUMERIC);
+			$localFiles = array_reverse($localFiles);
+
+			// Array $localFiles aufsplitten in zu behaltende und zu löschende Dateien
+			$obsoletFiles = array_splice($localFiles, 1);
+
+			// Starte Löschvorgang
+			if(count($obsoletFiles) > 0) {
+				echo "-> Starte Löschvorgang " . PHP_EOL;
+				foreach ($obsoletFiles as $filename) {
+					echo "\tLösche veraltete Wetterwarnung-Datei " . $filename . ": ";
+					if (!@unlink($this->localFolder . DIRECTORY_SEPARATOR . $filename)) {
+						throw new Exception(PHP_EOL . "Fehler beim aufräumen des Caches: '" . $this->localFolder . DIRECTORY_SEPARATOR . $filename . "'' konnte nicht erfolgreich gelöscht werden.");
+					} else {
+						echo "-> Datei gelöscht." . PHP_EOL;
+					}
+				}
+			} else {
+				echo("-> Es muss keine Datei gelöscht werden");
+			}
+		} catch (Exception $e) {
+			// Fehler-Handling
+			$this->logError($e);
+		}
+
 	}
 
 	/**
