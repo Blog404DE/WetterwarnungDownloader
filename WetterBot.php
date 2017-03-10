@@ -43,6 +43,7 @@ if(file_exists(dirname(__FILE__) . "/config.local.php")) {
  */
 try {
 	// Notwendige Libs laden
+	$unwetterConfig = [];
 	require_once(dirname(__FILE__) . "/botLib/WarnParser.class.php");
 
 
@@ -80,17 +81,14 @@ try {
 	if(!empty($optFehlerMail)) $warnBot->setLogToMail($optFehlerMail);
 	if(!empty($optFehlerLogfile)) $warnBot->setLogToFile($optFehlerLogfile);
 
-
-	// Verbindung zum DWD-Server aufbauen
-	if(array_key_exists("passiv", $unwetterConfig["ftp"])) {
-		$warnBot->connectToFTP($unwetterConfig["ftp"]["host"], $unwetterConfig["ftp"]["username"], $unwetterConfig["ftp"]["password"], $unwetterConfig["ftp"]["passiv"]);
-	} else {
-		$warnBot->connectToFTP($unwetterConfig["ftp"]["host"], $unwetterConfig["ftp"]["username"], $unwetterConfig["ftp"]["password"]);
+	if(!array_key_exists("passiv", $unwetterConfig["ftp"])) {
+		// Passiv/Aktive Verbindung zum FTP Server ist nicht konfiguriert -> daher aktive Verbindung
+		$unwetterConfig["ftp"]["passiv"] = FALSE;
 	}
 
+	// Neue Wetterwarnungen vom DWD FTP Server holen
+	$warnBot->connectToFTP($unwetterConfig["ftp"]["host"], $unwetterConfig["ftp"]["username"], $unwetterConfig["ftp"]["password"], $unwetterConfig["ftp"]["passiv"]);
 	$warnBot->updateFromFTP();
-
-	// Verbindung schließen
 	$warnBot->disconnectFromFTP();
 
 	// Cache aufräumen
