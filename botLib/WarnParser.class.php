@@ -1,9 +1,14 @@
 <?php
 /**
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
- * Version 2.0-dev
- * 05.03.2017
- * (c) tf-network.de Jens Dutzi 2012-2017
+ *
+ * @version 2.0-dev 2.0.0-dev
+ * @copyright (c) tf-network.de Jens Dutzi 2012-2017
+ * @license MIT
+ *
+ * @package blog404de\WetterScripts
+ *
+ * Stand: 05.03.2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -25,12 +30,23 @@
  */
 
 namespace blog404de\WetterScripts;
-use ZipArchive;
-use Exception;
 
 /**
- * Class WarnParser
- * @package blog404de\WetterScripts
+ * Benötigte Module laden
+ *
+ * @TODO: Auslagern in autoload.php
+ */
+
+require_once "Toolbox.php";
+
+use ZipArchive;
+use Exception;
+use blog404de\Toolbox;
+
+/**
+ * Parser für die Wetter-Warnungen des DWD
+ *
+ * @package blog404de\WetterScripts\WarnParser
  */
 class WarnParser extends ErrorLogging {
 	/** @var string Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen */
@@ -430,6 +446,7 @@ class WarnParser extends ErrorLogging {
 	 */
 
 	/**
+	 * Getter für $localFolder
 	 * @return string
 	 */
 	public function getLocalFolder(): string {
@@ -437,6 +454,7 @@ class WarnParser extends ErrorLogging {
 	}
 
 	/**
+	 * Setter für $localFolder
 	 * @param string $localFolder
 	 */
 	public function setLocalFolder(string $localFolder) {
@@ -456,6 +474,7 @@ class WarnParser extends ErrorLogging {
 	}
 
 	/**
+	 * Getter für $localJsonFile
 	 * @return string
 	 */
 	public function getLocalJsonFile(): string {
@@ -463,6 +482,7 @@ class WarnParser extends ErrorLogging {
 	}
 
 	/**
+	 * Setter für $localJsonFile
 	 * @param string $localJsonFile
 	 */
 	public function setLocalJsonFile(string $localJsonFile) {
@@ -511,6 +531,8 @@ class WarnParser extends ErrorLogging {
 
 /**
  * Error-Logging Klasse
+ *
+ * @package blog404de\WetterScripts\WarnParser
  */
 class ErrorLogging {
 	/** @var array E-Mail Absender/Empfänger in ["empfaenger"] und ["absender"] */
@@ -718,85 +740,3 @@ class ErrorLogging {
 		return $this->logToFile;
 	}
 }
-
-/**
- * Class Toolbox
- * @package blog404de\WetterScripts
- */
-class Toolbox {
-	/**
-	 * Creates a random unique temporary directory, with specified parameters,
-	 * that does not already exist (like tempnam(), but for dirs).
-	 *
-	 * Created dir will begin with the specified prefix, followed by random
-	 * numbers.
-	 *
-	 * @link https://php.net/manual/en/function.tempnam.php
-	 * @link http://stackoverflow.com/questions/1707801/making-a-temporary-dir-for-unpacking-a-zipfile-into
-	 *
-	 * @param string|null $dir 	Base directory under which to create temp dir. If null, the default system temp dir (sys_get_temp_dir()) will be used.
-	 * @param string $prefix String with which to prefix created dirs.
-	 * @param int $mode Octal file permission mask for the newly-created dir. Should begin with a 0.
-	 * @param int $maxAttempts Maximum attempts before giving up (to prevent endless loops).
-	 * @return string|bool Full path to newly-created dir, or false on failure.
-	 */
-	public static function tempdir(string $dir = null, string $prefix = 'tmp_', int $mode = 0700, int $maxAttempts = 1000) {
-		// Use the system temp dir by default.
-		if (is_null($dir)) {
-			$dir = sys_get_temp_dir();
-		}
-
-		/// Trim trailing slashes from $dir.
-		$dir = rtrim($dir, '/');
-
-		// If we don't have permission to create a directory, fail, otherwise we will be stuck in an endless loop.
-		if (!is_dir($dir) || !is_writable($dir)) {
-			return false;
-		}
-
-		// Make sure characters in prefix are safe.
-		if (strpbrk($prefix, '\\/:*?"<>|') !== false) {
-			return false;
-		}
-
-		// Tries to create a random directory until it works. Abort if we reach $maxAttempts.
-		// Something screwy could be happening with the filesystem and our loop could otherwise become endless.
-		$attempts = 0;
-		do {
-			$path = sprintf('%s/%s%s', $dir, $prefix, mt_rand(100000, mt_getrandmax()));
-		} while (
-			!mkdir($path, $mode) &&
-			$attempts++ < $maxAttempts
-		);
-
-		return $path;
-	}
-
-
-	/**
-	 * Löschen des Temporär-Verzeichnisses
-	 *
-	 * @param string $dir Temporär-Verezichnis
-	 * @return bool
-	 */
-	public static function removeTempDir(string $dir) {
-		// TMP Ordner löschen (sofern möglich)
-		if($dir !== FALSE && $dir !== NULL) {
-			// Prüfe ob Verzeichnis existiert
-			if(is_dir($dir)) {
-				// Lösche Inhalt des Verzeichnis und Verzeichnis selber
-				array_map('unlink', glob($dir. DIRECTORY_SEPARATOR . "*.xml"));
-				if (@rmdir($dir)) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
-				return false;
-			}
-		} else {
-			return false;
-		}
-	}
-}
-

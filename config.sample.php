@@ -1,9 +1,13 @@
 <?php
-/*
+/**
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
- * Version 2.0-dev
- * 05.03.2017
- * (c) tf-network.de Jens Dutzi 2012-2017
+ *
+ * @version 2.0-dev 2.0.0-dev
+ * @package blog404de\WetterScripts
+ * @copyright (c) tf-network.de Jens Dutzi 2012-2017
+ * @license MIT
+ *
+ * Stand: 05.03.2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -53,8 +57,9 @@ $unwetterConfig["localFolder"]		= "/pfad/zum/speicherordner/fuer/wetterWarnungen
 /* Sonstige Konfigurationsparameter für Fehler-Behandlung */
 
 /* Konfiguration für das zusenden von E-Mails bzw. das loggen in eine Datei (optional) */
-$optFehlerMail		= [ "empfaenger" => "deine.email@example.org",										//Empfänger der Fehler-Mail
-						"absender"	 => "deine.email@example.org" ];									//Absender der Fehler-Mail
 
-$optFehlerLogfile	= "/Volumes/DatenHDD/GitHub Projekte/Wetter/WetterwarnungDownloader/tmp/error_log";	// Log-Datei
-?>
+// Fehler per E-Mail melden
+$optFehlerMail		= [ "empfaenger" => "deine.email@example.org", "absender" => "deine.email@example.org" ];
+
+// Fehler in Log-Datei schreiben
+$optFehlerLogfile	= "/Volumes/DatenHDD/GitHub Projekte/Wetter/WetterwarnungDownloader/tmp/error_log";
