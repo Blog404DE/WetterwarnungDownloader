@@ -771,3 +771,4 @@ function fetchUnwetterDaten($config , $conn_id) {
 		return [];
 	}
 }
+

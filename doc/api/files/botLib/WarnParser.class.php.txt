@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
  * Version 2.0-dev
  * 05.03.2017
@@ -799,4 +799,5 @@ class Toolbox {
 		}
 	}
 }
+
 
