@@ -25,16 +25,40 @@
  */
 
 namespace blog404de\WetterScripts;
+use ZipArchive;
+use Exception;
 
+/**
+ * Class WarnParser
+ * @package blog404de\WetterScripts
+ */
 class WarnParser extends ErrorLogging {
 	/** @var string Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen */
 	private $remoteFolder = "/gds/gds/specials/alerts/cap/GER/community_status_geometry";
 
-	/** @var string Local Folder in dem die Wetterwarnungen gespeichert werden */
+	/** @var string Lokaler Ordner in dem die Wetterwarnungen gespeichert werden */
 	private $localFolder = "";
 
 	/** @var resource $ftpConnectionId Link identifier der FTP Verbindung */
 	private $ftpConnectionId;
+
+	/** @var string $localJsonFile Lokale Datei in der die verarbeiteten Wetterwarnungen gespeichert werden  */
+	private $localJsonFile = "";
+
+	/** @var string|bool $tmpFolder Ordner für temporäre Dateien */
+	private $tmpFolder = false;
+
+	/** @var array Array mit Bundesländer in Deutschland */
+	static $regionames = [
+		"BW" => "Baden-Würtemberg",		"BY" => "Bayern",
+		"BE" => "Berlin",				"BB" => "Brandenburg",
+		"HB" => "Bremen",				"HH" => "Hamburg",
+		"HE" => "Hessen",				"MV" => "Mecklenburg-Vorpommern",
+		"NI" => "Niedersachsen",		"NW" => "Nordrhein-Westfalen",
+		"RP" => "Rheinland-Pfalz",		"SL" => "Saarland",
+		"SN" => "Sachsen",				"ST" => "Sachsen-Anhalt",
+		"TH" => "Schleswig-Holstein",	"DE" => "Bundesrepublik Deutschland"
+	];
 
 	/**
 	 * WarnParser constructor.
@@ -44,17 +68,21 @@ class WarnParser extends ErrorLogging {
 		setlocale(LC_TIME, "de_DE.UTF-8");
 		date_default_timezone_set("Europe/Berlin");
 
+		// Via CLI gestartet?
+		if(php_sapi_name() !== "cli") {
+			throw new Exception("Script darf ausschließlich über die Kommandozeile gestartet werden.");
+		}
+
 		// Root-User Check
 		if (0 == posix_getuid()) {
-			throw new \Exception("Script darf nicht mit root-Rechten ausgeführt werden");
+			throw new Exception("Script darf nicht mit root-Rechten ausgeführt werden");
 		}
 
 		// FTP Modul vorhanden?
 		if(!extension_loaded("ftp")) {
-			throw new \Exception("PHP Modul 'ftp' steht nicht zur Verfügung");
+			throw new Exception("PHP Modul 'ftp' steht nicht zur Verfügung");
 		}
 	}
-
 
 	/**
 	 * Verbindung zum DWD FTP Server aufbauen
@@ -71,7 +99,7 @@ class WarnParser extends ErrorLogging {
 			// FTP-Verbindung aufbauen
 			$this->ftpConnectionId = ftp_connect($host);
 			if($this->ftpConnectionId === false) {
-				throw new \Exception( "FTP Verbindungsaufbau zu " . $host . " ist fehlgeschlagen" . PHP_EOL);
+				throw new Exception( "FTP Verbindungsaufbau zu " . $host . " ist fehlgeschlagen" . PHP_EOL);
 			}
 
 			// Login mit Benutzername und Passwort
@@ -79,7 +107,7 @@ class WarnParser extends ErrorLogging {
 
 			// Verbindung überprüfen
 			if ((!($this->ftpConnectionId)) || (!$login_result)) {
-				throw new \Exception("Verbindungsaufbau zu zu " . $host . " mit Benutzername " . $username . " fehlgeschlagen.");
+				throw new Exception("Verbindungsaufbau zu zu " . $host . " mit Benutzername " . $username . " fehlgeschlagen.");
 			} else {
 				echo "\t-> Verbindungsaufbau zu " . $host . " mit Benutzername " . $username . " erfolgreich" . PHP_EOL;
 			}
@@ -106,6 +134,9 @@ class WarnParser extends ErrorLogging {
 		}
 	}
 
+	/**
+	 * Lade aktuelle Wetterwarnungen vom DWD FTP Server
+	 */
 	public function updateFromFTP() {
 		try {
 			// Starte Verarbeitung der Dateien
@@ -113,20 +144,20 @@ class WarnParser extends ErrorLogging {
 
 			// Prüfe ob Verbindung aktiv ist
 			if(!is_resource($this->ftpConnectionId)) {
-				throw new \Exception("FTP Verbindung steht nicht mehr zur Verfügung.");
+				throw new Exception("FTP Verbindung steht nicht mehr zur Verfügung.");
 			};
 
 			// Versuche, in das benötigte Verzeichnis zu wechseln
 			if (@ftp_chdir($this->ftpConnectionId, $this->remoteFolder)) {
 				echo "-> Wechsle in das Verzeichnis: " . ftp_pwd($this->ftpConnectionId) . PHP_EOL;
 			} else {
-				throw new \Exception("Fehler beim Wechsel in das Verzeichnis '" . $this->remoteFolder . "' auf dem DWD FTP-Server.");
+				throw new Exception("Fehler beim Wechsel in das Verzeichnis '" . $this->remoteFolder . "' auf dem DWD FTP-Server.");
 			}
 
 			// Verzeichnisliste auslesen und sortieren
 			$arrFTPContent = @ftp_nlist($this->ftpConnectionId, ".");
 			if ($arrFTPContent === FALSE) {
-				throw new \Exception("Fehler beim auslesen des Verezichnis " . $this->remoteFolder  . " auf dem DWD FTP-Server.");
+				throw new Exception("Fehler beim auslesen des Verezichnis " . $this->remoteFolder  . " auf dem DWD FTP-Server.");
 			} else {
 				echo("-> Liste der auf dem DWD Server vorhandenen Wetterdaten herunterladen" . PHP_EOL);
 			}
@@ -184,7 +215,7 @@ class WarnParser extends ErrorLogging {
 					if ($remoteFileMTime !== $localFileMTime) {
 						// Öffne lokale Datei
 						$localFileHandle = fopen($localFile , 'w');
-						if(!$localFileHandle) throw new \Exception("Kann " . $localFile . " nicht zum schreiben öffnen");
+						if(!$localFileHandle) throw new Exception("Kann " . $localFile . " nicht zum schreiben öffnen");
 
 						if (ftp_fget($this->ftpConnectionId , $localFileHandle , $filename , FTP_BINARY , 0)) {
 							if ($localFileMTime === -1) {
@@ -194,7 +225,7 @@ class WarnParser extends ErrorLogging {
 									$localFile, date("d.m.Y H:i:s" , $localFileMTime), date("d.m.Y H:i:s" , $remoteFileMTime)) . PHP_EOL;
 							}
 						} else {
-							throw new \Exception(sprintf("\tDatei %s wurde erneut erfolgreich heruntergeladen.", $localFile));
+							throw new Exception(sprintf("\tDatei %s wurde erneut erfolgreich heruntergeladen.", $localFile));
 						}
 
 						// Schließe Datei-Handle
@@ -214,6 +245,9 @@ class WarnParser extends ErrorLogging {
 		}
 	}
 
+	/**
+	 * Bereinige lokalen Cache-Ordner
+	 */
 	public function cleanLocalCache() {
 		try {
 			// Starte Verarbeitung der Dateien
@@ -261,14 +295,132 @@ class WarnParser extends ErrorLogging {
 					}
 				}
 			} else {
-				echo("-> Es muss keine Datei gelöscht werden");
+				echo("-> Es muss keine Datei gelöscht werden" . PHP_EOL);
 			}
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
 			// Fehler-Handling
 			$this->logError($e);
 		}
 
 	}
+
+	/**
+	 * Parse lokale Wetterwarnungen nach WarnCellID
+	 * @param $WarnCellId
+	 */
+	public function parserWetterWarnungen($WarnCellId){
+		try {
+			// Starte verabeiten der Wetterwarnungen des DWD
+			echo PHP_EOL . "*** Verarbeite die Wetterwarnungen:" . PHP_EOL;
+
+			echo "-> Bereite das vearbeiten der Wetterwarnungen vor" . PHP_EOL;
+			echo "\tPrüfe Konfiguration" . PHP_EOL;
+			// WarnCellID gültig
+			if (!is_numeric($WarnCellId)) {
+				throw new Exception("WarnCellId-Parameter besteht nicht aus einer Nummer");
+			}
+
+			// Prüfe Existenz der lokalen Verzeichnisse
+			if (! is_readable($this->localFolder)) {
+				throw new Exception("Zugriff auf das Verzeichnis " . $this->localFolder . " mit den lokalen Wetterwarnungen fehlgeschlagen");
+			}
+
+			// Zugriff auf JSON Datei möglich
+			if(empty($this->localJsonFile)) {
+				throw new Exception("Es wurde keine JSON-Datei als Ziel für die Wetterwarnungen angegeben.");
+			} else {
+				if(file_exists($this->localJsonFile) && !is_writeable($this->localJsonFile)) {
+					throw new Exception("Auf die JSON Datei " . $this->localJsonFile . " mit den geparsten Wetterwarnungen kann nicht schreibend zugegriffen werden");
+				} else if (!is_writeable(dirname($this->localJsonFile))) {
+					throw new Exception("JSON Datei für die geparsten Wetterwarnungen kann nicht in " . dirname($this->localJsonFile) . " geschrieben werden");
+				}
+			}
+
+			echo "\tLege temporären Ordner an: ";
+			$this->tmpFolder = Toolbox::tempdir();
+			if(!$this->tmpFolder && is_string($this->tmpFolder)) {
+				// Temporär-Ordner kann nicht angelegt werden
+				echo "fehlgeschlagen" . PHP_EOL;
+				throw new Exception("Temporär-Ordner kann nicht angelegt werden. Bitte prüfen Sie ob in der php.ini 'sys_tmp_dir' oder die Umgebungsvariable 'TMPDIR' gesetzt ist.");
+			}
+			echo "erfolgreich (" . $this->tmpFolder . ")" . PHP_EOL;
+		} catch (\Exception $e) {
+			// Fehler an Logging-Modul übergeben
+			$this->logError($e, $this->tmpFolder);
+		}
+
+		// ZIP-Dateien in Temporär-Ordner entpacken
+		$this->extractZipFiles($this->localFolder, $this->tmpFolder);
+
+		// Cleanup durchführen
+		try {
+			echo "-> Führe abschließende Arbeiten durch: " . PHP_EOL;
+			if($this->tmpFolder !== FALSE) {
+				echo "\tLösche angelegten temporären Ordner: ";
+				if(!Toolbox::removeTempDir($this->tmpFolder)) {
+					echo "fehlgeschlagen" . PHP_EOL;
+					throw new Exception("Löschen des Temporären Ordner (" . $this->tmpFolder . ") ist fehlgeschlagen.");
+				};
+				echo "erfolgreich (" . $this->tmpFolder . ")" . PHP_EOL;
+			} else {
+				echo "\tKeine Arbeiten notwendig" . PHP_EOL;
+			}
+		} catch (\Exception $e) {
+			// Fehler an Logging-Modul übergeben
+			$this->logError($e);
+		}
+	}
+
+	/*
+	 *  Private Methoden
+	 */
+	private function extractZipFiles(string $zipFolder, string $dest) {
+		try {
+			echo "-> Entpacke die Wetterwarnungen des DWD" . PHP_EOL;
+			// Erzeuge Array mit allen ZIP-Dateien in $zipFolder
+			$localZipFiles = array();
+			$handle = opendir($zipFolder);
+			if ($handle) {
+				while (false !== ($entry = readdir($handle))) {
+					if (! is_dir($zipFolder . DIRECTORY_SEPARATOR . $entry)) {
+						$fileinfo = pathinfo($zipFolder . DIRECTORY_SEPARATOR . $entry);
+						if ($fileinfo["extension"] == "zip")
+							$localZipFiles[] = $entry;
+					}
+				}
+				closedir($handle);
+			} else {
+				throw new Exception("Fehler beim durchsuchen des lokale Wetterwarnung-Ordner nach DWD-ZIP Dateien");
+			}
+
+			// Eigentlich darf aktuell nur eine ZIP Datei vorhanden sein (vorbereitet aber für >1 ZIP Datei)
+			if (count($localZipFiles) > 1) {
+				throw new Exception("Mehr als eine Datei befindet sich im lokalen Wetterwarnung-Ordner und es dürfte nur eine vorhanden sein");
+			}
+
+			// Entpacke ZIP-Dateien
+			foreach ($localZipFiles as $zipFile) {
+				// Öffne ZIP Datei
+				$zip = new ZipArchive();
+				$res = $zip->open($zipFolder . DIRECTORY_SEPARATOR . $zipFile);
+				if ($res === true) {
+					echo "\tEntpacke Wetterwarnung-Datei: " . $zipFile . " (" . $zip->numFiles . " Datei" . ($zip->numFiles > 1 ? "en" : "") . ")" . PHP_EOL;
+					$zip->extractTo($dest);
+					$zip->close();
+				} else {
+					throw new Exception("Fehler beim öffnen der ZIP Datei '" . $zipFile . "'. Fehlercode: " . $res . " / " . $this->getZipErrorMessage($res));
+				}			
+			}
+
+		} catch (\Exception $e) {
+			// Fehler an Logging-Modul übergeben
+			$this->logError($e, $dest);
+		}
+	}
+
+	/*
+	 *  Getter / Setter Funktionen
+	 */
 
 	/**
 	 * @return string
@@ -286,16 +438,52 @@ class WarnParser extends ErrorLogging {
 				if(is_writeable($localFolder)) {
 					$this->localFolder = $localFolder;
 				} else {
-					throw new \Exception("In den lokale Ordner " . $localFolder . " kann nicht geschrieben werden.");
+					throw new Exception("In den lokale Ordner " . $localFolder . " kann nicht geschrieben werden.");
 				}
 			} else {
-				throw new \Exception("In den lokale Ordner " . $localFolder . " existiert nicht.");
+				throw new Exception("In den lokale Ordner " . $localFolder . " existiert nicht.");
 			}
 		} catch (\Exception $e) {
 			$this->logError($e);
 		}
 	}
 
+	/**
+	 * @return string
+	 */
+	public function getLocalJsonFile(): string {
+		return $this->localJsonFile;
+	}
+
+	/**
+	 * @param string $localJsonFile
+	 */
+	public function setLocalJsonFile(string $localJsonFile) {
+		try {
+			if(empty($localJsonFile)) {
+				throw new Exception("Es wurde keine JSON-Datei zals Ziel für die Wetterwarnungen angegeben.");
+			} else {
+				if(file_exists($localJsonFile) && !is_writeable($localJsonFile)) {
+					// Datei existiert - aber die Schreibrechte fehlen
+					throw new Exception("Auf die JSON Datei " . $localJsonFile . " mit den geparsten Wetterwarnungen kann nicht schreibend zugegriffen werden");
+				} else if (is_writeable(dirname($localJsonFile))) {
+					// Datei existiert nicht - Schreibrechte auf den Ordner existieren
+					if(!@touch($localJsonFile)) {
+						// Leere Datei anlegen ist nicht erfolgreich
+						throw new Exception("Leere JSON Datei für die geparsten Wetterwarnungen konnte nicht angelegt werden");
+					}
+				} else {
+					// Kein Zugriff auf Datei möglich
+					throw new Exception("JSON Datei für die geparsten Wetterwarnungen kann nicht in " . dirname($localJsonFile) . " geschrieben werden");
+				}
+			}
+
+			// Variable setzen
+			$this->localJsonFile = $localJsonFile;
+		} catch (\Exception $e) {
+			$this->logError($e);
+		}
+	}
 
 	/**
 	 * Getter für $remoteFolder
@@ -317,7 +505,6 @@ class WarnParser extends ErrorLogging {
 /**
  * Error-Logging Klasse
  */
-
 class ErrorLogging {
 	/** @var array E-Mail Absender/Empfänger in ["empfaenger"] und ["absender"] */
 	private $logToMail = [];
@@ -326,58 +513,10 @@ class ErrorLogging {
 	private $logToFile = "";
 
 	/**
-	 * @param array $logToMail
-	 * @return ErrorLogging
-	 */
-	public function setLogToMail(array $logToMail): ErrorLogging {
-
-		try {
-			if (is_array($logToMail)) {
-				if (array_key_exists("empfaenger" , $logToMail) && array_key_exists("absender", $logToMail )) {
-					if (filter_var($logToMail["empfaenger"], FILTER_VALIDATE_EMAIL) && filter_var($logToMail["absender"], FILTER_VALIDATE_EMAIL)) {
-						$this->logToMail = $logToMail;
-					} else {
-						throw new \Exception("LogToMail beinhaltet für die Array-Keys 'empfaenger' oder 'absender' keine gültige E-Mail Adresse");
-					}
-				} else {
-					// Error-Logging Konfiguration ist falsch
-					$this->logToMail = [];
-					throw new \Exception("LogToMail benötigt ein Array mit den Keys 'empfaenger' und 'absender'");
-				}
-			} else {
-				// Error Logging an E-Mail deaktivieren
-				$this->logToMail = [];
-			}
-		} catch (\Exception $e) {
-			$this->logError($e);
-		}
-
-		return $this;
-	}
-
-	/**
-	 * @param string $logToFile
-	 * @return ErrorLogging
-	 * @throws \Exception
-	 */
-	public function setLogToFile(string $logToFile): ErrorLogging {
-		try {
-			if (is_writeable($logToFile)) {
-				$this->logToFile = $logToFile;
-			} else {
-				throw new \Exception("Fehler beim schreiben der Log-Datei in: " . $logToFile);
-			}
-		} catch (\Exception $e) {
-			$this->logError($e);
-		}
-
-		return $this;
-	}
-
-	/**
 	 * @param \Exception $e
+	 * @param string $tmpPath
 	 */
-	protected function logError(\Exception $e) {
+	protected function logError(\Exception $e, string $tmpPath = NULL) {
 		// Zeitpunkt
 		$strDate = date("Y-m-d H:i:s");
 
@@ -397,12 +536,23 @@ class ErrorLogging {
 			$e->getMessage()
 		);
 
+		// Lösche evntuell vorhandenes Temporäre Verzeichnis
+		if($tmpPath !== FALSE && !is_null($tmpPath)) {
+			$tmpclean = Toolbox::removeTempDir($tmpPath);
+			if(!$tmpclean) {
+				$shortText = $shortText . " - Cleanup: temporärer Ordner (" . $tmpPath . ") konnte nicht gelöscht werden";
+				$longText = $longText . PHP_EOL . "\tCleanup: Fehler beim löschen des temporären Ordner (" . $tmpPath . ")";
+			} else {
+				$shortText = $shortText . " - Cleanup: temporärer Ordner gelöscht";
+				$longText = $longText . PHP_EOL . "\tCleanup:temporärer Ordner gelöscht";
+			}
+		}
+
 		// Loggen in Datei
 		if(!empty($this->logToFile)) {
-			echo "XX";
-			$writeFile = file_put_contents($this->logToFile, $shortText, FILE_APPEND);
+			$writeFile = file_put_contents($this->logToFile, $shortText . PHP_EOL, FILE_APPEND);
 			if($writeFile === FALSE) {
-				$longText = $longText . PHP_EOL . "Fehler beim schreiben der Log-Datei in: " . $this->logToFile . PHP_EOL;
+				$longText = $longText . PHP_EOL . "\tLogdatei schreiben: Fehler beim schreiben der Log-Datei in: " . $this->logToFile . PHP_EOL;
 			}
 		}
 
@@ -422,18 +572,218 @@ class ErrorLogging {
 
 				$sentMail = mail($this->logToMail["empfaenger"] , $mailBetreff , $longText , $mailHeader);
 				if ($sentMail === FALSE) {
-					$longText = $longText . PHP_EOL . "Fehler beim senden der Fehler E-Mail an: " . $this->logToMail["empfaenger"] . PHP_EOL;
+					$longText = $longText . PHP_EOL . "\tE-Mail Versand: Fehler beim senden der Fehler E-Mail an: " . $this->logToMail["empfaenger"] . PHP_EOL;
 				} else {
-					$longText = $longText . PHP_EOL . "Fehler E-Mail wurde erfolgreich an " . $this->logToMail["empfaenger"] . " versendet." . PHP_EOL;
+					$longText = $longText . PHP_EOL . "\tE-Mail Versand: Fehler E-Mail wurde erfolgreich an " . $this->logToMail["empfaenger"] . " versendet." . PHP_EOL;
 				}
 			}
 		}
 
 		// Ausgabe auf die Konsole
+		fwrite(STDOUT, PHP_EOL);
 		fwrite(STDERR, $longText);
 		fwrite(STDOUT, PHP_EOL);
 
 		exit(1);
 	}
 
+	/**
+	 * Methode zum generieren der Klartext-Fehlermeldung beim Zugriff auf ZIP-Dateien
+	 *
+	 * @param $errCode
+	 * @return string
+	 */
+	protected function getZipErrorMessage($errCode) {
+		switch ($errCode) {
+			case ZipArchive::ER_EXISTS:
+				return "Datei existiert bereits.";
+				break;
+			case ZipArchive::ER_INCONS:
+				return "Zip-Archiv ist nicht konsistent.";
+				break;
+			case ZipArchive::ER_INVAL:
+				return "Ungültiges Argument.";
+				break;
+			case ZipArchive::ER_MEMORY:
+				return "Malloc Fehler.";
+				break;
+			case ZipArchive::ER_NOENT:
+				return "Datei nicht vorhanden.";
+				break;
+			case ZipArchive::ER_NOZIP:
+				return "Kein Zip-Archiv.";
+				break;
+			case ZipArchive::ER_OPEN:
+				return "Datei kann nicht geöffnet werden.";
+				break;
+			case ZipArchive::ER_READ:
+				return "Lesefehler.";
+				break;
+			case ZipArchive::ER_SEEK:
+				return "Seek Fehler.";
+				break;
+			default:
+				return "Unknown error.";
+		}
+	}
+
+	/*
+	 * Getter / Setter-Methoden
+	 */
+
+	/**
+	 * Setter-Methode für logToMail
+	 *
+	 * @param array $logToMail
+	 * @return ErrorLogging
+	 */
+	public function setLogToMail(array $logToMail): ErrorLogging {
+
+		try {
+			if (is_array($logToMail)) {
+				if (array_key_exists("empfaenger" , $logToMail) && array_key_exists("absender", $logToMail )) {
+					if (filter_var($logToMail["empfaenger"], FILTER_VALIDATE_EMAIL) && filter_var($logToMail["absender"], FILTER_VALIDATE_EMAIL)) {
+						$this->logToMail = $logToMail;
+					} else {
+						throw new Exception("LogToMail beinhaltet für die Array-Keys 'empfaenger' oder 'absender' keine gültige E-Mail Adresse");
+					}
+				} else {
+					// Error-Logging Konfiguration ist falsch
+					$this->logToMail = [];
+					throw new Exception("LogToMail benötigt ein Array mit den Keys 'empfaenger' und 'absender'");
+				}
+			} else {
+				// Error Logging an E-Mail deaktivieren
+				$this->logToMail = [];
+			}
+		} catch (\Exception $e) {
+			$this->logError($e);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Setter-Methode für LogToFile
+	 *
+	 * @param string $logToFile
+	 * @return ErrorLogging
+	 * @throws \Exception
+	 */
+	public function setLogToFile(string $logToFile): ErrorLogging {
+		try {
+			if(file_exists($logToFile) && is_writeable($logToFile)) {
+				// Datei existiert und kann geschrieben werden
+				$this->logToFile = $logToFile;
+			} else if (!file_exists($logToFile) && is_writeable(dirname($logToFile))) {
+				if(touch($logToFile)) {
+					// Nicht existierende Log-Datei erfolgreich angelegt
+					$this->logToFile = $logToFile;
+				} else {
+					// Log-Datei kann nicht neu angelegt werden
+					throw new Exception("Fehler beim anlegen der Log-Datei in: " . $logToFile);
+				}
+			} else {
+				throw new Exception("Fehler beim schreiben der Log-Datei in: " . $logToFile);
+			}
+		} catch (\Exception $e) {
+			$this->logError($e);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * Getter-Methode für logToMail
+	 * @return array
+	 */
+	public function getLogToMail(): array {
+		return $this->logToMail;
+	}
+
+	/**
+	 * Getter-Methode für LogToFile
+	 * @return string
+	 */
+	public function getLogToFile(): string {
+		return $this->logToFile;
+	}
 }
+
+class Toolbox {
+	/**
+	 * Creates a random unique temporary directory, with specified parameters,
+	 * that does not already exist (like tempnam(), but for dirs).
+	 *
+	 * Created dir will begin with the specified prefix, followed by random
+	 * numbers.
+	 *
+	 * @link https://php.net/manual/en/function.tempnam.php
+	 * @link http://stackoverflow.com/questions/1707801/making-a-temporary-dir-for-unpacking-a-zipfile-into
+	 *
+	 * @param string|null $dir 	Base directory under which to create temp dir. If null, the default system temp dir (sys_get_temp_dir()) will be used.
+	 * @param string $prefix String with which to prefix created dirs.
+	 * @param int $mode Octal file permission mask for the newly-created dir. Should begin with a 0.
+	 * @param int $maxAttempts Maximum attempts before giving up (to prevent endless loops).
+	 * @return string|bool Full path to newly-created dir, or false on failure.
+	 */
+	public static function tempdir(string $dir = null, string $prefix = 'tmp_', int $mode = 0700, int $maxAttempts = 1000) {
+		// Use the system temp dir by default.
+		if (is_null($dir)) {
+			$dir = sys_get_temp_dir();
+		}
+
+		/// Trim trailing slashes from $dir.
+		$dir = rtrim($dir, '/');
+
+		// If we don't have permission to create a directory, fail, otherwise we will be stuck in an endless loop.
+		if (!is_dir($dir) || !is_writable($dir)) {
+			return false;
+		}
+
+		// Make sure characters in prefix are safe.
+		if (strpbrk($prefix, '\\/:*?"<>|') !== false) {
+			return false;
+		}
+
+		// Tries to create a random directory until it works. Abort if we reach $maxAttempts.
+		// Something screwy could be happening with the filesystem and our loop could otherwise become endless.
+		$attempts = 0;
+		do {
+			$path = sprintf('%s/%s%s', $dir, $prefix, mt_rand(100000, mt_getrandmax()));
+		} while (
+			!mkdir($path, $mode) &&
+			$attempts++ < $maxAttempts
+		);
+
+		return $path;
+	}
+
+
+	/**
+	 * Löschen des Temporär-Verzeichnisses
+	 *
+	 * @param string $dir Temporär-Verezichnis
+	 * @return bool
+	 */
+	public static function removeTempDir(string $dir) {
+		// TMP Ordner löschen (sofern möglich)
+		if($dir !== FALSE && $dir !== NULL) {
+			// Prüfe ob Verzeichnis existiert
+			if(is_dir($dir)) {
+				// Lösche Inhalt des Verzeichnis und Verzeichnis selber
+				array_map('unlink', glob($dir. DIRECTORY_SEPARATOR . "*.xml"));
+				if (@rmdir($dir)) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+}
+

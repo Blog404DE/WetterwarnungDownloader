@@ -26,15 +26,6 @@
  */
 
 /*
- *Konfiguration für die Unwetter-Informationen
- */
-if(file_exists(dirname(__FILE__) . "/config.local.php")) {
-	require_once(dirname(__FILE__) . "/config.local.php");
-} else {
-	throw new Exception("Die Konfigurationsdatei config.local.php wurde nicht gefunden.");
-}
-
-/*
  * ======================================================
  * ======================================================
  * ==				Warnlage-Update Bot                ==
@@ -44,10 +35,9 @@ if(file_exists(dirname(__FILE__) . "/config.local.php")) {
 try {
 	// Notwendige Libs laden
 	$unwetterConfig = [];
-	require_once(dirname(__FILE__) . "/botLib/WarnParser.class.php");
+	require_once dirname(__FILE__) . "/botLib/WarnParser.class.php";
 
-
-/*
+	/*
  * Script-Header ausgeben
  */
 
@@ -55,6 +45,11 @@ try {
 	echo("Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL);
 	echo("=====================================" . PHP_EOL);
 
+	if(is_readable(dirname(__FILE__) . "/config.local.php")) {
+		require_once dirname(__FILE__) . "/config.local.php";
+	} else {
+		throw new Exception("Konfigurationsdatei 'config.local.php' existiert nicht. Zur Konfiguration lesen Sie README.md");
+	}
 
 	// Prüfe Konfigurationsdatei auf Vollständigkeit
 	$configKeysNeeded = ["WarnCellId", "localJsonWarnfile", "localFolder", "ftp"];
@@ -77,6 +72,7 @@ try {
 
 	// Konfiguriere Bot
 	$warnBot->setLocalFolder($unwetterConfig["localFolder"]);
+	$warnBot->setLocalJsonFile($unwetterConfig["localJsonWarnfile"]);
 
 	if(!empty($optFehlerMail)) $warnBot->setLogToMail($optFehlerMail);
 	if(!empty($optFehlerLogfile)) $warnBot->setLogToFile($optFehlerLogfile);
@@ -87,12 +83,17 @@ try {
 	}
 
 	// Neue Wetterwarnungen vom DWD FTP Server holen
-	$warnBot->connectToFTP($unwetterConfig["ftp"]["host"], $unwetterConfig["ftp"]["username"], $unwetterConfig["ftp"]["password"], $unwetterConfig["ftp"]["passiv"]);
-	$warnBot->updateFromFTP();
-	$warnBot->disconnectFromFTP();
+	if(!defined("BLOCKFTP")) {
+		$warnBot->connectToFTP($unwetterConfig["ftp"]["host"], $unwetterConfig["ftp"]["username"], $unwetterConfig["ftp"]["password"], $unwetterConfig["ftp"]["passiv"]);
+		$warnBot->updateFromFTP();
+		$warnBot->disconnectFromFTP();
+	}
 
 	// Cache aufräumen
 	$warnBot->cleanLocalCache();
+
+	// Wetterwarnungen parsen
+	$warnBot->parserWetterWarnungen($unwetterConfig["WarnCellId"]);
 
 	/*
 	// Wetterwarnung auf via Twitter erzwingen?
