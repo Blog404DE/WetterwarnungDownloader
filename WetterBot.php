@@ -2,9 +2,14 @@
 <?php
 /**
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
- * Version 2.0-dev
- * 05.03.2017
- * (c) tf-network.de Jens Dutzi 2012-2017
+ *
+ * @version 2.0-dev 2.0.0-dev
+ * @copyright (c) tf-network.de Jens Dutzi 2012-2017
+ * @license MIT
+ *
+ * @package blog404de\WetterScripts
+ *
+ * Stand: 05.03.2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -23,8 +28,6 @@
  * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- *
- * @todo: Copyright in PHPDoc-Format umstellen
  */
 
 /*
