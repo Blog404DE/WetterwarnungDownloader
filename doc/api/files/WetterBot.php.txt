@@ -94,11 +94,16 @@ try {
 		$warnBot->disconnectFromFTP();
 	}
 
+	// Wetterwarnungen parsen
+	$warnBot->prepareWetterWarnungen();
+
+
 	// Cache aufräumen
 	$warnBot->cleanLocalCache();
 
-	// Wetterwarnungen parsen
-	$warnBot->parserWetterWarnungen($unwetterConfig["WarnCellId"]);
+
+
+	//$unwetterConfig["WarnCellId"]);
 
 	/*
 	// Wetterwarnung auf via Twitter erzwingen?

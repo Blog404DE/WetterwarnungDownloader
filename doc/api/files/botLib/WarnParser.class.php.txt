@@ -266,8 +266,22 @@ class WarnParser extends ErrorLogging {
 	 */
 	public function cleanLocalCache() {
 		try {
+			// Abschließende Arbeiten ausführen
+			echo PHP_EOL . "*** Führe abschließende Arbeiten durch: " . PHP_EOL;
+
+			if($this->tmpFolder !== FALSE) {
+				echo "\tLösche angelegten temporären Ordner: ";
+				if(!Toolbox::removeTempDir($this->tmpFolder)) {
+					echo "fehlgeschlagen" . PHP_EOL;
+					throw new Exception("Löschen des Temporären Ordner (" . $this->tmpFolder . ") ist fehlgeschlagen.");
+				};
+				echo "erfolgreich (" . $this->tmpFolder . ")" . PHP_EOL;
+			} else {
+				echo "\tKeine Arbeiten notwendig" . PHP_EOL;
+			}
+
 			// Starte Verarbeitung der Dateien
-			echo PHP_EOL . "*** Räume den lokalen Cache auf:" . PHP_EOL;
+			echo "\tLösche veraltete Wetterwarnungen aus Cache-Ordner." . PHP_EOL;
 
 			// Prüfe Existenz der lokalen Verzeichnisse
 			if (!is_writeable($this->localFolder)) {
@@ -303,7 +317,7 @@ class WarnParser extends ErrorLogging {
 			if(count($obsoletFiles) > 0) {
 				echo "-> Starte Löschvorgang " . PHP_EOL;
 				foreach ($obsoletFiles as $filename) {
-					echo "\tLösche veraltete Wetterwarnung-Datei " . $filename . ": ";
+					echo "\t - Lösche veraltete Wetterwarnung-Datei " . $filename . ": ";
 					if (!@unlink($this->localFolder . DIRECTORY_SEPARATOR . $filename)) {
 						throw new Exception(PHP_EOL . "Fehler beim aufräumen des Caches: '" . $this->localFolder . DIRECTORY_SEPARATOR . $filename . "'' konnte nicht erfolgreich gelöscht werden.");
 					} else {
@@ -311,7 +325,7 @@ class WarnParser extends ErrorLogging {
 					}
 				}
 			} else {
-				echo("-> Es muss keine Datei gelöscht werden" . PHP_EOL);
+				echo("\t - Es muss keine Datei gelöscht werden" . PHP_EOL);
 			}
 		} catch (\Exception $e) {
 			// Fehler-Handling
@@ -322,19 +336,14 @@ class WarnParser extends ErrorLogging {
 
 	/**
 	 * Parse lokale Wetterwarnungen nach WarnCellID
-	 * @param $WarnCellId
 	 */
-	public function parserWetterWarnungen($WarnCellId){
+	public function prepareWetterWarnungen() {
 		try {
 			// Starte verabeiten der Wetterwarnungen des DWD
 			echo PHP_EOL . "*** Verarbeite die Wetterwarnungen:" . PHP_EOL;
 
 			echo "-> Bereite das vearbeiten der Wetterwarnungen vor" . PHP_EOL;
 			echo "\tPrüfe Konfiguration" . PHP_EOL;
-			// WarnCellID gültig
-			if (!is_numeric($WarnCellId)) {
-				throw new Exception("WarnCellId-Parameter besteht nicht aus einer Nummer");
-			}
 
 			// Prüfe Existenz der lokalen Verzeichnisse
 			if (! is_readable($this->localFolder)) {
@@ -360,32 +369,12 @@ class WarnParser extends ErrorLogging {
 				throw new Exception("Temporär-Ordner kann nicht angelegt werden. Bitte prüfen Sie ob in der php.ini 'sys_tmp_dir' oder die Umgebungsvariable 'TMPDIR' gesetzt ist.");
 			}
 			echo "erfolgreich (" . $this->tmpFolder . ")" . PHP_EOL;
+
+			// ZIP-Dateien in Temporär-Ordner entpacken
+			$this->extractZipFiles();
 		} catch (\Exception $e) {
 			// Fehler an Logging-Modul übergeben
 			$this->logError($e, $this->tmpFolder);
-		}
-
-		// ZIP-Dateien in Temporär-Ordner entpacken
-		$this->extractZipFiles($this->localFolder, $this->tmpFolder);
-
-
-
-		// Cleanup durchführen
-		try {
-			echo "-> Führe abschließende Arbeiten durch: " . PHP_EOL;
-			if($this->tmpFolder !== FALSE) {
-				echo "\tLösche angelegten temporären Ordner: ";
-				if(!Toolbox::removeTempDir($this->tmpFolder)) {
-					echo "fehlgeschlagen" . PHP_EOL;
-					throw new Exception("Löschen des Temporären Ordner (" . $this->tmpFolder . ") ist fehlgeschlagen.");
-				};
-				echo "erfolgreich (" . $this->tmpFolder . ")" . PHP_EOL;
-			} else {
-				echo "\tKeine Arbeiten notwendig" . PHP_EOL;
-			}
-		} catch (\Exception $e) {
-			// Fehler an Logging-Modul übergeben
-			$this->logError($e);
 		}
 	}
 
@@ -394,20 +383,18 @@ class WarnParser extends ErrorLogging {
 	 */
 
 	/**
-	 * Entpacken der ZIP-Dateien in einem Ordner
-	 * @param string $zipFolder Ordner mit den ZIP Dateien
-	 * @param string $dest Ziel-Ordner für den Inhalt der ZIP-Dateien
+	 * Entpacken der ZIP-Dateien von localFolder in tmpFolder in einem Ordner
 	 */
-	private function extractZipFiles(string $zipFolder, string $dest) {
+	private function extractZipFiles() {
 		try {
 			echo "-> Entpacke die Wetterwarnungen des DWD" . PHP_EOL;
-			// Erzeuge Array mit allen ZIP-Dateien in $zipFolder
+			// Erzeuge Array mit allen ZIP-Dateien in $this->localFolder
 			$localZipFiles = array();
-			$handle = opendir($zipFolder);
+			$handle = opendir($this->localFolder);
 			if ($handle) {
 				while (false !== ($entry = readdir($handle))) {
-					if (! is_dir($zipFolder . DIRECTORY_SEPARATOR . $entry)) {
-						$fileinfo = pathinfo($zipFolder . DIRECTORY_SEPARATOR . $entry);
+					if (! is_dir($this->localFolder . DIRECTORY_SEPARATOR . $entry)) {
+						$fileinfo = pathinfo($this->localFolder . DIRECTORY_SEPARATOR . $entry);
 						if ($fileinfo["extension"] == "zip")
 							$localZipFiles[] = $entry;
 					}
@@ -426,10 +413,10 @@ class WarnParser extends ErrorLogging {
 			foreach ($localZipFiles as $zipFile) {
 				// Öffne ZIP Datei
 				$zip = new ZipArchive();
-				$res = $zip->open($zipFolder . DIRECTORY_SEPARATOR . $zipFile);
+				$res = $zip->open($this->localFolder . DIRECTORY_SEPARATOR . $zipFile);
 				if ($res === true) {
 					echo "\tEntpacke Wetterwarnung-Datei: " . $zipFile . " (" . $zip->numFiles . " Datei" . ($zip->numFiles > 1 ? "en" : "") . ")" . PHP_EOL;
-					$zip->extractTo($dest);
+					$zip->extractTo($this->tmpFolder);
 					$zip->close();
 				} else {
 					throw new Exception("Fehler beim öffnen der ZIP Datei '" . $zipFile . "'. Fehlercode: " . $res . " / " . $this->getZipErrorMessage($res));
@@ -437,7 +424,7 @@ class WarnParser extends ErrorLogging {
 			}
 		} catch (\Exception $e) {
 			// Fehler an Logging-Modul übergeben
-			$this->logError($e, $dest);
+			$this->logError($e, $this->tmpFolder);
 		}
 	}
 
