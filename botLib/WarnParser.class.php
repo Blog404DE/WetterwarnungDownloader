@@ -480,7 +480,7 @@ class WarnParser extends ErrorLogging {
 
 						if (!$testWarnung) {
 							// Da keine Test-Warnung: beginne Suche nach WarnCellID
-							$warnRegonFound = $this->getWarnAreaNameFromCAP($info, $warnCellId);
+							$warnRegonFound = $this->searchForWarnAreaInCAP($info, $warnCellId);
 							//$arrRohWarnungen = "";
 						} else {
 							// Da Test-Warnung, diese Warnung nicht zur weiteren Verarbeitung übernehmen
@@ -510,8 +510,8 @@ class WarnParser extends ErrorLogging {
 	 * @param \SimpleXMLElement $WarnInfoNode Info-Block der zu prüfenden Wetter-Warnung
 	 * @param int $warncellid WarnCellID nach der gesucht werden soll
 	 */
-	private function getWarnAreaNameFromCAP(\SimpleXMLElement $WarnInfoNode, int $warncellid) {
-		var_dump($WarnInfoNode);
+	private function searchForWarnAreaInCAP(\SimpleXMLElement $WarnInfoNode, int $warncellid) {
+
 	}
 
 	/*
