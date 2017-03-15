@@ -30,13 +30,61 @@
  */
 
 namespace blog404de;
-
+use ZipArchive;
 
 /**
  * Class Toolbox
  * @package blog404de\ToolBox
  */
 class Toolbox {
+	/**
+	 * @param string $source Ordner mit den beinhalteten XML Dateien
+	 * @param string $destination Ordner in den der Inhalt der ZIP-Dateien entpackt werden soll
+	 * @param int $maxFiles Anzahl der ZIP-Dateien die maximal entpackt werden können (optional) / -1 = ohne Limit
+	 * @throws \Exception
+	 */
+	public static function extractAllZipFiles(string $source, string $destination, int $maxFiles = -1) {
+			// Erzeuge Array mit allen ZIP-Dateien
+			$localZipFiles = array();
+			$handle = @opendir($source);
+			if ($handle) {
+				while (false !== ($entry = readdir($handle))) {
+					if (! is_dir($source . DIRECTORY_SEPARATOR . $entry)) {
+						$fileinfo = pathinfo($source . DIRECTORY_SEPARATOR . $entry);
+						if ($fileinfo["extension"] == "zip")
+							$localZipFiles[] = $entry;
+					}
+				}
+				closedir($handle);
+			} else {
+				throw new \Exception("Fehler beim durchsuchen des Ordners " . $source . " mit den ZIP-Dateien");
+			}
+
+			// Eigentlich darf aktuell nur eine ZIP Datei vorhanden sein (vorbereitet aber für >1 ZIP Datei)
+			if ($maxFiles != -1 && count($localZipFiles) > $maxFiles) {
+				throw new \Exception("Die maximale Anzahl an erlaubten ZIP-Dateien (" . $maxFiles . ") wurde überschritten");
+			}
+
+			// Existiert der Ordner?
+			if(!is_writeable($destination)) {
+				throw new \Exception("Der Ziel-Ordner " . $destination . " für die entpackten ZIP-Dateien existiert nicht oder hat keine Schreib-Rechte");
+			}
+
+			// Entpacke ZIP-Dateien
+			foreach ($localZipFiles as $zipFile) {
+				// Öffne ZIP Datei
+				$zip = new ZipArchive();
+				$res = $zip->open($source . DIRECTORY_SEPARATOR . $zipFile);
+				if ($res === true) {
+					echo "\tEntpacke ZIP-Datei: " . $zipFile . " (" . $zip->numFiles . " Datei" . ($zip->numFiles > 1 ? "en" : "") . ")" . PHP_EOL;
+					$zip->extractTo($destination);
+					$zip->close();
+				} else {
+					throw new \Exception("Fehler beim öffnen der ZIP Datei '" . $zipFile . "'. Fehlercode: " . $res . " / " . Toolbox::getZipErrorMessage($res));
+				}
+			}
+	}
+
 	/**
 	 * Creates a random unique temporary directory, with specified parameters,
 	 * that does not already exist (like tempnam(), but for dirs).
@@ -85,7 +133,6 @@ class Toolbox {
 		return $path;
 	}
 
-
 	/**
 	 * Löschen des Temporär-Verzeichnisses
 	 *
@@ -109,6 +156,46 @@ class Toolbox {
 			}
 		} else {
 			return false;
+		}
+	}
+
+	/**
+	 * Methode zum generieren der Klartext-Fehlermeldung beim Zugriff auf ZIP-Dateien
+	 *
+	 * @param $errCode
+	 * @return string
+	 */
+	static protected function getZipErrorMessage($errCode) {
+		switch ($errCode) {
+			case ZipArchive::ER_EXISTS:
+				return "Datei existiert bereits.";
+				break;
+			case ZipArchive::ER_INCONS:
+				return "Zip-Archiv ist nicht konsistent.";
+				break;
+			case ZipArchive::ER_INVAL:
+				return "Ungültiges Argument.";
+				break;
+			case ZipArchive::ER_MEMORY:
+				return "Malloc Fehler.";
+				break;
+			case ZipArchive::ER_NOENT:
+				return "Datei nicht vorhanden.";
+				break;
+			case ZipArchive::ER_NOZIP:
+				return "Kein Zip-Archiv.";
+				break;
+			case ZipArchive::ER_OPEN:
+				return "Datei kann nicht geöffnet werden.";
+				break;
+			case ZipArchive::ER_READ:
+				return "Lesefehler.";
+				break;
+			case ZipArchive::ER_SEEK:
+				return "Seek Fehler.";
+				break;
+			default:
+				return "Unknown error.";
 		}
 	}
 }

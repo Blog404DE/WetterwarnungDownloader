@@ -94,9 +94,11 @@ try {
 		$warnBot->disconnectFromFTP();
 	}
 
-	// Wetterwarnungen parsen
+	// Wetterwarnungen vorbereiten
 	$warnBot->prepareWetterWarnungen();
 
+	// Wetterwarnungen parsen
+	$warnBot->parseWetterWarnungen($unwetterConfig["WarnCellId"]);
 
 	// Cache aufräumen
 	$warnBot->cleanLocalCache();
