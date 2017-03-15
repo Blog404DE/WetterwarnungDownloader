@@ -39,7 +39,6 @@ namespace blog404de\WetterScripts;
 
 require_once "Toolbox.php";
 
-use ZipArchive;
 use Exception;
 use blog404de\Toolbox;
 
@@ -63,6 +62,9 @@ class WarnParser extends ErrorLogging {
 
 	/** @var string|bool $tmpFolder Ordner für temporäre Dateien */
 	private $tmpFolder = false;
+
+	/** @var array $wetterWarnungen Aktuelle geparsten Wetterwarnungen */
+	private $wetterWarnungen = [];
 
 	/** @var array Array mit Bundesländer in Deutschland */
 	static $regionames = [
@@ -97,6 +99,11 @@ class WarnParser extends ErrorLogging {
 		// FTP Modul vorhanden?
 		if(!extension_loaded("ftp")) {
 			throw new Exception("PHP Modul 'ftp' steht nicht zur Verfügung");
+		}
+
+		// PHP Version prüfen
+		if (version_compare(PHP_VERSION, "7.0.0") < 0) {
+			throw new Exception("Für das Script wird mindestens PHP7 vorrausgesetzt (PHP 5.6.x wird nur noch mit Sicherheitsupdates bis 31.12.2018 versorgt");
 		}
 	}
 
@@ -371,8 +378,125 @@ class WarnParser extends ErrorLogging {
 			echo "erfolgreich (" . $this->tmpFolder . ")" . PHP_EOL;
 
 			// ZIP-Dateien in Temporär-Ordner entpacken
-			$this->extractZipFiles();
+			echo "-> Entpacke die Wetterwarnungen des DWD" . PHP_EOL;
+			Toolbox::extractAllZipFiles($this->localFolder, $this->tmpFolder, 1);
 		} catch (\Exception $e) {
+			// Fehler an Logging-Modul übergeben
+			$this->logError($e, $this->tmpFolder);
+		}
+	}
+
+	/**
+	 * Parsen der Wetterwarnungen
+	 *
+	 * @param int $warnCellId Warn-Region mittels WarnCellID festlegen
+	 * @param bool $append Zu bestehenden Warnungen hinzufügen
+	 */
+	public function parseWetterWarnungen(int $warnCellId, bool $append=TRUE) {
+		try {
+			// Starte parsen der Wetterwarnungen des DWD
+			echo PHP_EOL . "*** Verarbeite die Wetterwarnungen:" . PHP_EOL;
+
+			// WarnCellID gültig?
+			if(!is_numeric($warnCellId)) {
+				throw new Exception("Die übergebene WarnCellID beinhaltete keine gültige Nummer");
+			}
+
+			// Lese Verzeichnis mit XML Dateien ein
+			$localXmlFiles = array();
+			$handle = @opendir($this->tmpFolder);
+			if ($handle) {
+				while (false !== ($entry = readdir($handle))) {
+					if (! is_dir($this->tmpFolder . DIRECTORY_SEPARATOR . $entry)) {
+						$fileinfo = pathinfo($this->tmpFolder . DIRECTORY_SEPARATOR . $entry);
+						if ($fileinfo["extension"] == "xml")
+							$localXmlFiles[] = $this->tmpFolder . DIRECTORY_SEPARATOR . $entry;
+					}
+				}
+				closedir($handle);
+			} else {
+				throw new Exception("Fehler beim zusammenstellen der Wetterwarnungen aus dem Temporär-Ordner.");
+			}
+
+			// Lege Array an für die ermittelten Roh-Warnungen
+			$arrRohWarnungen = array();
+
+			// Parse XML Dateien
+			foreach ($localXmlFiles as $xmlFile) {
+				echo "\tVerarbeite Wetterwarnung-Datei " . basename($xmlFile) . " (" . round(filesize($xmlFile) / 1024 , 2) . " kbyte): " . PHP_EOL;
+
+				// Datei kann geöffnet werden?
+				if (!is_readable($xmlFile)) {
+					throw new Exception("Die XML Datei " . $xmlFile . " konnte nicht geöffnet werden.");
+				}
+
+				// Öffne XML Datei zum lesen
+				$content = @file_get_contents($xmlFile);
+				if (!$content) {
+					throw new Exception("Fehler beim lesen der XML Datei " . $xmlFile);
+				}
+
+				// XML Datei in Parser laden
+				$xml = new \SimpleXMLElement($content, LIBXML_NOERROR|LIBXML_NOWARNING|LIBXML_NONET);
+				if (!$xml) {
+					throw new Exception("Fehler in parseWetterWarnung: Die XML Datei konnte nicht verarbeitet werden.");
+				}
+
+				// Prüfe ob die Warnung nicht vom Typ "cancel" ist:
+				if (!isset($xml->{"msgType"})) {
+					throw new Exception("Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'msgType'-Node.");
+				}
+
+				// Prüfe um welche Art von Wetter-Warnung es sich handelt (Alert oder Cancel)
+				echo ("\t\t* Art der Warnung: " . $xml->{"msgType"} . PHP_EOL);
+				if (strtolower($xml->{"msgType"}) == "alert") {
+					// Verarbeite Inhalt der XML Datei (Typ: Alert)
+
+					// Prüfe ob Info-Node existiert
+					if (! isset($xml->{"info"})) {
+						throw new Exception("Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'info'-Node.");
+					} else {
+						$info = $xml->{"info"};
+					}
+
+					// Verarbeite den Info-Node und prüfe ob eine Wetter-Warnung für die angegebene WarnCellId vorhanden ist
+					foreach ($info as $wetterWarnung) {
+						// Prüfe ob es sich um eine Testwarnung handelt
+						if (! isset($wetterWarnung->{"eventCode"})) {
+							throw new Exception("Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'eventCode'-Node.");
+						} else {
+							$testWarnung = false;
+							foreach ($wetterWarnung->{"eventCode"} as $eventCode) {
+								if (! isset($eventCode->{"valueName"}) || ! isset($eventCode->{"value"})) {
+									throw new Exception("Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'eventCode'->'valueName' bzw. 'value'-Node.");
+								}
+
+								// Schaue nach EventName = "II"
+								if ((string)$eventCode->{"valueName"} == "II") {
+									if ((string)$eventCode->{"value"} == "98" || (string)$eventCode->{"value"} == "99") $testWarnung = true;
+								}
+							}
+						}
+
+						if (!$testWarnung) {
+							// Da keine Test-Warnung: beginne Suche nach WarnCellID
+							$warnRegonFound = $this->getWarnAreaNameFromCAP($info, $warnCellId);
+							//$arrRohWarnungen = "";
+						} else {
+							// Da Test-Warnung, diese Warnung nicht zur weiteren Verarbeitung übernehmen
+							echo "\t\t-> Testwarnung (ignoriere Inhalt)" . PHP_EOL;
+						}
+
+					}
+				} else if (strtolower($xml->{"msgType"}) == "cancel") {
+					// Verarbeite Inhalt der XML Datei (Typ: Cancel)
+					echo "\t\t-> Stoppe Verarbeitung der Wetterwarnung-Datei" . PHP_EOL;
+				} else {
+					// Verarbeite Inhalt der XML Datei (Typ: Unbekannt)
+					echo "\t\t-> Stoppe Verarbeitung da der Warn-Typ unbekannt ist" . PHP_EOL;
+				}
+			}
+		} catch (Exception $e) {
 			// Fehler an Logging-Modul übergeben
 			$this->logError($e, $this->tmpFolder);
 		}
@@ -383,49 +507,11 @@ class WarnParser extends ErrorLogging {
 	 */
 
 	/**
-	 * Entpacken der ZIP-Dateien von localFolder in tmpFolder in einem Ordner
+	 * @param \SimpleXMLElement $WarnInfoNode Info-Block der zu prüfenden Wetter-Warnung
+	 * @param int $warncellid WarnCellID nach der gesucht werden soll
 	 */
-	private function extractZipFiles() {
-		try {
-			echo "-> Entpacke die Wetterwarnungen des DWD" . PHP_EOL;
-			// Erzeuge Array mit allen ZIP-Dateien in $this->localFolder
-			$localZipFiles = array();
-			$handle = opendir($this->localFolder);
-			if ($handle) {
-				while (false !== ($entry = readdir($handle))) {
-					if (! is_dir($this->localFolder . DIRECTORY_SEPARATOR . $entry)) {
-						$fileinfo = pathinfo($this->localFolder . DIRECTORY_SEPARATOR . $entry);
-						if ($fileinfo["extension"] == "zip")
-							$localZipFiles[] = $entry;
-					}
-				}
-				closedir($handle);
-			} else {
-				throw new Exception("Fehler beim durchsuchen des lokale Wetterwarnung-Ordner nach DWD-ZIP Dateien");
-			}
-
-			// Eigentlich darf aktuell nur eine ZIP Datei vorhanden sein (vorbereitet aber für >1 ZIP Datei)
-			if (count($localZipFiles) > 1) {
-				throw new Exception("Mehr als eine Datei befindet sich im lokalen Wetterwarnung-Ordner und es dürfte nur eine vorhanden sein");
-			}
-
-			// Entpacke ZIP-Dateien
-			foreach ($localZipFiles as $zipFile) {
-				// Öffne ZIP Datei
-				$zip = new ZipArchive();
-				$res = $zip->open($this->localFolder . DIRECTORY_SEPARATOR . $zipFile);
-				if ($res === true) {
-					echo "\tEntpacke Wetterwarnung-Datei: " . $zipFile . " (" . $zip->numFiles . " Datei" . ($zip->numFiles > 1 ? "en" : "") . ")" . PHP_EOL;
-					$zip->extractTo($this->tmpFolder);
-					$zip->close();
-				} else {
-					throw new Exception("Fehler beim öffnen der ZIP Datei '" . $zipFile . "'. Fehlercode: " . $res . " / " . $this->getZipErrorMessage($res));
-				}
-			}
-		} catch (\Exception $e) {
-			// Fehler an Logging-Modul übergeben
-			$this->logError($e, $this->tmpFolder);
-		}
+	private function getWarnAreaNameFromCAP(\SimpleXMLElement $WarnInfoNode, int $warncellid) {
+		var_dump($WarnInfoNode);
 	}
 
 	/*
@@ -603,46 +689,6 @@ class ErrorLogging {
 		fwrite(STDOUT, PHP_EOL);
 
 		exit(1);
-	}
-
-	/**
-	 * Methode zum generieren der Klartext-Fehlermeldung beim Zugriff auf ZIP-Dateien
-	 *
-	 * @param $errCode
-	 * @return string
-	 */
-	protected function getZipErrorMessage($errCode) {
-		switch ($errCode) {
-			case ZipArchive::ER_EXISTS:
-				return "Datei existiert bereits.";
-				break;
-			case ZipArchive::ER_INCONS:
-				return "Zip-Archiv ist nicht konsistent.";
-				break;
-			case ZipArchive::ER_INVAL:
-				return "Ungültiges Argument.";
-				break;
-			case ZipArchive::ER_MEMORY:
-				return "Malloc Fehler.";
-				break;
-			case ZipArchive::ER_NOENT:
-				return "Datei nicht vorhanden.";
-				break;
-			case ZipArchive::ER_NOZIP:
-				return "Kein Zip-Archiv.";
-				break;
-			case ZipArchive::ER_OPEN:
-				return "Datei kann nicht geöffnet werden.";
-				break;
-			case ZipArchive::ER_READ:
-				return "Lesefehler.";
-				break;
-			case ZipArchive::ER_SEEK:
-				return "Seek Fehler.";
-				break;
-			default:
-				return "Unknown error.";
-		}
 	}
 
 	/*

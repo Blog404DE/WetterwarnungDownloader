@@ -46,7 +46,7 @@ $unwetterConfig["ftp"]["passiv"]		= true;
 // Array mit den zu verarbeiteten Landkreisen
 // - siehe Erklärung in: README.md
 // - Beispiel: Landkreis und Stadt Karlsruhe
-$unwetterConfig["WarnCellId"]      = "908215999";
+$unwetterConfig["WarnCellId"]      = 908215999;
 
 // Speicherpfad für JSON Datei mit den aktuellen Wetterwarnungen
 $unwetterConfig["localJsonWarnfile"]= "/pfad/zur/wetterwarnung.json";

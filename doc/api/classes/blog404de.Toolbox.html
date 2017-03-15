@@ -114,7 +114,7 @@
                         <ul class="dropdown-menu">
                             <li>
                                 <a href="../reports/errors.html">
-                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">0</span>
+                                                                                                                                                                                                                                                                                                                                                                                                                            <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">2</span>
                                 </a>
                             </li>
                             <li>
@@ -144,28 +144,28 @@
                                 <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-1722530350"></a>
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-485669268"></a>
                                 <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
             </div>
-            <div id="namespace-1722530350" class="accordion-body collapse in">
+            <div id="namespace-485669268" class="accordion-body collapse in">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-492695122"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-374647761"></a>
                                 <a href="../namespaces/blog404de.html" style="margin-left: 30px; padding-left: 0">blog404de</a>
             </div>
-            <div id="namespace-492695122" class="accordion-body collapse ">
+            <div id="namespace-374647761" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                                                     <div class="accordion" style="margin-bottom: 0">
         <div class="accordion-group">
             <div class="accordion-heading">
-                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1529631410"></a>
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1074502340"></a>
                                 <a href="../namespaces/blog404de.WetterScripts.html" style="margin-left: 30px; padding-left: 0">WetterScripts</a>
             </div>
-            <div id="namespace-1529631410" class="accordion-body collapse ">
+            <div id="namespace-1074502340" class="accordion-body collapse ">
                 <div class="accordion-inner">
 
                     
@@ -226,6 +226,7 @@
                         </section>
                         <section class="row-fluid public">
                             <section class="span4">
+                                                                    <a href="../classes/blog404de.Toolbox.html#method_extractAllZipFiles" class="">extractAllZipFiles()</a><br />
                                                                     <a href="../classes/blog404de.Toolbox.html#method_tempdir" class="">tempdir()</a><br />
                                                                     <a href="../classes/blog404de.Toolbox.html#method_removeTempDir" class="">removeTempDir()</a><br />
                                                             </section>
@@ -238,7 +239,7 @@
                         </section>
                         <section class="row-fluid protected">
                             <section class="span4">
-                                                                    <em>No protected methods found</em>
+                                                                    <a href="../classes/blog404de.Toolbox.html#method_getZipErrorMessage" class="">getZipErrorMessage()</a><br />
                                                             </section>
                             <section class="span4">
                                                                     <em>No protected properties found</em>
@@ -292,6 +293,56 @@
                 <div class="span8 content class"><h2>Methods</h2></div>
                 <aside class="span4 detailsbar"></aside>
             </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_extractAllZipFiles" name="method_extractAllZipFiles" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">extractAllZipFiles()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">extractAllZipFiles(string  <span class="argument">$source</span>, string  <span class="argument">$destination</span>, integer  <span class="argument">$maxFiles = -1</span>) </pre>
+                <p><em></em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$source </td>
+                                <td><p>Ordner mit den beinhalteten XML Dateien</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$destination </td>
+                                <td><p>Ordner in den der Inhalt der ZIP-Dateien entpackt werden soll</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>integer</td>
+                                <td>$maxFiles </td>
+                                <td><p>Anzahl der ZIP-Dateien die maximal entpackt werden können (optional) / -1 = ohne Limit</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
 
                                     <div class="row-fluid">
         <div class="span8 content class">
@@ -388,7 +439,44 @@ numbers.</p>
         </aside>
     </div>
 
-                                                                    </div>
+                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getZipErrorMessage" name="method_getZipErrorMessage" class="anchor"></a>
+            <article class="method">
+                <h3 class="protected ">getZipErrorMessage()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getZipErrorMessage(  <span class="argument">$errCode</span>) : string</pre>
+                <p><em>Methode zum generieren der Klartext-Fehlermeldung beim Zugriff auf ZIP-Dateien</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td></td>
+                                <td>$errCode </td>
+                                <td></td>
+                            </tr>
+                                            </table>
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                            <span class="label label-info">static</span>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                    </div>
     </section>
 
     <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
@@ -438,7 +526,7 @@ numbers.</p>
                 <section class="span10 offset1">
                     <hr />
                     Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
-                    on March 14th, 2017 at 17:22.
+                    on March 15th, 2017 at 17:53.
                 </section>
             </section>
         </section>
