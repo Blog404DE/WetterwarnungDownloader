@@ -38,20 +38,23 @@
  * ======================================================
  */
 try {
+	// Root-Verzeichnis festlegen
+	define( 'ROOT_PATH', dirname( __FILE__ ) . "/" );
+
 	// Notwendige Libs laden
 	$unwetterConfig = [];
-	require_once dirname(__FILE__) . "/botLib/WarnParser.class.php";
+	require_once ROOT_PATH . "botLib/WarnParser.class.php";
 
 	/*
- * Script-Header ausgeben
- */
+ 	 * Script-Header ausgeben
+ 	 */
 
 	echo(PHP_EOL);
 	echo("Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL);
 	echo("=====================================" . PHP_EOL);
 
-	if(is_readable(dirname(__FILE__) . "/config.local.php")) {
-		require_once dirname(__FILE__) . "/config.local.php";
+	if(is_readable(ROOT_PATH . "config.local.php")) {
+		require_once ROOT_PATH . "config.local.php";
 	} else {
 		throw new Exception("Konfigurationsdatei 'config.local.php' existiert nicht. Zur Konfiguration lesen Sie README.md");
 	}
