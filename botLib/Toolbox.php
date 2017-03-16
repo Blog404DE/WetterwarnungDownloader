@@ -30,6 +30,7 @@
  */
 
 namespace blog404de;
+
 use ZipArchive;
 
 /**

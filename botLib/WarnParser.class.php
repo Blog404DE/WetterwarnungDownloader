@@ -39,8 +39,7 @@ namespace blog404de\WetterScripts;
 
 require_once "Toolbox.php";
 
-use Exception;
-use blog404de\Toolbox;
+use Exception, \blog404de\Toolbox;
 
 /**
  * Parser für die Wetter-Warnungen des DWD
@@ -443,7 +442,7 @@ class WarnParser extends ErrorLogging {
 				}
 
 				// Prüfe ob die Warnung nicht vom Typ "cancel" ist:
-				if (!isset($xml->{"msgType"})) {
+				if (!property_exists($xml, "msgType")) {
 					throw new Exception("Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'msgType'-Node.");
 				}
 
@@ -453,7 +452,7 @@ class WarnParser extends ErrorLogging {
 					// Verarbeite Inhalt der XML Datei (Typ: Alert)
 
 					// Prüfe ob Info-Node existiert
-					if (! isset($xml->{"info"})) {
+					if (!property_exists($xml, "info")) {
 						throw new Exception("Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'info'-Node.");
 					} else {
 						$info = $xml->{"info"};
@@ -462,7 +461,7 @@ class WarnParser extends ErrorLogging {
 					// Verarbeite den Info-Node und prüfe ob eine Wetter-Warnung für die angegebene WarnCellId vorhanden ist
 					foreach ($info as $wetterWarnung) {
 						// Prüfe ob es sich um eine Testwarnung handelt
-						if (! isset($wetterWarnung->{"eventCode"})) {
+						if (!property_exists($wetterWarnung, "eventCode")) {
 							throw new Exception("Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'eventCode'-Node.");
 						} else {
 							$testWarnung = false;
@@ -480,8 +479,12 @@ class WarnParser extends ErrorLogging {
 
 						if (!$testWarnung) {
 							// Da keine Test-Warnung: beginne Suche nach WarnCellID
-							$warnRegonFound = $this->searchForWarnAreaInCAP($info, $warnCellId);
-							//$arrRohWarnungen = "";
+							if(property_exists($info, "area")) {
+								$warnRegonFound = $this->searchForWarnAreaInCAP($info->{"areaa"} , $warnCellId);
+								exit();
+							} else {
+								throw new Exception("Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'area'-Node.");
+							}
 						} else {
 							// Da Test-Warnung, diese Warnung nicht zur weiteren Verarbeitung übernehmen
 							echo "\t\t-> Testwarnung (ignoriere Inhalt)" . PHP_EOL;
@@ -507,11 +510,91 @@ class WarnParser extends ErrorLogging {
 	 */
 
 	/**
-	 * @param \SimpleXMLElement $WarnInfoNode Info-Block der zu prüfenden Wetter-Warnung
-	 * @param int $warncellid WarnCellID nach der gesucht werden soll
+	 * @param array $WarnInfoNode Info-Block der zu prüfenden Wetter-Warnung
+	 * @param int $warnCellId WarnCellID nach der gesucht werden soll
+	 * @return array|bool
 	 */
-	private function searchForWarnAreaInCAP(\SimpleXMLElement $WarnInfoNode, int $warncellid) {
+	private function searchForWarnAreaInCAP($WarnInfoNode, int $warnCellId) {
+		try {
+			$areaDesc = false;
+			$state = false;
+			$altitude = 0;
+			$ceiling = 0;
 
+			foreach ($WarnInfoNode as $area) {
+				// Ermittle WarnCell-ID und State
+				$currentState = array();
+				$currentWarnCellID = false;
+
+
+				// Speichere areaDesc
+				if (! isset($area->{"areaDesc"})) {
+					throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'areaDesc'-Node.");
+				} else {
+					$currentAreaDesc = (string)$area->{"areaDesc"};
+				}
+
+				// Speichere Höhenangaben
+				if (! isset($area->{"altitude"})) {
+					throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'altitude'-Node.");
+				} else {
+					$currentAltitude = (float)$area->{"altitude"};
+				}
+				if (! isset($area->{"ceiling"})) {
+					throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'ceiling'-Node.");
+				} else {
+					$currentCeiling = (float)$area->{"ceiling"};
+				}
+
+				// Ermittle WarnCelLID im Objekt
+				/*
+				if (! isset($area->{"geocode"})) {
+					throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'geocode'-Node.");
+				} else {
+					// Durchlaufe beide Geocode-Einträge bis zum WARNCELLID-Eintrag im XML Dokument
+					foreach ($area->{"geocode"} as $geocode) {
+						// Speichere je nach Bedarf
+						if (! isset($geocode->{"valueName"}) || ! isset($geocode->{"value"})) {
+							throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'geocode'->'valueName' oder 'value>-Node.");
+						} else {
+							if ($geocode->{"valueName"} == "STATE") {
+								$currentState[] = (string)$geocode->{"value"};
+							} else if ($geocode->{"valueName"} == "WARNCELLID") {
+								$currentWarnCellID = (string)$geocode->{"value"};
+							}
+						}
+					}
+				}
+				*/
+
+				var_dump($area);
+
+				// Falls beide Werte ermittelt wurden -> Prüfe ob WarnCell-ID vorkommen
+				/*
+				if (count($currentState) == 0 || $currentWarnCellID === false) {
+					throw new Exception("Ein Area-Eintrag in der XML Datei beinhaltete keine State/WarncellID Angabe");
+				} else {
+					// Gehört der Warnzelle zu den benötigten?
+					if ($warnCellId == $currentWarnCellID) {
+						$areaDesc = $currentAreaDesc;
+						$state = $currentState;
+						$altitude = $currentAltitude;
+						$ceiling = $currentCeiling;
+					}
+				}
+				*/
+			}
+
+			if ($areaDesc !== false) {
+				$arrReturn = array("warncellid" => $warnCellId, "areaDesc" => $areaDesc, "state" => $state, "altitude" => $altitude, "ceiling" => $ceiling);
+				return $arrReturn;
+			} else {
+				return false;
+			}
+		} catch (Exception $e) {
+			// Fehler-Handling
+			$this->logError($e, $this->tmpFolder);
+		}
 	}
 
 	/*
