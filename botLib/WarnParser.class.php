@@ -47,6 +47,9 @@ use Exception, \blog404de\Toolbox;
  * @package blog404de\WetterScripts\WarnParser
  */
 class WarnParser extends ErrorLogging {
+	/** @var bool $strictMode Verarbeite Wetterwarnungen im Strict-Modus und unterbreche den Ablauf bei unbekanntem Warn-Typ */
+	public $strictMode = false;
+
 	/** @var string Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen */
 	private $remoteFolder = "/gds/gds/specials/alerts/cap/GER/community_status_geometry";
 
@@ -104,6 +107,9 @@ class WarnParser extends ErrorLogging {
 		if (version_compare(PHP_VERSION, "7.0.0") < 0) {
 			throw new Exception("Für das Script wird mindestens PHP7 vorrausgesetzt (PHP 5.6.x wird nur noch mit Sicherheitsupdates bis 31.12.2018 versorgt");
 		}
+
+		// Array leeren
+		$this->wetterWarnungen = [];
 	}
 
 	/**
@@ -276,18 +282,18 @@ class WarnParser extends ErrorLogging {
 			echo PHP_EOL . "*** Führe abschließende Arbeiten durch: " . PHP_EOL;
 
 			if($this->tmpFolder !== FALSE) {
-				echo "\tLösche angelegten temporären Ordner: ";
+				echo "-> Lösche angelegten temporären Ordner: ";
 				if(!Toolbox::removeTempDir($this->tmpFolder)) {
 					echo "fehlgeschlagen" . PHP_EOL;
 					throw new Exception("Löschen des Temporären Ordner (" . $this->tmpFolder . ") ist fehlgeschlagen.");
 				};
 				echo "erfolgreich (" . $this->tmpFolder . ")" . PHP_EOL;
 			} else {
-				echo "\tKeine Arbeiten notwendig" . PHP_EOL;
+				echo "-> Keine abschlißende Arbeiten notwendig" . PHP_EOL;
 			}
 
 			// Starte Verarbeitung der Dateien
-			echo "\tLösche veraltete Wetterwarnungen aus Cache-Ordner." . PHP_EOL;
+			echo "-> Lösche veraltete Wetterwarnungen aus Cache-Ordner." . PHP_EOL;
 
 			// Prüfe Existenz der lokalen Verzeichnisse
 			if (!is_writeable($this->localFolder)) {
@@ -323,7 +329,7 @@ class WarnParser extends ErrorLogging {
 			if(count($obsoletFiles) > 0) {
 				echo "-> Starte Löschvorgang " . PHP_EOL;
 				foreach ($obsoletFiles as $filename) {
-					echo "\t - Lösche veraltete Wetterwarnung-Datei " . $filename . ": ";
+					echo "\tLösche veraltete Wetterwarnung-Datei " . $filename . ": ";
 					if (!@unlink($this->localFolder . DIRECTORY_SEPARATOR . $filename)) {
 						throw new Exception(PHP_EOL . "Fehler beim aufräumen des Caches: '" . $this->localFolder . DIRECTORY_SEPARATOR . $filename . "'' konnte nicht erfolgreich gelöscht werden.");
 					} else {
@@ -331,7 +337,7 @@ class WarnParser extends ErrorLogging {
 					}
 				}
 			} else {
-				echo("\t - Es muss keine Datei gelöscht werden" . PHP_EOL);
+				echo("\tEs muss keine Datei gelöscht werden" . PHP_EOL);
 			}
 		} catch (\Exception $e) {
 			// Fehler-Handling
@@ -346,9 +352,9 @@ class WarnParser extends ErrorLogging {
 	public function prepareWetterWarnungen() {
 		try {
 			// Starte verabeiten der Wetterwarnungen des DWD
-			echo PHP_EOL . "*** Verarbeite die Wetterwarnungen:" . PHP_EOL;
+			echo PHP_EOL . "*** Starte Vorbereitungen::" . PHP_EOL;
 
-			echo "-> Bereite das vearbeiten der Wetterwarnungen vor" . PHP_EOL;
+			echo "-> Bereite das Vearbeiten der Wetterwarnungen vor" . PHP_EOL;
 			echo "\tPrüfe Konfiguration" . PHP_EOL;
 
 			// Prüfe Existenz der lokalen Verzeichnisse
@@ -395,6 +401,7 @@ class WarnParser extends ErrorLogging {
 		try {
 			// Starte parsen der Wetterwarnungen des DWD
 			echo PHP_EOL . "*** Verarbeite die Wetterwarnungen:" . PHP_EOL;
+			echo "-> Lese die heruntergeladenen Wetterwarnungen ein und suche nach der WarnCellID " . $warnCellId . PHP_EOL;
 
 			// WarnCellID gültig?
 			if(!is_numeric($warnCellId)) {
@@ -422,7 +429,7 @@ class WarnParser extends ErrorLogging {
 
 			// Parse XML Dateien
 			foreach ($localXmlFiles as $xmlFile) {
-				echo "\tVerarbeite Wetterwarnung-Datei " . basename($xmlFile) . " (" . round(filesize($xmlFile) / 1024 , 2) . " kbyte): " . PHP_EOL;
+				echo "\tPrüfe " . basename($xmlFile) . " (" . round(filesize($xmlFile) / 1024 , 2) . " kbyte): " . PHP_EOL;
 
 				// Datei kann geöffnet werden?
 				if (!is_readable($xmlFile)) {
@@ -447,7 +454,7 @@ class WarnParser extends ErrorLogging {
 				}
 
 				// Prüfe um welche Art von Wetter-Warnung es sich handelt (Alert oder Cancel)
-				echo ("\t\t* Art der Warnung: " . $xml->{"msgType"} . PHP_EOL);
+				echo ("\t\t* Art der Warnung: " . (string)$xml->{"msgType"} . PHP_EOL);
 				if (strtolower($xml->{"msgType"}) == "alert") {
 					// Verarbeite Inhalt der XML Datei (Typ: Alert)
 
@@ -458,7 +465,7 @@ class WarnParser extends ErrorLogging {
 						$info = $xml->{"info"};
 					}
 
-					// Verarbeite den Info-Node und prüfe ob eine Wetter-Warnung für die angegebene WarnCellId vorhanden ist
+					// Verarbeite den Info-Node in einer Schleife (falls mehrere einmal existieren für eine Alert-Datei) und prüfe ob eine Wetter-Warnung für die angegebene WarnCellId vorhanden ist
 					foreach ($info as $wetterWarnung) {
 						// Prüfe ob es sich um eine Testwarnung handelt
 						if (!property_exists($wetterWarnung, "eventCode")) {
@@ -470,7 +477,7 @@ class WarnParser extends ErrorLogging {
 									throw new Exception("Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'eventCode'->'valueName' bzw. 'value'-Node.");
 								}
 
-								// Schaue nach EventName = "II"
+								// Schaue nach EventName = "II" und prüfe ob der Wert auf 98/99 steht (=Testwarnung)
 								if ((string)$eventCode->{"valueName"} == "II") {
 									if ((string)$eventCode->{"value"} == "98" || (string)$eventCode->{"value"} == "99") $testWarnung = true;
 								}
@@ -480,8 +487,13 @@ class WarnParser extends ErrorLogging {
 						if (!$testWarnung) {
 							// Da keine Test-Warnung: beginne Suche nach WarnCellID
 							if(property_exists($info, "area")) {
-								$warnRegonFound = $this->searchForWarnAreaInCAP($info->{"areaa"} , $warnCellId);
-								exit();
+								$warnRegonFound = $this->searchForWarnAreaInCAP($info->{"area"}, $warnCellId);
+								if($warnRegonFound) {
+									echo sprintf("\t\t* Treffer für %s (%s) / WarnCellID %d gefunden", $warnRegonFound["areaDesc"], $warnRegonFound["state"], $warnRegonFound["warncellid"]) . PHP_EOL;
+									$arrRohWarnungen[] = ["warnung" => $wetterWarnung, "geo" => $warnRegonFound];
+								} else {
+
+								}
 							} else {
 								throw new Exception("Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'area'-Node.");
 							}
@@ -489,16 +501,22 @@ class WarnParser extends ErrorLogging {
 							// Da Test-Warnung, diese Warnung nicht zur weiteren Verarbeitung übernehmen
 							echo "\t\t-> Testwarnung (ignoriere Inhalt)" . PHP_EOL;
 						}
-
 					}
 				} else if (strtolower($xml->{"msgType"}) == "cancel") {
 					// Verarbeite Inhalt der XML Datei (Typ: Cancel)
-					echo "\t\t-> Stoppe Verarbeitung der Wetterwarnung-Datei" . PHP_EOL;
+					echo "\t\t-> Stoppe Verarbeitung der Wetterwarnung-Datei (Auflösungs-Nachricht muss nicht versendet werden)" . PHP_EOL;
 				} else {
 					// Verarbeite Inhalt der XML Datei (Typ: Unbekannt)
 					echo "\t\t-> Stoppe Verarbeitung da der Warn-Typ unbekannt ist" . PHP_EOL;
+					if($this->strictMode) throw new \Exception("Strict-Mode Fehler: Wetterwarnung mit unbekannten Wetter-Typ " . (string)$xml->{"msgType"});
 				}
 			}
+
+			echo "-> Verarbeite alle gefundenen Wetterwarnungen (Anzahl: " . count($arrRohWarnungen) . ")" . PHP_EOL;
+
+
+
+			var_dump(count($arrRohWarnungen));
 		} catch (Exception $e) {
 			// Fehler an Logging-Modul übergeben
 			$this->logError($e, $this->tmpFolder);
@@ -510,90 +528,93 @@ class WarnParser extends ErrorLogging {
 	 */
 
 	/**
-	 * @param array $WarnInfoNode Info-Block der zu prüfenden Wetter-Warnung
+	 * @param \SimpleXMLElement $WarnInfoNode Info-Block der zu prüfenden Wetter-Warnung
 	 * @param int $warnCellId WarnCellID nach der gesucht werden soll
 	 * @return array|bool
 	 */
-	private function searchForWarnAreaInCAP($WarnInfoNode, int $warnCellId) {
+	private function searchForWarnAreaInCAP(\SimpleXMLElement $WarnInfoNode, int $warnCellId) {
 		try {
-			$areaDesc = false;
-			$state = false;
-			$altitude = 0;
-			$ceiling = 0;
+			$result = false;
+			$hits = 0;
 
 			foreach ($WarnInfoNode as $area) {
 				// Ermittle WarnCell-ID und State
-				$currentState = array();
-				$currentWarnCellID = false;
+				$currentState = null;
+				$currentWarnCellID = null;
 
+				// Prüfe ob es sich um ein Geo-Feld oder um ein Polygon-Feld handelt
+				if (property_exists($area , "polygon")) {
+					// Beinhaltet polygon -> zum nächsten Zweig wechseln
+					continue;
+				} else {
+					// Keine polygon-Informationen gefunden -> verarbeite Daten
+					$hits++;
+				}
 
 				// Speichere areaDesc
 				if (! isset($area->{"areaDesc"})) {
-					throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'areaDesc'-Node.");
+					throw new Exception("Fehler beim durchsuchen der Geo-Informationen: XML-Nodes 'areaDesc' fehlt.");
 				} else {
 					$currentAreaDesc = (string)$area->{"areaDesc"};
 				}
 
 				// Speichere Höhenangaben
 				if (! isset($area->{"altitude"})) {
-					throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'altitude'-Node.");
+					throw new Exception("Fehler beim durchsuchen der Geo-Informationen: XML-Nodes 'altitude' fehlt");
 				} else {
 					$currentAltitude = (float)$area->{"altitude"};
 				}
 				if (! isset($area->{"ceiling"})) {
-					throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'ceiling'-Node.");
+					throw new Exception("Fehler beim durchsuchen der Geo-Informationen: XML-Nodes 'ceiling' fehlt.");
 				} else {
 					$currentCeiling = (float)$area->{"ceiling"};
 				}
 
-				// Ermittle WarnCelLID im Objekt
-				/*
-				if (! isset($area->{"geocode"})) {
-					throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'geocode'-Node.");
-				} else {
-					// Durchlaufe beide Geocode-Einträge bis zum WARNCELLID-Eintrag im XML Dokument
-					foreach ($area->{"geocode"} as $geocode) {
-						// Speichere je nach Bedarf
-						if (! isset($geocode->{"valueName"}) || ! isset($geocode->{"value"})) {
-							throw new Exception("Fehler in getWarnAreaNameFromCAP: Die XML Datei beinhaltet kein 'area'->'geocode'->'valueName' oder 'value>-Node.");
-						} else {
-							if ($geocode->{"valueName"} == "STATE") {
-								$currentState[] = (string)$geocode->{"value"};
-							} else if ($geocode->{"valueName"} == "WARNCELLID") {
-								$currentWarnCellID = (string)$geocode->{"value"};
-							}
-						}
+				// Prüfe auf Vorkommen der WarnCell ID und übernehme die Geo-Informationen
+				foreach ($area->{"geocode"} as $geocode) {
+					// Prüfe ob Nodes vorhanden sind
+					if (!property_exists($geocode, "valueName") || !property_exists($geocode, "value")) {
+						throw new Exception("Fehler beim durchsuchen der Geo-Informationen: XML-Nodes 'area'->'geocode'->'valueName' oder 'value' fehlen.");
 					}
-				}
-				*/
 
-				var_dump($area);
-
-				// Falls beide Werte ermittelt wurden -> Prüfe ob WarnCell-ID vorkommen
-				/*
-				if (count($currentState) == 0 || $currentWarnCellID === false) {
-					throw new Exception("Ein Area-Eintrag in der XML Datei beinhaltete keine State/WarncellID Angabe");
-				} else {
-					// Gehört der Warnzelle zu den benötigten?
-					if ($warnCellId == $currentWarnCellID) {
-						$areaDesc = $currentAreaDesc;
-						$state = $currentState;
-						$altitude = $currentAltitude;
-						$ceiling = $currentCeiling;
+					if ($geocode->{"valueName"} == "STATE") {
+						$currentState = (string)$geocode->{"value"};
+					} else if ($geocode->{"valueName"} == "WARNCELLID") {
+						$currentWarnCellID = (string)$geocode->{"value"};
 					}
+
 				}
-				*/
+
+				// Prüfe ob mindestens ein gültiger Eintrag existiert in dem geprüften Area-Node
+				if (is_null($currentState) || is_null($currentWarnCellID)) {
+					throw new Exception("Fehler beim durchsuchen der Geo-Informationen: Ein 'GeoCode'-Node beinhaltete keine State/WarncellID-Informationen");
+				}
+
+				// Gehört die WarnCellID zu der gesuchten?
+				if ($warnCellId == $currentWarnCellID) {
+					$result = ["warncellid" => $currentWarnCellID,
+							   "areaDesc" => $currentAreaDesc,
+							   "state" => $currentState,
+							   "altitude" => $currentAltitude,
+							   "ceiling" => $currentCeiling];
+
+					// Da Treffer, stoppe weitere Verarbeitung der restlichen Geocoder-Felder
+					break;
+				}
 			}
 
-			if ($areaDesc !== false) {
-				$arrReturn = array("warncellid" => $warnCellId, "areaDesc" => $areaDesc, "state" => $state, "altitude" => $altitude, "ceiling" => $ceiling);
-				return $arrReturn;
-			} else {
-				return false;
+			// Prüfe ob überhaupt ein Feld mit Orts-Informationen gefunden wurden.
+			if($hits == 0) {
+				throw new Exception("Fehler beim durchsuchen der Geo-Informationen: Die Geo-Informationen beinhalteten überhaupt keine State/WarnCellID-Informationen");
 			}
+
+			// Ergebnis übergeben
+			return $result;
 		} catch (Exception $e) {
 			// Fehler-Handling
 			$this->logError($e, $this->tmpFolder);
+
+			return false;
 		}
 	}
 
