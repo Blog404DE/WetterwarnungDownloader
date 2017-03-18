@@ -95,6 +95,7 @@ try {
 		$warnBot->connectToFTP($unwetterConfig["ftp"]["host"], $unwetterConfig["ftp"]["username"], $unwetterConfig["ftp"]["password"], $unwetterConfig["ftp"]["passiv"]);
 		$warnBot->updateFromFTP();
 		$warnBot->disconnectFromFTP();
+		$warnBot->cleanLocalDownloadFolder();
 	}
 
 	// Wetterwarnungen vorbereiten

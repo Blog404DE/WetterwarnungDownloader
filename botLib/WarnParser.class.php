@@ -39,7 +39,7 @@ namespace blog404de\WetterScripts;
 
 require_once "Toolbox.php";
 
-use Exception, \blog404de\Toolbox;
+use Exception, DateTime, DateTimeZone, \blog404de\Toolbox;
 
 /**
  * Parser für die Wetter-Warnungen des DWD
@@ -275,26 +275,12 @@ class WarnParser extends ErrorLogging {
 	}
 
 	/**
-	 * Bereinige lokalen Cache-Ordner
+	 * Lösche nicht mehr benötigte Dateien
 	 */
-	public function cleanLocalCache() {
+	public function cleanLocalDownloadFolder() {
 		try {
-			// Abschließende Arbeiten ausführen
-			echo PHP_EOL . "*** Führe abschließende Arbeiten durch: " . PHP_EOL;
-
-			if($this->tmpFolder !== FALSE) {
-				echo "-> Lösche angelegten temporären Ordner: ";
-				if(!Toolbox::removeTempDir($this->tmpFolder)) {
-					echo "fehlgeschlagen" . PHP_EOL;
-					throw new Exception("Löschen des Temporären Ordner (" . $this->tmpFolder . ") ist fehlgeschlagen.");
-				};
-				echo "erfolgreich (" . $this->tmpFolder . ")" . PHP_EOL;
-			} else {
-				echo "-> Keine abschlißende Arbeiten notwendig" . PHP_EOL;
-			}
-
 			// Starte Verarbeitung der Dateien
-			echo "-> Lösche veraltete Wetterwarnungen aus Cache-Ordner." . PHP_EOL;
+			echo PHP_EOL . "*** Lösche veraltete Wetterwarnungen aus Cache-Ordner." . PHP_EOL;
 
 			// Prüfe Existenz der lokalen Verzeichnisse
 			if (!is_writeable($this->localFolder)) {
@@ -320,14 +306,14 @@ class WarnParser extends ErrorLogging {
 			}
 
 			// Dateiliste sortieren
-			asort($localFiles, SORT_NUMERIC);
+			asort($localFiles , SORT_NUMERIC);
 			$localFiles = array_reverse($localFiles);
 
 			// Array $localFiles aufsplitten in zu behaltende und zu löschende Dateien
 			$obsoletFiles = array_splice($localFiles, 1);
 
 			// Starte Löschvorgang
-			if(count($obsoletFiles) > 0) {
+			if (count($obsoletFiles) > 0) {
 				echo "-> Starte Löschvorgang " . PHP_EOL;
 				foreach ($obsoletFiles as $filename) {
 					echo "\tLösche veraltete Wetterwarnung-Datei " . $filename . ": ";
@@ -344,7 +330,31 @@ class WarnParser extends ErrorLogging {
 			// Fehler-Handling
 			$this->logError($e);
 		}
+	}
 
+	/**
+	 * Bereinige lokalen Cache-Ordner
+	 */
+	public function cleanLocalCache() {
+		try {
+			// Abschließende Arbeiten ausführen
+			echo PHP_EOL . "*** Führe abschließende Arbeiten durch: " . PHP_EOL;
+
+			// Lösche Cache-Folder
+			if($this->tmpFolder !== FALSE) {
+				echo "-> Lösche angelegten temporären Ordner" . PHP_EOL;
+				if(!Toolbox::removeTempDir($this->tmpFolder)) {
+					echo "\tLöschen des Ordner " . $this->tmpFolder . " fehlgeschlagen" . PHP_EOL;
+					throw new Exception("Löschen des Temporären Ordner (" . $this->tmpFolder . ") ist fehlgeschlagen.");
+				};
+				echo "\tLöschen des Ordner " . $this->tmpFolder . " erfolgreich" . PHP_EOL;
+			} else {
+				echo "-> Keine abschließenden Arbeiten otwendigArbeiten notwendig" . PHP_EOL;
+			}
+		} catch (\Exception $e) {
+			// Fehler-Handling
+			$this->logError($e);
+		}
 	}
 
 	/**
@@ -518,6 +528,7 @@ class WarnParser extends ErrorLogging {
 				// Durchlaufe alle Warnungen
 				foreach ($arrRohWarnungen as $filename => $rawWarnung) {
 					echo("\tWetterwarnung aus " . $filename . ":" . PHP_EOL);
+					$parsedWarnInfo = [];
 
 					if (array_key_exists("warnung", $rawWarnung) && array_key_exists("region", $rawWarnung)) {
 						$currentWarnung = $rawWarnung["warnung"];
@@ -538,17 +549,42 @@ class WarnParser extends ErrorLogging {
 					if (!property_exists($currentWarnung, "event")) {
 						throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'event.");
 					} else {
-						$event = (string)$wetterWarnung->{"event"};
+						$parsedWarnInfo["event"] = (string)$wetterWarnung->{"event"};
 					}
 
+					// Start- und Ablaufdatum ermitteln
+					if (!property_exists($currentWarnung, "onset")) {
+						throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'onset'.");
+					} else {
+						$strRawDate = str_replace("+00:00", "", (string)$wetterWarnung->{"onset"});
+						$objDateOnset = DateTime::createFromFormat('Y-m-d*H:i:s', $strRawDate, new DateTimeZone("UTC"));
+						if (!$objDateOnset) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung beinhaltet ungültige Daten im XML-Mode  XML-Node 'warnung'->'onset'.");
+						} else {
+							$objDateOnset->setTimezone(new DateTimeZone("Europe/Berlin"));
+							$parsedWarnInfo["onset"] = $objDateOnset->format("d.m.Y H:i");
+						}
+					}
+
+					if (!property_exists($currentWarnung, "expires")) {
+						//$dateExpires = $objDateOnset;
+						$parsedWarnInfo["expires"] = $parsedWarnInfo["onset"];
+					} else {
+						$strRawDate = str_replace("+00:00", "", (string)$wetterWarnung->{"expires"});
+						$dateExpires = DateTime::createFromFormat('Y-m-d*H:i:s', $strRawDate, new DateTimeZone("UTC"));
+						if (!$dateExpires) {
+							throw new Exception("Fehler in parseWetterWarnung: Der Zeitpunkt im 'expires'-Node konnte nicht verarbeitet werden.");
+						} else {
+							$dateExpires->setTimezone(new DateTimeZone("Europe/Berlin"));
+							$parsedWarnInfo["expires"] = $dateExpires->format("d.m.Y H:i");
+						}
+					}
+
+
+
 					// Ermittle-Warnkennung
-					var_dump($event);
-					// Prüfe ob Info-Node existiert
-					//if (!property_exists($currentWarnung, "identfier")) {
-					//	throw new Exception("Fehler in parseWetterWarnung: Die XML Datei beinhaltet kein 'identifier'-Node.");
-					//} else {
-					//	$identifier = $xml->{"identifier"};
-					//}
+					var_dump($parsedWarnInfo);
+
 				}
 
 
@@ -643,12 +679,12 @@ class WarnParser extends ErrorLogging {
 
 					// Treffer als XML Objekt zusammenstellen (XML um durchgehend den gleichen Objekt-Typ zu haben)
 					$result = new \SimpleXMLElement("<geoInfo/>");
-					$result->addChild("warncellid", $currentWarnCellID);
-					$result->addChild("areaDesc", $currentAreaDesc);
-					$result->addChild("stateCode", $currentStateCode);
-					$result->addChild("stateName", $currentStateName);
-					$result->addChild("altitude", $currentAltitude);
-					$result->addChild("ceiling", $currentCeiling);
+					$result->addChild("warncellid",	$currentWarnCellID);
+					$result->addChild("areaDesc",		$currentAreaDesc);
+					$result->addChild("stateCode",	$currentStateCode);
+					$result->addChild("stateName",	$currentStateName);
+					$result->addChild("altitude",		$currentAltitude);
+					$result->addChild("ceiling",		$currentCeiling);
 
 					// Da Treffer, stoppe weitere Verarbeitung der restlichen Geocoder-Felder
 					break;
