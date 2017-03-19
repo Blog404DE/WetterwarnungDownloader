@@ -50,8 +50,9 @@ try {
  	 */
 
 	echo(PHP_EOL);
-	echo("Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL);
-	echo("=====================================" . PHP_EOL);
+	$header  = "Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL;
+	$header .= str_repeat("=", strlen(trim($header))) . PHP_EOL;
+	echo $header;
 
 	if(is_readable(ROOT_PATH . "config.local.php")) {
 		require_once ROOT_PATH . "config.local.php";
@@ -103,6 +104,9 @@ try {
 
 	// Wetterwarnungen parsen
 	$warnBot->parseWetterWarnungen($unwetterConfig["WarnCellId"]);
+
+	// Speichere Wetterwarnungen
+	$warnBot->saveToLocalJsonFile();
 
 	// Cache aufräumen
 	$warnBot->cleanLocalCache();
