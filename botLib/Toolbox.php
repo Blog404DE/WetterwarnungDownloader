@@ -166,7 +166,7 @@ class Toolbox {
 	 * @param $errCode
 	 * @return string
 	 */
-	static protected function getZipErrorMessage($errCode) {
+	static public function getZipErrorMessage($errCode) {
 		switch ($errCode) {
 			case ZipArchive::ER_EXISTS:
 				return "Datei existiert bereits.";
@@ -204,7 +204,7 @@ class Toolbox {
 	 * @param $errCode
 	 * @return string
 	 */
-	static protected function getJsonErrorMessage($errCode) {
+	static public function getJsonErrorMessage($errCode) {
 		switch($errCode) {
 			case JSON_ERROR_NONE:
 				return "Keine Fehler";
