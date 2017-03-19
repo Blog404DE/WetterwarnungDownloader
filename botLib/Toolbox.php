@@ -199,4 +199,43 @@ class Toolbox {
 				return "Unknown error.";
 		}
 	}
+
+	/** Methode zum generieren von Klartext-Fehlermeldung während der JSON Kodierung
+	 * @param $errCode
+	 * @return string
+	 */
+	static protected function getJsonErrorMessage($errCode) {
+		switch($errCode) {
+			case JSON_ERROR_NONE:
+				return "Keine Fehler";
+				break;
+			case JSON_ERROR_DEPTH:
+				return "Maximale Stacktiefe überschritten";
+				break;
+			case JSON_ERROR_STATE_MISMATCH:
+				return "Ungültiges oder missgestaltetes JSON";
+				break;
+			case JSON_ERROR_CTRL_CHAR:
+				return "Steuerzeichenfehler, möglicherweise unkorrekt kodiert.";
+				break;
+			case JSON_ERROR_SYNTAX:
+				return "Syntaxfehler, ungültiges JSON";
+				break;
+			case JSON_ERROR_UTF8:
+				return "Missgestaltete UTF-8 Zeichen, möglicherweise fehlerhaft kodiert";
+				break;
+			case JSON_ERROR_RECURSION:
+				return "Eine oder mehrere rekursive Referenzen im zu kodierenden Wert";
+				break;
+			case JSON_ERROR_INF_OR_NAN:
+				return "Eine oder mehrere NAN oder INF Werte im zu kodierenden Wert";
+				break;
+			case JSON_ERROR_UNSUPPORTED_TYPE:
+				return "Ein Wert eines Typs, der nicht kodiert werden kann, wurde übergeben";
+				break;
+			default:
+				return "Unbekannter Fehler";
+				break;
+		}
+	}
 }
