@@ -78,7 +78,6 @@ try {
 	 */
 	$warnBot = new \blog404de\WetterScripts\WarnParser();
 
-
 	// Konfiguriere Bot
 	$warnBot->setLocalFolder($unwetterConfig["localFolder"]);
 	$warnBot->setLocalJsonFile($unwetterConfig["localJsonWarnfile"]);
@@ -106,59 +105,10 @@ try {
 	$warnBot->parseWetterWarnungen($unwetterConfig["WarnCellId"]);
 
 	// Speichere Wetterwarnungen
-	$warnBot->saveToLocalJsonFile();
+	$test = $warnBot->saveToLocalJsonFile();
 
 	// Cache aufräumen
 	$warnBot->cleanLocalCache();
-
-
-
-	//$unwetterConfig["WarnCellId"]);
-
-	/*
-	// Wetterwarnung auf via Twitter erzwingen?
-	$forceWetterUpdate = false;
-
-	echo("*** Aktualisiere die Wetterwarnungen: ***" . PHP_EOL);
-
-	// FTP-Verbindung aufbauen
-	$conn_id = ftp_connect($ftp["host"]);
-	if($conn_id === false) {
-	    fwrite(STDERR, "FTP Verbindungsaufbau zu " . $ftp["host"] . " ist fehlgeschlagen" . PHP_EOL);
-	    exit(1);
-	}
-
-	// Login mit Benutzername und Passwort
-	$login_result = @ftp_login($conn_id, $ftp["username"], $ftp["password"]);
-
-	// Verbindung überprüfen
-	if ((!$conn_id) || (!$login_result)) {
-		throw new Exception("Verbindungsaufbau zu zu " . $ftp["host"] . " mit Benutzername " . $ftp["username"] . " fehlgeschlagen.");
-	} else {
-		echo "Verbunden zu " . $ftp["host"] . " mit Benutzername " . $ftp["username"] . PHP_EOL;
-	}
-
-	// Auf Passive Nutzung umschalten
-	@ftp_pasv($conn_id, true);
-
-	// Lade Wetterdaten
-	echo("Lade aktuelle Wetterwarnungen von dem Grundversorgungsdaten des DWD (Pfad: Verzeichnis " . $unwetterConfig["localFolder"] . ")" . PHP_EOL);
-	$remoteFile = fetchUnwetterDaten($unwetterConfig, $conn_id);
-	echo("... Auftrag ausgeführt!" . PHP_EOL . PHP_EOL);
-
-	// FTP Verbindung schließen
-	ftp_close($conn_id);
-
-	// Prüfe welche Wetterwarnungen gelöscht werden können
-	echo("Prüfe welche Wetterwarnung-Dateien nicht mehr benötigt werden und veraltet sind:" . PHP_EOL);
-	cleanupUnwetterDaten($unwetterConfig, $remoteFile);
-	echo("... Auftrag ausgeführt!" . PHP_EOL . PHP_EOL);
-
-	// Verarbeite die lokalen Wetterwarnungen zu der JSON Datei für die Homepage
-	echo("Verarbeite die XML Wetterwarnungen vom DWD für die eigene Homepage (JSON-Format):" . PHP_EOL);
-	$forceWetterUpdate = parseWetterWarnung($unwetterConfig, $optFehlerMail);
-	echo("... Auftrag ausgeführt!" . PHP_EOL . PHP_EOL);
-	*/
 } catch (Exception $e) {
 	// Fehler-Handling
 	fwrite(STDERR,"Fataler Fehler: " . $e->getFile() . ":" . $e->getLine() . " - " .  $e->getMessage());

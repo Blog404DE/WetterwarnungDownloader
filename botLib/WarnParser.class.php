@@ -524,10 +524,11 @@ class WarnParser extends ErrorLogging {
 				}
 			}
 
-			//				echo ("\t\t* Art der Warnung: " . (string)$xml->{"msgType"} . PHP_EOL);
-
 			echo "-> Verarbeite alle gefundenen Wetterwarnungen (Anzahl: " . count($arrRohWarnungen) . ")" . PHP_EOL;
 			if (count($arrRohWarnungen) > 0) {
+				// Sollen die Wetterwarnungen hinzugefügt werden zu bestehenden?
+				if($append !== true) $this->wetterWarnungen = [];
+
 				// Durchlaufe alle Warnungen
 				foreach ($arrRohWarnungen as $filename => $rawWarnung) {
 					echo("\tWetterwarnung aus " . $filename . ":" . PHP_EOL);
@@ -559,30 +560,30 @@ class WarnParser extends ErrorLogging {
 					if (!property_exists($currentWarnung, "onset")) {
 						throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'onset'.");
 					} else {
-						$strRawDate = str_replace("+00:00", "", (string)$wetterWarnung->{"onset"});
+						$strRawDate = str_replace("+00:00", "", (string)$currentWarnung->{"onset"});
 						$objDateOnset = DateTime::createFromFormat('Y-m-d*H:i:s', $strRawDate, new DateTimeZone("UTC"));
 						if (!$objDateOnset) {
-							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung beinhaltet ungültige Daten im XML-Mode  XML-Node 'warnung'->'onset'.");
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung beinhaltet ungültige Daten im XML-Node 'warnung'->'onset'.");
 						} else {
 							// Zeitzone auf Deutschland umstellen
 							$objDateOnset->setTimezone(new DateTimeZone("Europe/Berlin"));
-							$parsedWarnInfo["onset"] = $objDateOnset->format("d.m.Y H:i");
 						}
+						$parsedWarnInfo["startzeit"] = serialize($objDateOnset);
 					}
 
 					// Expire-Zeitpunkt setzen (entweder aus der Wetterwarnung oder geschätzt)
 					if (!property_exists($currentWarnung, "expires")) {
 						$objDateExpires = $objDateOnset;
-						$parsedWarnInfo["expires"] = $parsedWarnInfo["onset"];
+						$parsedWarnInfo["endzeit"] = $parsedWarnInfo["startzeit"];
 					} else {
-						$strRawDate = str_replace("+00:00", "", (string)$wetterWarnung->{"expires"});
+						$strRawDate = str_replace("+00:00", "", (string)$currentWarnung->{"expires"});
 						$objDateExpires = DateTime::createFromFormat('Y-m-d*H:i:s', $strRawDate, new DateTimeZone("UTC"));
 						if (!$objDateExpires) {
-							throw new Exception("Fehler in parseWetterWarnung: Der Zeitpunkt im 'expires'-Node konnte nicht verarbeitet werden.");
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung beinhaltet ungültige Daten im XML-Node 'warnung'->'expires'.");
 						} else {
 							$objDateExpires->setTimezone(new DateTimeZone("Europe/Berlin"));
-							$parsedWarnInfo["expires"] = $objDateExpires->format("d.m.Y H:i");
 						}
+						$parsedWarnInfo["endzeit"] = serialize($objDateExpires);
 					}
 
 					// Aktuelle Uhrzeit
@@ -595,27 +596,194 @@ class WarnParser extends ErrorLogging {
 					} else {
 						// Warnung ist aktuell -> verarbeite Warnung
 
+						// Warnstufe
+						if (!property_exists($currentWarnung, "severity")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'severity'.");
+						} else {
+							// Severity ermitteln und auf die DWD "Sprache" übersetzen
+							$severity = (string)$wetterWarnung->{"severity"};
+							switch ($severity) {
+								case "Minor":
+									$parsedWarnInfo["severity"] = "Wetterwarnung";
+									$parsedWarnInfo["warnstufe"] = 1;
+									break;
+								case "Moderate":
+									$parsedWarnInfo["severity"] = "Markante Wetterwarnung";
+									$parsedWarnInfo["warnstufe"] = 2;
+									break;
+								case "Severe":
+									$parsedWarnInfo["severity"] = "Unwetterwarnung";
+									$parsedWarnInfo["warnstufe"] = 3;
+									break;
+								case "Extreme":
+									$parsedWarnInfo["severity"] = "Extreme Unwetterwarnung";
+									$parsedWarnInfo["warnstufe"] = 4;
+									break;
+								default:
+									$parsedWarnInfo["severity"] = "Unbekannt";
+									$parsedWarnInfo["warnstufe"] = -1;
+							}
+						}
+
+						// Dringlichkeit - handelt es sich um eien Vorab-Warnung
+						if (!property_exists($currentWarnung, "urgency")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'urgency'.");
+						} else {
+							// Im Fall einer Vorhersage (Urgency == Future oder OnSet-Zeitpunkt in der Zukunft)
+							$parsedWarnInfo["urgency"] = (string)$currentWarnung->{"urgency"};
+							if((string)$currentWarnung->{"urgency"} == "Future" || $objDateOnset->getTimestamp() > time()) {
+								$parsedWarnInfo["warnstufe"] = 0;
+								$parsedWarnInfo["severity"] = "Vorwarnung";
+							}
+						}
+
+						// Ermittle die Inhalt für das erstellen des Textes der Wetterwarnung selber
+						if (!property_exists($currentWarnung, "headline")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'headline'.");
+						} else {
+							$parsedWarnInfo["headline"] = (string)$currentWarnung->{"headline"};
+						}
+						if (!property_exists($currentWarnung, "description")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'description'.");
+						} else {
+							$parsedWarnInfo["description"] = (string)$currentWarnung->{"description"};
+						}
+						if (!property_exists($currentWarnung, "instruction")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'instruction'.");
+						} else {
+							$parsedWarnInfo["instruction"] = (string)$currentWarnung->{"instruction"};
+						}
+						if (!property_exists($currentWarnung, "senderName")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'senderName'.");
+						} else {
+							$parsedWarnInfo["sender"] = (string)$currentWarnung->{"senderName"};
+						}
+						if (!property_exists($currentWarnung, "web")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'web'.");
+						} else {
+							$parsedWarnInfo["web"] = (string)$currentWarnung->{"web"};
+						}
+
+						// Warnregion ermitteln samt des ausgeschriebenen Ländernamen
+						if (!property_exists($rawWarnung["region"], "warncellid")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'region' das XML-Node 'warncellid'.");
+						} else {
+							$parsedWarnInfo["warncellid"] = (string)$rawWarnung["region"]->{"warncellid"};
+						}
+						if (!property_exists($rawWarnung["region"], "areaDesc")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'region' das XML-Node 'areaDesc'.");
+						} else {
+							$parsedWarnInfo["area"] = (string)$rawWarnung["region"]->{"areaDesc"};
+						}
+						if (!property_exists($rawWarnung["region"], "stateName")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'region' das XML-Node 'stateName'.");
+						} else {
+							$parsedWarnInfo["stateLong"] = (string)$rawWarnung["region"]->{"stateName"};
+						}
+						if (!property_exists($rawWarnung["region"], "stateCode")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'stateCode' das XML-Node 'stateName'.");
+						} else {
+							$parsedWarnInfo["stateShort"] = (string)$rawWarnung["region"]->{"stateCode"};
+						}
+
+						// Höhenangnaben ermitteln umd umrechnen
+						if (!property_exists($rawWarnung["region"], "altitude") || !property_exists($rawWarnung["region"], "ceiling")) {
+							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlen XML-Nodes 'region'->'altitude' und/oder 'region'->'ceiling.");
+						} else {
+							// abrunden, anstatt wie laut CAPS Doku aufruden -> das Ergebnis passt sonst nicht zum Text
+							$parsedWarnInfo["altitude"] = floor($rawWarnung["region"]->{"altitude"} * 0.3048);
+							$parsedWarnInfo["ceiling"] = floor($rawWarnung["region"]->{"ceiling"} * 0.3048 );
+							if($rawWarnung["region"]->{"altitude"} == 0 & $rawWarnung["region"]->{"ceiling"} != 9842.5197) {
+								$parsedWarnInfo["hoehenangabe"] = "Höhenlagen unter " . $parsedWarnInfo["ceiling"] . "m";
+							} else if($rawWarnung["region"]->{"altitude"} != 0 & $rawWarnung["region"]->{"ceiling"} == 9842.5197) {
+								$parsedWarnInfo["hoehenangabe"] = "Höhenlagen über " . $parsedWarnInfo["altitude"] . "m";
+							} else {
+								$parsedWarnInfo["hoehenangabe"] = "Alle Höhenlagen";
+							}
+						}
+
+						// MD5Hash erzeugen aus Angaben der Wetterwarnung
+						$strForHash  = $parsedWarnInfo["warnstufe"] . $parsedWarnInfo["event"] . $objDateOnset->getTimestamp() . $objDateExpires->getTimestamp();
+						$strForHash .= $parsedWarnInfo["area"] . $parsedWarnInfo["headline"] . $parsedWarnInfo["description"] . $parsedWarnInfo["instruction"];
+						$parsedWarnInfo["hash"] = md5($strForHash);
+
+						// Ausgabe der Anwendung:
+						echo "\t\t* Wetterwarnung für '" . $parsedWarnInfo["event"] . "' verarbeitet" . PHP_EOL;
 					}
 
-
-
-					// Ermittle-Warnkennung
-					echo PHP_EOL . "-- PAUSE --" . PHP_EOL;
-					$fp = fopen("php://stdin","r"); fgets($fp);
-					var_dump($parsedWarnInfo);
+					// Wetterwarnung übernehmen und neu sortieren
+					$this->wetterWarnungen[$parsedWarnInfo["hash"]] = $parsedWarnInfo;
+					asort($this->wetterWarnungen);
 				}
-
-
-				//var_dump($arrRohWarnungen);
 			} else {
 				echo ("\tKeine Warnmeldungen zum verarbeiten vorhanden" . PHP_EOL);
 			}
-
-
-
 		} catch (Exception $e) {
 			// Fehler an Logging-Modul übergeben
 			$this->logError($e, $this->tmpFolder);
+		}
+	}
+
+	/**
+	 * Speichern der Wetterwarnung in JSON Datei
+	 * @return bool
+	 */
+	public function saveToLocalJsonFile() {
+		try {
+			echo PHP_EOL . "*** Beginne speichern der Wetterwarnungen:" . PHP_EOL;
+
+			// Prüfe ob Zugriff auf json-Datei existiert
+			if(empty($this->localJsonFile) || !is_writeable($this->localJsonFile)) {
+				throw new Exception("Es ist kein Pfad zu der lokalen JSON-Datei mit den Wetterwarnungen vorhanden oder es besteht kein Schreibzugriff auf die Datei (Pfad: " . $this->localJsonFile . ")");
+			}
+
+			// Wetterwarnungen aufbereiten (Key entfernen)
+			$wetterWarnungen = array("anzahl" => count($this->wetterWarnungen), "wetterwarnungen" => array_values($this->wetterWarnungen));
+
+			// Wandle in JSON um
+			echo "-> Konvertiere Wetterwarnungen in JSON-Daten" . PHP_EOL;
+			$jsonWetterWarnung = @json_encode( $wetterWarnungen, JSON_PRETTY_PRINT);
+			if(json_last_error() > 0) {
+				throw new Exception("Fehler während der JSON Kodierung der Wetter-Warnungen (Fehler: " . Toolbox::getJsonErrorMessage(json_last_error()) . ")");
+			}
+
+			// Ermittle MD5-Hashes der bisherigen und ehemaligen Wetterwarnungen
+			echo "-> Ermittle MD5-Hashs der bisherigen Wetterwarnung und der neuen Wetterwarnung um Änderungen festzustellen" . PHP_EOL;
+			$md5hashes = [];
+			$md5hashes["new"] = @md5($jsonWetterWarnung);
+			if(empty($md5hashes["new"] || $md5hashes["new"] === FALSE)) {
+				throw new Exception("Fehler beim erzeugen des MD5-Hashs der neuen Wetterwarnungen");
+			}
+
+			$md5hashes["old"] = @md5_file($this->localJsonFile);
+			if(empty($md5hashes["old"] || $md5hashes["old"] === FALSE)) {
+				throw new Exception("Fehler beim erzeugen des MD5-Hashs der bisherigen Wetterwarnungen");
+			}
+
+			echo "\t\tMD5-Hashs der bisherigen Wetterwarnungen:\t" . $md5hashes["old"] . PHP_EOL;
+			echo "\t\tMD5-Hashs der neuenWetterwarnungen:\t\t" . $md5hashes["new"] . PHP_EOL;
+
+
+			// Gab es eine Änderung?
+			if($md5hashes["old"] !== $md5hashes["new"]) {
+				echo "-> Änderung bei den Wetterwarnungen gefunden - speichere neue Wetterwarnung" . PHP_EOL;
+				$saveJson = file_put_contents($this->localJsonFile, $jsonWetterWarnung);
+				if(!$saveJson) {
+					throw new Exception("Fehler beim speichern der verarbeiteten Wetterwarnungen (Pfad: " . $this->localJsonFile . ")");
+				}
+
+				$fileupdated = true;
+			} else {
+				echo "-> Keine Änderung bei den Wetterwarnungen vorhanden - kein speichern notwendig" . PHP_EOL;
+				$fileupdated = false;
+			}
+
+			return $fileupdated ;
+		} catch (Exception $e) {
+			// Fehler an Logging-Modul übergeben
+			$this->logError($e, $this->tmpFolder);
+
+			return false;
 		}
 	}
 
@@ -805,6 +973,14 @@ class WarnParser extends ErrorLogging {
 	 */
 	public function setRemoteFolder(string $remoteFolder) {
 		$this->remoteFolder = $remoteFolder;
+	}
+
+	/**
+	 * Getter-Methode für WetterWarnungen
+	 * @return array Liste mit Wetterwarnungen
+	 */
+	public function getWetterWarnungen(): array {
+		return $this->wetterWarnungen;
 	}
 }
 
