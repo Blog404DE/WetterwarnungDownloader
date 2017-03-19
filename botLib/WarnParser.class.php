@@ -553,7 +553,7 @@ class WarnParser extends ErrorLogging {
 					if (!property_exists($currentWarnung, "event")) {
 						throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'event.");
 					} else {
-						$parsedWarnInfo["event"] = (string)$wetterWarnung->{"event"};
+						$parsedWarnInfo["event"] = (string)$currentWarnung->{"event"};
 					}
 
 					// Start- und Ablaufdatum ermitteln
@@ -601,7 +601,7 @@ class WarnParser extends ErrorLogging {
 							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'severity'.");
 						} else {
 							// Severity ermitteln und auf die DWD "Sprache" übersetzen
-							$severity = (string)$wetterWarnung->{"severity"};
+							$severity = (string)$currentWarnung->{"severity"};
 							switch ($severity) {
 								case "Minor":
 									$parsedWarnInfo["severity"] = "Wetterwarnung";
