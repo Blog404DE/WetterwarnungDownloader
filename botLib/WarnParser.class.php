@@ -146,7 +146,7 @@ class WarnParser extends ErrorLogging {
 				echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
 				@ftp_pasv(($this->ftpConnectionId), true);
 			}
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			$this->logError($e);
 		}
 	}
@@ -269,7 +269,7 @@ class WarnParser extends ErrorLogging {
 
 				}
 			}
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			$this->logError($e);
 		}
 	}
@@ -326,7 +326,7 @@ class WarnParser extends ErrorLogging {
 			} else {
 				echo("\tEs muss keine Datei gelöscht werden" . PHP_EOL);
 			}
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			// Fehler-Handling
 			$this->logError($e);
 		}
@@ -351,7 +351,7 @@ class WarnParser extends ErrorLogging {
 			} else {
 				echo "-> Keine abschließenden Arbeiten otwendigArbeiten notwendig" . PHP_EOL;
 			}
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			// Fehler-Handling
 			$this->logError($e);
 		}
@@ -396,7 +396,7 @@ class WarnParser extends ErrorLogging {
 			// ZIP-Dateien in Temporär-Ordner entpacken
 			echo "-> Entpacke die Wetterwarnungen des DWD" . PHP_EOL;
 			Toolbox::extractAllZipFiles($this->localFolder, $this->tmpFolder, 1);
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			// Fehler an Logging-Modul übergeben
 			$this->logError($e, $this->tmpFolder);
 		}
@@ -915,7 +915,7 @@ class WarnParser extends ErrorLogging {
 			} else {
 				throw new Exception("In den lokale Ordner " . $localFolder . " existiert nicht.");
 			}
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			$this->logError($e);
 		}
 	}
@@ -954,7 +954,7 @@ class WarnParser extends ErrorLogging {
 
 			// Variable setzen
 			$this->localJsonFile = $localJsonFile;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 			$this->logError($e);
 		}
 	}
@@ -999,10 +999,10 @@ class ErrorLogging {
 	/**
 	 * Fehler innerhalb der Anwendung verarbeiten
 	 *
-	 * @param \Exception $e
+	 * @param Exception $e
 	 * @param string $tmpPath
 	 */
-	protected function logError(\Exception $e, string $tmpPath = NULL) {
+	protected function logError(Exception $e, string $tmpPath = NULL) {
 		// Zeitpunkt
 		$strDate = date("Y-m-d H:i:s");
 
