@@ -122,12 +122,12 @@ class WarnParser extends ErrorLogging {
 	/**
 	 * Verbindung zum DWD FTP Server aufbauen
 	 *
-	 * @param $host
-	 * @param $username
-	 * @param $password
-	 * @param $passiv
+	 * @param string $host FTP Host des DWD
+	 * @param string $username FTP Username des DWD
+	 * @param string $password FTP Passwort des DWD
+	 * @param bool $passiv FTP passive oder aktive Verbindung verwenden
 	 */
-	public function connectToFTP($host, $username, $password, $passiv = false) {
+	public function connectToFTP(string $host, string $username, string $password, bool $passiv = false) {
 		try {
 			echo "*** Baue Verbindung zum DWD-FTP Server auf." . PHP_EOL;
 
