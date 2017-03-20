@@ -33,8 +33,6 @@ namespace blog404de\WetterScripts;
 
 /**
  * Benötigte Module laden
- *
- * @TODO: Auslagern in autoload.php
  */
 
 require_once "Toolbox.php";
@@ -70,15 +68,23 @@ class WarnParser extends ErrorLogging {
 
 	/** @var array Array mit Bundesländer in Deutschland */
 	private $regionames = [
-		"BB"  => "Brandenburg",			"BL" => "Berlin",
-		"BW"  => "Baden-Würtemberg",	"BY" => "Bayern",
-		"HB"  => "Bremen",				"HE" => "Hessen",
-		"HH"  => "Hamburg",				"MV" => "Mecklenburg-Vorpommern",
-		"NRW" => "Nordrhein-Westfalen",	"NS" => "Niedersachsen",
-		"RP"  => "Rheinland-Pfalz",		"SA" => "Sachsen-Anhalt",
-		"SH"  => "Schleswig-Holstein",	"SL" => "Saarland",
-		"SN"  => "Sachsen",				"TH" => "Thüringen",
-		"DE" => "Bundesrepublik Deutschland"
+		"BB"  => "Brandenburg",
+		"BL"  => "Berlin",
+		"BW"  => "Baden-Würtemberg",
+		"BY"  => "Bayern",
+		"HB"  => "Bremen",
+		"HE"  => "Hessen",
+		"HH"  => "Hamburg",
+		"MV"  => "Mecklenburg-Vorpommern",
+		"NRW" => "Nordrhein-Westfalen",
+		"NS"  => "Niedersachsen",
+		"RP"  => "Rheinland-Pfalz",
+		"SA"  => "Sachsen-Anhalt",
+		"SH"  => "Schleswig-Holstein",
+		"SL"  => "Saarland",
+		"SN"  => "Sachsen",
+		"TH"  => "Thüringen",
+		"DE"  => "Bundesrepublik Deutschland"
 	];
 
 	/**
@@ -251,7 +257,7 @@ class WarnParser extends ErrorLogging {
 								echo sprintf("\tDatei %s wurde erfolgreich heruntergeladen (Remote: %s).", $localFile, date("d.m.Y H:i:s" , $remoteFileMTime)) . PHP_EOL;
 							} else {
 								echo sprintf("\tDatei %s wurde erneut erfolgreich heruntergeladen (Lokal: %s / Remote: %s).",
-									$localFile, date("d.m.Y H:i:s" , $localFileMTime), date("d.m.Y H:i:s" , $remoteFileMTime)) . PHP_EOL;
+										$localFile, date("d.m.Y H:i:s" , $localFileMTime), date("d.m.Y H:i:s" , $remoteFileMTime)) . PHP_EOL;
 							}
 						} else {
 							throw new Exception(sprintf("\tDatei %s wurde erneut erfolgreich heruntergeladen.", $localFile));
@@ -1008,9 +1014,9 @@ class ErrorLogging {
 
 		// Fehler-Ausgabe erzeugen:
 		$longText = sprintf("Fehler im Programmablauf:" . PHP_EOL .
-							"\tZeitpunkt: %s" . PHP_EOL .
-							"\tFehlermeldung: %s" . PHP_EOL .
-							"\tPosition: %s:%d",
+			"\tZeitpunkt: %s" . PHP_EOL .
+			"\tFehlermeldung: %s" . PHP_EOL .
+			"\tPosition: %s:%d",
 			$strDate, $e->getMessage(), $e->getFile(), $e->getLine()
 		);
 

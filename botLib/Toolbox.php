@@ -45,45 +45,45 @@ class Toolbox {
 	 * @throws \Exception
 	 */
 	public static function extractAllZipFiles(string $source, string $destination, int $maxFiles = -1) {
-			// Erzeuge Array mit allen ZIP-Dateien
-			$localZipFiles = array();
-			$handle = @opendir($source);
-			if ($handle) {
-				while (false !== ($entry = readdir($handle))) {
-					if (! is_dir($source . DIRECTORY_SEPARATOR . $entry)) {
-						$fileinfo = pathinfo($source . DIRECTORY_SEPARATOR . $entry);
-						if ($fileinfo["extension"] == "zip")
-							$localZipFiles[] = $entry;
-					}
+		// Erzeuge Array mit allen ZIP-Dateien
+		$localZipFiles = array();
+		$handle = @opendir($source);
+		if ($handle) {
+			while (false !== ($entry = readdir($handle))) {
+				if (! is_dir($source . DIRECTORY_SEPARATOR . $entry)) {
+					$fileinfo = pathinfo($source . DIRECTORY_SEPARATOR . $entry);
+					if ($fileinfo["extension"] == "zip")
+						$localZipFiles[] = $entry;
 				}
-				closedir($handle);
+			}
+			closedir($handle);
+		} else {
+			throw new \Exception("Fehler beim durchsuchen des Ordners " . $source . " mit den ZIP-Dateien");
+		}
+
+		// Eigentlich darf aktuell nur eine ZIP Datei vorhanden sein (vorbereitet aber für >1 ZIP Datei)
+		if ($maxFiles != -1 && count($localZipFiles) > $maxFiles) {
+			throw new \Exception("Die maximale Anzahl an erlaubten ZIP-Dateien (" . $maxFiles . ") wurde überschritten");
+		}
+
+		// Existiert der Ordner?
+		if(!is_writeable($destination)) {
+			throw new \Exception("Der Ziel-Ordner " . $destination . " für die entpackten ZIP-Dateien existiert nicht oder hat keine Schreib-Rechte");
+		}
+
+		// Entpacke ZIP-Dateien
+		foreach ($localZipFiles as $zipFile) {
+			// Öffne ZIP Datei
+			$zip = new ZipArchive();
+			$res = $zip->open($source . DIRECTORY_SEPARATOR . $zipFile);
+			if ($res === true) {
+				echo "\tEntpacke ZIP-Datei: " . $zipFile . " (" . $zip->numFiles . " Datei" . ($zip->numFiles > 1 ? "en" : "") . ")" . PHP_EOL;
+				$zip->extractTo($destination);
+				$zip->close();
 			} else {
-				throw new \Exception("Fehler beim durchsuchen des Ordners " . $source . " mit den ZIP-Dateien");
+				throw new \Exception("Fehler beim öffnen der ZIP Datei '" . $zipFile . "'. Fehlercode: " . $res . " / " . Toolbox::getZipErrorMessage($res));
 			}
-
-			// Eigentlich darf aktuell nur eine ZIP Datei vorhanden sein (vorbereitet aber für >1 ZIP Datei)
-			if ($maxFiles != -1 && count($localZipFiles) > $maxFiles) {
-				throw new \Exception("Die maximale Anzahl an erlaubten ZIP-Dateien (" . $maxFiles . ") wurde überschritten");
-			}
-
-			// Existiert der Ordner?
-			if(!is_writeable($destination)) {
-				throw new \Exception("Der Ziel-Ordner " . $destination . " für die entpackten ZIP-Dateien existiert nicht oder hat keine Schreib-Rechte");
-			}
-
-			// Entpacke ZIP-Dateien
-			foreach ($localZipFiles as $zipFile) {
-				// Öffne ZIP Datei
-				$zip = new ZipArchive();
-				$res = $zip->open($source . DIRECTORY_SEPARATOR . $zipFile);
-				if ($res === true) {
-					echo "\tEntpacke ZIP-Datei: " . $zipFile . " (" . $zip->numFiles . " Datei" . ($zip->numFiles > 1 ? "en" : "") . ")" . PHP_EOL;
-					$zip->extractTo($destination);
-					$zip->close();
-				} else {
-					throw new \Exception("Fehler beim öffnen der ZIP Datei '" . $zipFile . "'. Fehlercode: " . $res . " / " . Toolbox::getZipErrorMessage($res));
-				}
-			}
+		}
 	}
 
 	/**
