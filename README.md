@@ -1,14 +1,15 @@
 # Wetterwarnung Downloader Script
 
+> **Wichtige Änderungen (21.03.2017):**
+>
+> Die Struktur der Ziel-JSON Datei wurde vereinheitlicht und um ein Zähler mit der Anzahl der Wetterwarnungen erweitert. Anpassungen an den Scripten sind daher notwendig.
+
+
 ## Einleitung
 
 Bei dem Wetterwarnung-Downloader handelt es sich um ein Script zum automatischen herunterladen aktueller Wetterwarnungen für eine bestimmte Warnregion. Die Wetterwarnungen werden im Rahmen der Grundversorgung des DWD bereitgestellt. Details zur Grundversorgung finden sich auf der [NeuthardWetterScripts Hauptseite](https://github.com/Blog404DE/NeuthardWetterScripts).
 
 Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch wenn das Script ausführlich getestet wurde, so kann niemand garantieren, dass keine Fehler oder Probleme auftreten. 
-
-##### Wichtige Änderungen:
-- *08.11.2015:* Die Struktur der Ziel-JSON Datei wurde vereinheitlicht und um ein Zähler mit der Anzahl der Wetterwarnungen erweitert. Anpassungen an den Scripten sind daher notwendig.
-	
 
 ## Anleitung zur Einrichtung des Wetterwarnung-Downloader
 
