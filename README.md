@@ -1,6 +1,6 @@
 # Wetterwarnung Downloader Script
 
-## HINWEIS: Das Repository 'CodeRewrite' beinhaltet keine lauffähige Version des Scripts. In diesem Repository wird der Wetterwarnung Downloader von Grund auf neu entwickelt.
+### HINWEIS: Das Repository 'CodeRewrite' beinhaltet eine von Grund auf neu entwickelt Version des Scriptes, welches sich noch in einer Beta-Fassung befindet.
 
 ## Einleitung
 
@@ -9,7 +9,7 @@ Bei dem Wetterwarnung-Downloader handelt es sich um ein Script zum automatischen
 Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch wenn das Script ausführlich getestet wurde, so kann niemand garantieren, dass keine Fehler oder Probleme auftreten. 
 
 ##### Wichtige Änderungen:
-- *19.03.2017:* Ein kompletter Code-Rewrite wurde durchgeführt. Aus diesem Grund hat sich auch die Konfigurationsdatei geändert. Unbedingt daher die Konfigurationsdatei nach der folgenden Anleitung neu anlegen. Zusätzlich haben sich auch die Software-Vorrausetzungen geändert. 
+- *21.03.2017:* Ein kompletter Code-Rewrite wurde durchgeführt. Aus diesem Grund hat sich auch die Konfigurationsdatei geändert. Unbedingt daher die Konfigurationsdatei nach der folgenden Anleitung neu anlegen. Zusätzlich haben sich auch die Software-Vorrausetzungen geändert. 
 	
 
 ## Anleitung zur Einrichtung des Wetterwarnung-Downloader
@@ -65,20 +65,20 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 2. Der zweite Konfigurationsparmaeter ist die Angabe für die Region, für welche die Wetterwarnungen ermittelt werden sollen. Die WarnCellID ist dabei die Nummer, welche im vorherigen Schritt ermittelt wurde. 
 
 	```php
-	$unwetterConfig["WarnCellIds"]     		= 908215999;  
+	$unwetterConfig["WarnCellIds"] = 908215999;  
 	```
 	
 	Sie können auch mehrere WarnCellIDs angeben. Hierfür verwenden Sie ein einfaches Array für den Konfigurationsparameter.
 	
 	```php
-	$unwetterConfig["WarnCellIds"]      	= [908215999, 108215000];  
+	$unwetterConfig["WarnCellIds"] = [908215999, 108215000];  
 	```
 
 	
 3. Speicherpfad für die JSON Datei mit den Wetterwarnung-Daten:
 
 	```php
-	$unwetterConfig["localJsonWarnfile"]	= "/pfad/zur/wetterwarnung.json";
+	$unwetterConfig["localJsonWarnfile"] = "/pfad/zur/wetterwarnung.json";
 	```
 	
 	Der angegebene Pfad sollte - je nach Art der Auswertung der Wetterwarnung - innerhalb eines vom Webserver zugänglichen Ordner sich befinden.
@@ -86,7 +86,7 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 4. Speicherpfade für die vom DWD Server heruntergeladenen Wetterwarnung-Dateien:
 
 	```php
-	$unwetterConfig["localFolder"]			= "/pfad/zum/speicherordner/fuer/wetterWarnungen";
+	$unwetterConfig["localFolder"] = "/pfad/zum/speicherordner/fuer/wetterWarnungen";
 	```
 	
 	Bei *localFolder* handelt es sich um den Pfad, der die aktuellste Datei mit Wetterwarnungen beinhaltet, welche vom DWD FTP Server heruntergeladen wurde.
@@ -111,13 +111,13 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 	[ -f $LOCKFILE ] && { echo "$(basename $0) läuft schon"; exit 1; }
 
 	lock_file_loeschen() {
-    	    rm -f $LOCKFILE
+    	    rm -f ${LOCKFILE}
 	}
 
 	trap "lock_file_loeschen ; exit 1" 2 9 15
 
 	# Lock-Datei anlegen
-	echo $$ > $LOCKFILE
+	echo $$ > ${LOCKFILE}
 
 
 	# Starte Script
@@ -149,15 +149,15 @@ Um dies zu aktivieren müssen Sie in der ```config.local.php``` folgende Paramet
 1. Fehler in eine Log-Datei aufzeichnen:
 
 	```php
-	$optFehlerLogfile	= "/pfad/zur/log/error_log";						
+	$optFehlerLogfile = "/pfad/zur/log/error_log";						
 	```
 	**Wichtig**: Der Speicher-Pfad zur Log-Datei muss bereits existieren. Zusätzlich sollten Sie z.B. mittels Log-Rotate die Log-Datei automatisch rotieren lassen um ein übergroße Log-Datei zu vermeiden.
 	
 2. Fehler per E-Mail melden:	
 
 	```php
-	$optFehlerMail		= [ "empfaenger" => "deine.email@example.org", "absender" => "deine.email@example.org" ];		
-	$optFehlerLogfile	= "/pfad/zur/log/error_log";						
+	$optFehlerMail    = [ "empfaenger" => "deine.email@example.org", "absender" => "deine.email@example.org" ];		
+	$optFehlerLogfile = "/pfad/zur/log/error_log";						
 	```
 	
 	Dieses Array beinhaltet die Absender- und Empfänger-Adresse die für den Versand von E-Mails im Fehlerfall verwendet werden. Die E-Mail Unterstützung sollte *ausschließlich* zu *Test-Zwecken* aktiviert werden, da durchaus viele E-Mails generiert werden können. 
@@ -168,7 +168,7 @@ Um dies zu aktivieren müssen Sie in der ```config.local.php``` folgende Paramet
 Das Script erzeugt eine JSON Datei mit, welche die Anzahl der Wetterrwarnungen *(anzahl)* sowie die Informationen zu den entsprechenden Wetterwarnungen *(wetterwarnungen)* enthält. Hier zwei Beispiele für diese Datei (exemplarisch mit einer Meldung, wobei das Array mit den Wetterwarnungen durchaus mehrere Meldungen beinhalten kann sowie ein Beispiel einer Datei falls keine Wetterwarnung aktuell existiert):
 
 ```json
-
+{
     "anzahl": 1,
     "wetterwarnungen": [
         {
@@ -248,5 +248,5 @@ Solltet Ihr Fragen oder Anregungen haben, so steht euch offen sich jederzeit an 
 --
 ##### Lizenz-Information:
 
-Copyright Jens Dutzi 2015-2017 / Stand: 05.03.2017 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
+Copyright Jens Dutzi 2015-2017 / Stand: 21.03.2017 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
 
