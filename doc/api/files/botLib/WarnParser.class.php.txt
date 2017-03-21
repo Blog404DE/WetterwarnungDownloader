@@ -46,7 +46,7 @@ use Exception, DateTime, DateTimeZone, \blog404de\Toolbox;
  */
 class WarnParser extends ErrorLogging {
 	/** @var bool $strictMode Verarbeite Wetterwarnungen im Strict-Modus und unterbreche den Ablauf bei unbekanntem Warn-Typ */
-	public $strictMode = false;
+	public $strictMode = FALSE;
 
 	/** @var string Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen */
 	private $remoteFolder = "/gds/gds/specials/alerts/cap/GER/community_status_geometry";
@@ -61,7 +61,7 @@ class WarnParser extends ErrorLogging {
 	private $localJsonFile = "";
 
 	/** @var string|bool $tmpFolder Ordner für temporäre Dateien */
-	private $tmpFolder = false;
+	private $tmpFolder = FALSE;
 
 	/** @var array $wetterWarnungen Aktuelle geparsten Wetterwarnungen */
 	private $wetterWarnungen = [];
@@ -127,13 +127,13 @@ class WarnParser extends ErrorLogging {
 	 * @param string $password FTP Passwort des DWD
 	 * @param bool $passiv FTP passive oder aktive Verbindung verwenden
 	 */
-	public function connectToFTP(string $host, string $username, string $password, bool $passiv = false) {
+	public function connectToFTP(string $host, string $username, string $password, bool $passiv = FALSE) {
 		try {
 			echo "*** Baue Verbindung zum DWD-FTP Server auf." . PHP_EOL;
 
 			// FTP-Verbindung aufbauen
 			$this->ftpConnectionId = ftp_connect($host);
-			if($this->ftpConnectionId === false) {
+			if($this->ftpConnectionId === FALSE) {
 				throw new Exception( "FTP Verbindungsaufbau zu " . $host . " ist fehlgeschlagen" . PHP_EOL);
 			}
 
@@ -148,9 +148,9 @@ class WarnParser extends ErrorLogging {
 			}
 
 			// Auf Passive Nutzung umschalten
-			if($passiv == true) {
+			if($passiv == TRUE) {
 				echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
-				@ftp_pasv(($this->ftpConnectionId), true);
+				@ftp_pasv(($this->ftpConnectionId), TRUE);
 			}
 		} catch (Exception $e) {
 			$this->logError($e);
@@ -429,7 +429,7 @@ class WarnParser extends ErrorLogging {
 			$localXmlFiles = array();
 			$handle = @opendir($this->tmpFolder);
 			if ($handle) {
-				while (false !== ($entry = readdir($handle))) {
+				while (FALSE !== ($entry = readdir($handle))) {
 					if (! is_dir($this->tmpFolder . DIRECTORY_SEPARATOR . $entry)) {
 						$fileinfo = pathinfo($this->tmpFolder . DIRECTORY_SEPARATOR . $entry);
 						if ($fileinfo["extension"] == "xml")
@@ -487,7 +487,7 @@ class WarnParser extends ErrorLogging {
 						if (!property_exists($wetterWarnung, "eventCode")) {
 							throw new Exception(PHP_EOL . "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'eventCode'-Node.");
 						} else {
-							$testWarnung = false;
+							$testWarnung = FALSE;
 							foreach ($wetterWarnung->{"eventCode"} as $eventCode) {
 								if (! isset($eventCode->{"valueName"}) || ! isset($eventCode->{"value"})) {
 									throw new Exception(PHP_EOL . "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'eventCode'->'valueName' bzw. 'value'-Node.");
@@ -495,7 +495,7 @@ class WarnParser extends ErrorLogging {
 
 								// Schaue nach EventName = "II" und prüfe ob der Wert auf 98/99 steht (=Testwarnung)
 								if ((string)$eventCode->{"valueName"} == "II") {
-									if ((string)$eventCode->{"value"} == "98" || (string)$eventCode->{"value"} == "99") $testWarnung = true;
+									if ((string)$eventCode->{"value"} == "98" || (string)$eventCode->{"value"} == "99") $testWarnung = TRUE;
 								}
 							}
 						}
@@ -533,7 +533,7 @@ class WarnParser extends ErrorLogging {
 			echo "-> Verarbeite alle gefundenen Wetterwarnungen (Anzahl: " . count($arrRohWarnungen) . ")" . PHP_EOL;
 			if (count($arrRohWarnungen) > 0) {
 				// Sollen die Wetterwarnungen hinzugefügt werden zu bestehenden?
-				if($append !== true) $this->wetterWarnungen = [];
+				if($append !== TRUE) $this->wetterWarnungen = [];
 
 				// Durchlaufe alle Warnungen
 				foreach ($arrRohWarnungen as $filename => $rawWarnung) {
@@ -718,7 +718,8 @@ class WarnParser extends ErrorLogging {
 
 						// Wetterwarnung übernehmen und neu sortieren
 						$this->wetterWarnungen[$parsedWarnInfo["hash"]] = $parsedWarnInfo;
-						asort($this->wetterWarnungen);					}
+						asort($this->wetterWarnungen);
+					}
 				}
 			} else {
 				echo ("\tKeine Warnmeldungen zum verarbeiten vorhanden" . PHP_EOL);
@@ -777,10 +778,10 @@ class WarnParser extends ErrorLogging {
 					throw new Exception("Fehler beim speichern der verarbeiteten Wetterwarnungen (Pfad: " . $this->localJsonFile . ")");
 				}
 
-				$fileupdated = true;
+				$fileupdated = TRUE;
 			} else {
 				echo "-> Keine Änderung bei den Wetterwarnungen vorhanden - kein speichern notwendig" . PHP_EOL;
-				$fileupdated = false;
+				$fileupdated = FALSE;
 			}
 
 			return $fileupdated ;
@@ -788,7 +789,7 @@ class WarnParser extends ErrorLogging {
 			// Fehler an Logging-Modul übergeben
 			$this->logError($e, $this->tmpFolder);
 
-			return false;
+			return FALSE;
 		}
 	}
 
@@ -806,7 +807,7 @@ class WarnParser extends ErrorLogging {
 	private function searchForWarnAreaInCAP(\SimpleXMLElement $WarnInfoNode, int $warnCellId) {
 		try {
 			// Lege Result- und Hits-Variable an
-			$result = false;
+			$result = FALSE;
 			$hits = 0;
 
 			// Durchlaufe den gesamten Info-Node
@@ -891,7 +892,7 @@ class WarnParser extends ErrorLogging {
 			// Fehler-Handling
 			$this->logError($e, $this->tmpFolder);
 
-			return false;
+			return FALSE;
 		}
 	}
 
