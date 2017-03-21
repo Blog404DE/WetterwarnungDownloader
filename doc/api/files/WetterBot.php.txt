@@ -38,26 +38,30 @@
  * ======================================================
  */
 try {
+	// Root-Verzeichnis festlegen
+	define( 'ROOT_PATH', dirname( __FILE__ ) . "/" );
+
 	// Notwendige Libs laden
 	$unwetterConfig = [];
-	require_once dirname(__FILE__) . "/botLib/WarnParser.class.php";
+	require_once ROOT_PATH . "botLib/WarnParser.class.php";
 
 	/*
- * Script-Header ausgeben
- */
+ 	 * Script-Header ausgeben
+ 	 */
 
 	echo(PHP_EOL);
-	echo("Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL);
-	echo("=====================================" . PHP_EOL);
+	$header  = "Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL;
+	$header .= str_repeat("=", strlen(trim($header))) . PHP_EOL;
+	echo $header;
 
-	if(is_readable(dirname(__FILE__) . "/config.local.php")) {
-		require_once dirname(__FILE__) . "/config.local.php";
+	if(is_readable(ROOT_PATH . "config.local.php")) {
+		require_once ROOT_PATH . "config.local.php";
 	} else {
 		throw new Exception("Konfigurationsdatei 'config.local.php' existiert nicht. Zur Konfiguration lesen Sie README.md");
 	}
 
 	// Prüfe Konfigurationsdatei auf Vollständigkeit
-	$configKeysNeeded = ["WarnCellId", "localJsonWarnfile", "localFolder", "ftp"];
+	$configKeysNeeded = ["WarnCellIds", "localJsonWarnfile", "localFolder", "ftp"];
 	foreach ($configKeysNeeded as $configKey) {
 		if (array_key_exists($configKey, $unwetterConfig)) {
 		} else {
@@ -73,7 +77,6 @@ try {
 	 *  WarnParser instanzieren
 	 */
 	$warnBot = new \blog404de\WetterScripts\WarnParser();
-
 
 	// Konfiguriere Bot
 	$warnBot->setLocalFolder($unwetterConfig["localFolder"]);
@@ -92,65 +95,31 @@ try {
 		$warnBot->connectToFTP($unwetterConfig["ftp"]["host"], $unwetterConfig["ftp"]["username"], $unwetterConfig["ftp"]["password"], $unwetterConfig["ftp"]["passiv"]);
 		$warnBot->updateFromFTP();
 		$warnBot->disconnectFromFTP();
+		$warnBot->cleanLocalDownloadFolder();
 	}
 
 	// Wetterwarnungen vorbereiten
 	$warnBot->prepareWetterWarnungen();
 
 	// Wetterwarnungen parsen
-	$warnBot->parseWetterWarnungen($unwetterConfig["WarnCellId"]);
+	if(is_numeric($unwetterConfig["WarnCellIds"])) {
+		// Nach einer einzelnen WarnCellId suchen
+		$warnBot->parseWetterWarnungen($unwetterConfig["WarnCellIds"], FALSE);
+	} else if(is_array($unwetterConfig["WarnCellIds"])) {
+		// Nach mehreren WarnCellIds suchen
+		foreach ($unwetterConfig["WarnCellIds"] as $warnCellId) {
+			$warnBot->parseWetterWarnungen($warnCellId, TRUE);
+		}
+	} else {
+		// Variablen-Typ ist falssch
+		throw new Exception("Der Konfigurationsparameter für die WarnCellId ist kein numerischer Wert oder ");
+	}
+
+	// Speichere Wetterwarnungen
+	$test = $warnBot->saveToLocalJsonFile();
 
 	// Cache aufräumen
 	$warnBot->cleanLocalCache();
-
-
-
-	//$unwetterConfig["WarnCellId"]);
-
-	/*
-	// Wetterwarnung auf via Twitter erzwingen?
-	$forceWetterUpdate = false;
-
-	echo("*** Aktualisiere die Wetterwarnungen: ***" . PHP_EOL);
-
-	// FTP-Verbindung aufbauen
-	$conn_id = ftp_connect($ftp["host"]);
-	if($conn_id === false) {
-	    fwrite(STDERR, "FTP Verbindungsaufbau zu " . $ftp["host"] . " ist fehlgeschlagen" . PHP_EOL);
-	    exit(1);
-	}
-
-	// Login mit Benutzername und Passwort
-	$login_result = @ftp_login($conn_id, $ftp["username"], $ftp["password"]);
-
-	// Verbindung überprüfen
-	if ((!$conn_id) || (!$login_result)) {
-		throw new Exception("Verbindungsaufbau zu zu " . $ftp["host"] . " mit Benutzername " . $ftp["username"] . " fehlgeschlagen.");
-	} else {
-		echo "Verbunden zu " . $ftp["host"] . " mit Benutzername " . $ftp["username"] . PHP_EOL;
-	}
-
-	// Auf Passive Nutzung umschalten
-	@ftp_pasv($conn_id, true);
-
-	// Lade Wetterdaten
-	echo("Lade aktuelle Wetterwarnungen von dem Grundversorgungsdaten des DWD (Pfad: Verzeichnis " . $unwetterConfig["localFolder"] . ")" . PHP_EOL);
-	$remoteFile = fetchUnwetterDaten($unwetterConfig, $conn_id);
-	echo("... Auftrag ausgeführt!" . PHP_EOL . PHP_EOL);
-
-	// FTP Verbindung schließen
-	ftp_close($conn_id);
-
-	// Prüfe welche Wetterwarnungen gelöscht werden können
-	echo("Prüfe welche Wetterwarnung-Dateien nicht mehr benötigt werden und veraltet sind:" . PHP_EOL);
-	cleanupUnwetterDaten($unwetterConfig, $remoteFile);
-	echo("... Auftrag ausgeführt!" . PHP_EOL . PHP_EOL);
-
-	// Verarbeite die lokalen Wetterwarnungen zu der JSON Datei für die Homepage
-	echo("Verarbeite die XML Wetterwarnungen vom DWD für die eigene Homepage (JSON-Format):" . PHP_EOL);
-	$forceWetterUpdate = parseWetterWarnung($unwetterConfig, $optFehlerMail);
-	echo("... Auftrag ausgeführt!" . PHP_EOL . PHP_EOL);
-	*/
 } catch (Exception $e) {
 	// Fehler-Handling
 	fwrite(STDERR,"Fataler Fehler: " . $e->getFile() . ":" . $e->getLine() . " - " .  $e->getMessage());
