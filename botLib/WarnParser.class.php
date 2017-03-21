@@ -598,7 +598,7 @@ class WarnParser extends ErrorLogging {
 					// Prüfe ob Warnung bereits abgelaufen ist und übersprungen werden kann
 					if ($objDateExpires->getTimestamp() <= $dateCurrent->getTimestamp() && $objDateExpires->getTimestamp() != $objDateOnset->getTimestamp()) {
 						// Warnung ist bereits abgelaufen
-						echo ("\t\t* Hinweis: Warnung über " . $parsedWarnInfo["event"] . " ist bereits am " . $parsedWarnInfo["expires"] . " abgelaufen und wird ingoriert" . PHP_EOL);
+						echo ("\t\t* Hinweis: Warnung über " . $parsedWarnInfo["event"] . " ist bereits am " . $objDateExpires->format("d.m.Y H:i:s") . " abgelaufen und wird ingoriert" . PHP_EOL);
 					} else {
 						// Warnung ist aktuell -> verarbeite Warnung
 
@@ -715,11 +715,11 @@ class WarnParser extends ErrorLogging {
 
 						// Ausgabe der Anwendung:
 						echo "\t\t* Wetterwarnung für '" . $parsedWarnInfo["event"] . "' verarbeitet" . PHP_EOL;
-					}
 
-					// Wetterwarnung übernehmen und neu sortieren
-					$this->wetterWarnungen[$parsedWarnInfo["hash"]] = $parsedWarnInfo;
-					asort($this->wetterWarnungen);
+						// Wetterwarnung übernehmen und neu sortieren
+						$this->wetterWarnungen[$parsedWarnInfo["hash"]] = $parsedWarnInfo;
+						asort($this->wetterWarnungen);
+					}
 				}
 			} else {
 				echo ("\tKeine Warnmeldungen zum verarbeiten vorhanden" . PHP_EOL);
@@ -798,6 +798,8 @@ class WarnParser extends ErrorLogging {
 	 */
 
 	/**
+	 * Info-Node der Wetterwarnungen des DWD nach einer bestimmten WarnCellID durchsuchen
+	 *
 	 * @param \SimpleXMLElement $WarnInfoNode Info-Block der zu prüfenden Wetter-Warnung
 	 * @param int $warnCellId WarnCellID nach der gesucht werden soll
 	 * @return \SimpleXMLElement|bool
@@ -987,6 +989,15 @@ class WarnParser extends ErrorLogging {
 	 */
 	public function getWetterWarnungen(): array {
 		return $this->wetterWarnungen;
+	}
+
+	/**
+	 * Methode zum löschen der Wetterwarnung-Liste
+	 */
+	public function clearWetterWarnungen() {
+		$this->wetterWarnungen = [];
+
+		return TRUE;
 	}
 }
 
