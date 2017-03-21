@@ -61,7 +61,7 @@ try {
 	}
 
 	// Prüfe Konfigurationsdatei auf Vollständigkeit
-	$configKeysNeeded = ["WarnCellId", "localJsonWarnfile", "localFolder", "ftp"];
+	$configKeysNeeded = ["WarnCellIds", "localJsonWarnfile", "localFolder", "ftp"];
 	foreach ($configKeysNeeded as $configKey) {
 		if (array_key_exists($configKey, $unwetterConfig)) {
 		} else {
@@ -102,7 +102,18 @@ try {
 	$warnBot->prepareWetterWarnungen();
 
 	// Wetterwarnungen parsen
-	$warnBot->parseWetterWarnungen($unwetterConfig["WarnCellId"]);
+	if(is_numeric($unwetterConfig["WarnCellIds"])) {
+		// Nach einer einzelnen WarnCellId suchen
+		$warnBot->parseWetterWarnungen($unwetterConfig["WarnCellIds"], FALSE);
+	} else if(is_array($unwetterConfig["WarnCellIds"])) {
+		// Nach mehreren WarnCellIds suchen
+		foreach ($unwetterConfig["WarnCellIds"] as $warnCellId) {
+			$warnBot->parseWetterWarnungen($warnCellId, TRUE);
+		}
+	} else {
+		// Variablen-Typ ist falssch
+		throw new Exception("Der Konfigurationsparameter für die WarnCellId ist kein numerischer Wert oder ");
+	}
 
 	// Speichere Wetterwarnungen
 	$test = $warnBot->saveToLocalJsonFile();

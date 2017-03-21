@@ -46,7 +46,7 @@ $unwetterConfig["ftp"]["passiv"]		= true;
 // Array mit den zu verarbeiteten Landkreisen
 // - siehe Erklärung in: README.md
 // - Beispiel: Landkreis und Stadt Karlsruhe
-$unwetterConfig["WarnCellId"]      = 908215999;
+$unwetterConfig["WarnCellIds"]      = 908215999;
 
 // Speicherpfad für JSON Datei mit den aktuellen Wetterwarnungen
 $unwetterConfig["localJsonWarnfile"]= "/pfad/zur/wetterwarnung.json";
@@ -59,7 +59,7 @@ $unwetterConfig["localFolder"]		= "/pfad/zum/speicherordner/fuer/wetterWarnungen
 /* Konfiguration für das zusenden von E-Mails bzw. das loggen in eine Datei (optional) */
 
 // Fehler per E-Mail melden
-$optFehlerMail		= [ "empfaenger" => "deine.email@example.org", "absender" => "deine.email@example.org" ];
+// $optFehlerMail		= [ "empfaenger" => "deine.email@example.org", "absender" => "deine.email@example.org" ];
 
 // Fehler in Log-Datei schreiben
-$optFehlerLogfile	= "/Volumes/DatenHDD/GitHub Projekte/Wetter/WetterwarnungDownloader/tmp/error_log";
+// $optFehlerLogfile	= "/pfad/zur/log/error_log";

@@ -39,6 +39,8 @@ use ZipArchive;
  */
 class Toolbox {
 	/**
+	 * Methode zum extrahieren aller ZIP-Dateien die sich in einem bestimmten Ordner befinden
+	 *
 	 * @param string $source Ordner mit den beinhalteten XML Dateien
 	 * @param string $destination Ordner in den der Inhalt der ZIP-Dateien entpackt werden soll
 	 * @param int $maxFiles Anzahl der ZIP-Dateien die maximal entpackt werden können (optional) / -1 = ohne Limit
