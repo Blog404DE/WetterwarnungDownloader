@@ -1,9 +1,13 @@
 <?php
-/*
- * Wetterwarn-Bot für neuthardwetter.de by Jens Dutzi
- * Version 1.0
- * 30.11.2015
- * (c) tf-network.de Jens Dutzi 2012-2015
+/**
+ * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
+ *
+ * @version 2.0-dev 2.0.0-dev
+ * @package blog404de\WetterScripts
+ * @copyright (c) tf-network.de Jens Dutzi 2012-2017
+ * @license MIT
+ *
+ * Stand: 05.03.2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -29,32 +33,33 @@
  */
 
 // FTP Zugangsdaten:
-$ftp["host"]        = "ftp-outgoing2.dwd.de";
-$ftp["username"]    = "********************";
-$ftp["password"]    = "********************";
+$unwetterConfig["ftp"] = [
+	"host"		=>	"ftp-outgoing2.dwd.de",
+	"username"	=>  "************",
+	"password"	=>	"************"
+];
+
+// Für passive FTP Verbindung aktivieren (falls FTP Transfer fehlschlägt)
+$unwetterConfig["ftp"]["passiv"]		= true;
+
 
 // Array mit den zu verarbeiteten Landkreisen
-// - siehe: Warngebiets-Liste in legend_warnings.pdf / Spalte "WarnCellId ab Ende 2015 (cap)"
+// - siehe Erklärung in: README.md
 // - Beispiel: Landkreis und Stadt Karlsruhe
-$unwetterConfig["WarnCellId"]      = "908215999";  				
+$unwetterConfig["WarnCellIds"]      = 908215999;
 
 // Speicherpfad für JSON Datei mit den aktuellen Wetterwarnungen
 $unwetterConfig["localJsonWarnfile"]= "/pfad/zur/wetterwarnung.json";
 
 // Speicherordner für die Orginal Wetterwarnungen vom DWD (localDebugFolder = optionaler Sicherungsordner für Wetterwarnungen mit unbekanntem Nachrichten-Typ wie z.B. "update")
 $unwetterConfig["localFolder"]		= "/pfad/zum/speicherordner/fuer/wetterWarnungen";
-//$unwetterConfig["localDebugFolder"]	= $unwetterConfig["localFolder"] . "/debug";
 
-// Pfad zu den XML Wetterdaten auf dem DWD FTP Server
-$unwetterConfig["remoteFolder"] = "/gds/gds/specials/alerts/cap/GER/status";
+/* Sonstige Konfigurationsparameter für Fehler-Behandlung */
 
-/* Sonstige Konfigurationsparameter */
+/* Konfiguration für das zusenden von E-Mails bzw. das loggen in eine Datei (optional) */
 
-/* Konfiguration für das zusenden von E-Mails sofern der Cronjob nicht komplett durchläuft (optional) */
-$optFehlerMail		= array("empfaenger" => "deine.email@example.org",										//Empfänger der Fehler-Mail
-							"absender"	 => "deine.email@example.org");										//Absender der Fehler-Mail
+// Fehler per E-Mail melden
+// $optFehlerMail		= [ "empfaenger" => "deine.email@example.org", "absender" => "deine.email@example.org" ];
 
-// Locals und Zeitzone setzen
-setlocale(LC_TIME, "de_DE.UTF-8");
-date_default_timezone_set("Europe/Berlin");
-?>
+// Fehler in Log-Datei schreiben
+// $optFehlerLogfile	= "/pfad/zur/log/error_log";
