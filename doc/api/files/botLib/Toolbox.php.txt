@@ -30,6 +30,7 @@
  */
 
 namespace blog404de;
+
 use ZipArchive;
 
 /**
@@ -38,51 +39,53 @@ use ZipArchive;
  */
 class Toolbox {
 	/**
+	 * Methode zum extrahieren aller ZIP-Dateien die sich in einem bestimmten Ordner befinden
+	 *
 	 * @param string $source Ordner mit den beinhalteten XML Dateien
 	 * @param string $destination Ordner in den der Inhalt der ZIP-Dateien entpackt werden soll
 	 * @param int $maxFiles Anzahl der ZIP-Dateien die maximal entpackt werden können (optional) / -1 = ohne Limit
 	 * @throws \Exception
 	 */
 	public static function extractAllZipFiles(string $source, string $destination, int $maxFiles = -1) {
-			// Erzeuge Array mit allen ZIP-Dateien
-			$localZipFiles = array();
-			$handle = @opendir($source);
-			if ($handle) {
-				while (false !== ($entry = readdir($handle))) {
-					if (! is_dir($source . DIRECTORY_SEPARATOR . $entry)) {
-						$fileinfo = pathinfo($source . DIRECTORY_SEPARATOR . $entry);
-						if ($fileinfo["extension"] == "zip")
-							$localZipFiles[] = $entry;
-					}
+		// Erzeuge Array mit allen ZIP-Dateien
+		$localZipFiles = array();
+		$handle = @opendir($source);
+		if ($handle) {
+			while (false !== ($entry = readdir($handle))) {
+				if (! is_dir($source . DIRECTORY_SEPARATOR . $entry)) {
+					$fileinfo = pathinfo($source . DIRECTORY_SEPARATOR . $entry);
+					if ($fileinfo["extension"] == "zip")
+						$localZipFiles[] = $entry;
 				}
-				closedir($handle);
+			}
+			closedir($handle);
+		} else {
+			throw new \Exception("Fehler beim durchsuchen des Ordners " . $source . " mit den ZIP-Dateien");
+		}
+
+		// Eigentlich darf aktuell nur eine ZIP Datei vorhanden sein (vorbereitet aber für >1 ZIP Datei)
+		if ($maxFiles != -1 && count($localZipFiles) > $maxFiles) {
+			throw new \Exception("Die maximale Anzahl an erlaubten ZIP-Dateien (" . $maxFiles . ") wurde überschritten");
+		}
+
+		// Existiert der Ordner?
+		if(!is_writeable($destination)) {
+			throw new \Exception("Der Ziel-Ordner " . $destination . " für die entpackten ZIP-Dateien existiert nicht oder hat keine Schreib-Rechte");
+		}
+
+		// Entpacke ZIP-Dateien
+		foreach ($localZipFiles as $zipFile) {
+			// Öffne ZIP Datei
+			$zip = new ZipArchive();
+			$res = $zip->open($source . DIRECTORY_SEPARATOR . $zipFile);
+			if ($res === true) {
+				echo "\tEntpacke ZIP-Datei: " . $zipFile . " (" . $zip->numFiles . " Datei" . ($zip->numFiles > 1 ? "en" : "") . ")" . PHP_EOL;
+				$zip->extractTo($destination);
+				$zip->close();
 			} else {
-				throw new \Exception("Fehler beim durchsuchen des Ordners " . $source . " mit den ZIP-Dateien");
+				throw new \Exception("Fehler beim öffnen der ZIP Datei '" . $zipFile . "'. Fehlercode: " . $res . " / " . Toolbox::getZipErrorMessage($res));
 			}
-
-			// Eigentlich darf aktuell nur eine ZIP Datei vorhanden sein (vorbereitet aber für >1 ZIP Datei)
-			if ($maxFiles != -1 && count($localZipFiles) > $maxFiles) {
-				throw new \Exception("Die maximale Anzahl an erlaubten ZIP-Dateien (" . $maxFiles . ") wurde überschritten");
-			}
-
-			// Existiert der Ordner?
-			if(!is_writeable($destination)) {
-				throw new \Exception("Der Ziel-Ordner " . $destination . " für die entpackten ZIP-Dateien existiert nicht oder hat keine Schreib-Rechte");
-			}
-
-			// Entpacke ZIP-Dateien
-			foreach ($localZipFiles as $zipFile) {
-				// Öffne ZIP Datei
-				$zip = new ZipArchive();
-				$res = $zip->open($source . DIRECTORY_SEPARATOR . $zipFile);
-				if ($res === true) {
-					echo "\tEntpacke ZIP-Datei: " . $zipFile . " (" . $zip->numFiles . " Datei" . ($zip->numFiles > 1 ? "en" : "") . ")" . PHP_EOL;
-					$zip->extractTo($destination);
-					$zip->close();
-				} else {
-					throw new \Exception("Fehler beim öffnen der ZIP Datei '" . $zipFile . "'. Fehlercode: " . $res . " / " . Toolbox::getZipErrorMessage($res));
-				}
-			}
+		}
 	}
 
 	/**
@@ -165,7 +168,7 @@ class Toolbox {
 	 * @param $errCode
 	 * @return string
 	 */
-	static protected function getZipErrorMessage($errCode) {
+	static public function getZipErrorMessage($errCode) {
 		switch ($errCode) {
 			case ZipArchive::ER_EXISTS:
 				return "Datei existiert bereits.";
@@ -196,6 +199,45 @@ class Toolbox {
 				break;
 			default:
 				return "Unknown error.";
+		}
+	}
+
+	/** Methode zum generieren von Klartext-Fehlermeldung während der JSON Kodierung
+	 * @param $errCode
+	 * @return string
+	 */
+	static public function getJsonErrorMessage($errCode) {
+		switch($errCode) {
+			case JSON_ERROR_NONE:
+				return "Keine Fehler";
+				break;
+			case JSON_ERROR_DEPTH:
+				return "Maximale Stacktiefe überschritten";
+				break;
+			case JSON_ERROR_STATE_MISMATCH:
+				return "Ungültiges oder missgestaltetes JSON";
+				break;
+			case JSON_ERROR_CTRL_CHAR:
+				return "Steuerzeichenfehler, möglicherweise unkorrekt kodiert.";
+				break;
+			case JSON_ERROR_SYNTAX:
+				return "Syntaxfehler, ungültiges JSON";
+				break;
+			case JSON_ERROR_UTF8:
+				return "Missgestaltete UTF-8 Zeichen, möglicherweise fehlerhaft kodiert";
+				break;
+			case JSON_ERROR_RECURSION:
+				return "Eine oder mehrere rekursive Referenzen im zu kodierenden Wert";
+				break;
+			case JSON_ERROR_INF_OR_NAN:
+				return "Eine oder mehrere NAN oder INF Werte im zu kodierenden Wert";
+				break;
+			case JSON_ERROR_UNSUPPORTED_TYPE:
+				return "Ein Wert eines Typs, der nicht kodiert werden kann, wurde übergeben";
+				break;
+			default:
+				return "Unbekannter Fehler";
+				break;
 		}
 	}
 }
