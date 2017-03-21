@@ -9,6 +9,7 @@ doc/*.zip
 doc/*.pdf
 doc/*.csv
 doc/*.xls
+/phpdoc.dist.xml
 
 # Eigene Konfigurationsdatei
 config.local.php
@@ -87,4 +88,3 @@ Temporary Items
 .apdisk
 
 .idea/
-
