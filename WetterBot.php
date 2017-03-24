@@ -48,9 +48,9 @@ try {
 	}
 
 	// Notwendige Libs laden
-	require_once  ROOT_PATH . "botLib/Toolbox.php";
-	require_once  ROOT_PATH . "botLib/ErrorLogging.php";
-	require_once  ROOT_PATH . "botLib/WarnParser.php";
+	require_once  dirname( __FILE__ ) . "/botLib/Toolbox.php";
+	require_once  dirname( __FILE__ ) . "/botLib/ErrorLogging.php";
+	require_once  dirname( __FILE__ ) . "/botLib/WarnParser.php";
 
 	/*
  	 * Script-Header ausgeben
