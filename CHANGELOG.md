@@ -4,6 +4,8 @@
 ----------
 - Laden der Klassen etwas optimiert
 - Code-Style auf PSR-0 geprüft und korrigiert
+- Kleinere Bugfixes
+- ErrorLog-Klasse ausgelagert in eigenständige Datei
 
 2017-03-19, 2.0.0 beta
 ----------
