@@ -1,126 +1,97 @@
 # Wetterwarnung Downloader Script
 
+> **Wichtige Änderung:** Die Konfigurations-Datei der aktuellste Version des Wetterwarnung Downloader ist nicht kompatibel zur Konfigurations-Datei der bisherigen Version 1.x. Weitere Informationen hierzu finden Sie hier in der README.md. 
+
 ## Einleitung
 
-Bei dem Wetterwarnung-Downloader handelt es sich um ein Script zum automatischen herunterladen aktueller Wetterwarnungen für eine bestimmte Warnregion. Die Wetterwarnungen werden im Rahmen der Grundversorgung des DWD bereitgestellt. Details zur Grundversorgung finden sich auf der [NeuthardWetterScripts Hauptseite](https://github.com/Blog404DE/NeuthardWetterScripts).
+Bei dem Wetterwarnung-Downloader handelt es sich um ein Script zum automatischen herunterladen aktueller Wetterwarnungen für eine bestimmte Warnregion. Die Wetterwarnungen werden im Rahmen der Grundversorgung des DWD bereitgestellt. Details zur Grundversorgung finden sich auf der [NeuthardWetterScripts Hauptseite](https://github.com/Blog404DE/NeuthardWetter-Scripts).
 
 Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch wenn das Script ausführlich getestet wurde, so kann niemand garantieren, dass keine Fehler oder Probleme auftreten. 
-
-##### Wichtige Änderungen:
-- *08.11.2015:* Die Struktur der Ziel-JSON Datei wurde vereinheitlicht und um ein Zähler mit der Anzahl der Wetterwarnungen erweitert. Anpassungen an den Scripten sind daher notwendig.
-	
 
 ## Anleitung zur Einrichtung des Wetterwarnung-Downloader
 
 ### Vorraussetzungen:
 
-- Linux (unter Debian getestet)
-- PHP 5.5 (oder neuer) mit FTP-Modul einkompiliert
+- Linux oder OS X (unter Debian und OS X getestet)
+- PHP 7.0.0 (oder neuer) inklusive ftp-, mhash und zip-Modul aktiv
 - wget
 
 ### Vorbereitung:
 
-1. Anmeldung für die Grundversorgungs-Daten des Deutschen Wetterdienstes (siehe Einleitung)
+1. Anmeldung für die Grundversorgungsdaten des Deutschen Wetterdienstes (siehe Einleitung)
 
-2. Download des Script-Pakets https://github.com/Blog404DE/NeuthardWetterScripts/archive/master.zip und entpacken der ZIP Datei mittels unzip.
+2. Download des Script-Pakets [https://github.com/Blog404DE/WetterwarnungDownloader/archive/master.zip](https://github.com/Blog404DE/WetterwarnungDownloader/archive/master.zip) und entpacken der ZIP Datei mittels unzip.
 
-3. Wechseln in den Ordner mit den benötigten Scripten:
-	```sh
-	cd WetterwarnungDownloader
-	```
+3. Download der Liste mit den Warngebieten (WarnCellID) des Deutschen Wetterdienstes
 
-4. Download der Liste mit den Warngebieten (WarnCellID) des Deutschen Wetterdienstes
-
-	Hierzu ist es zuerst notwendig das ShellScript *fetchManual.sh* nut einem beliebigen Editor zu öffnen und in folgenden beiden Zeilen die vom DWD übermittelten Zugangsdaten einzutragen.
-	
-	```bash
-	# Zugangsdaten zum DWD Grundversorgungs-Server
-	FTPUSER="**********"
-	FTPPASSWD="********"
-	```
-	
-	Danach führen wir das Shell-Script aus:
+	Um die WarnCellID Liste zusammen mit der Entwickler-Dokumentation zu erhalten ist es notwendig 
+	das ShellScript *fetchManual.sh* einmalig auszuführen.  
 	
 	```sh
+	cd doc
 	./fetchManual.sh
 	```
 	
-	Nach dem ausführen des Scripts befinden sich mehrere PDF-Dateien und eine CSV Datei im aktuellen Verzeichnis. Es handelt sich dabei um verschiedene Anleitungen und eine Liste der Warn-Regionen des DWD, welche später unter anderem für die Konfiguration notwendig sind. Zusätzlich sind diese Dokumente auch interessant für eventuelle Anpassungen des Scripts.
-	
+	Nach dem ausführen des Scripts befindet sich eine CSV-Datei, sowie mehrere PDF- und eine XLS-Datei im aktuellen Verzeichnis. Es handelt sich dabei um verschiedene Anleitungen und eine Liste der Warn-Regionen des DWD, welche später unter anderem für die Konfiguration notwendig sind. Zusätzlich sind diese Dokumente auch interessant für eventuelle Anpassungen des Scripts.
 
-> **Wichtiger Hinweis:**
-> Im Anschluss können wir das Shell-Script ```fetchManual.sh``` löschen. Kopieren Sie dieses Script *niemals auf Ihren Webserver*, da ansonsten Ihre Zugangsdaten zum DWD FTP Server herausgelesen werden können
-	
 ### WarnCell ID ermitteln
 
-Wichtig für das Script ist zu ermitteln, für welche Kennung die Warnregion besitzt, für welche man die Wetterwarnungen ermitteln möchte. Eine Liste der Regionen findet sich in der im vorherigen Schritt heruntergeladenen ```legend_warnings_CAP_WarnCellsID.csv``` oder ```legend_warnings.pdf```. In der PDF Datei befindet sich die Liste ab Seite 14 und relativ ist die Spalte ```Warngebiet im DWD``` (Name des Gebiets) sowie ```WarnCellIdab Ende 2015 (cap)``` (die zwingend für die Konfiguration benötigte WarnCellID). Die CSV Datei können Sie in einer beliebigen Tabellenkalkulationsprogramm (OpenOffice, LibreOffice, Microsoft Excel oder Numbers) öffnen und relevant sind hier die Spalten ```WARNCELLID``` sowie ```NAME```. 
+Wichtig für das Script ist zu ermitteln, für welche Kennung die Warnregion besitzt, für welche man die Wetterwarnungen ermitteln möchte. Eine Liste der Regionen findet sich in der im vorherigen Schritt heruntergeladenen ```cap_warncellids_csv.csv```. Die CSV Datei können Sie mittels 
+[LibreOffice](https://de.libreoffice.org/) (empfohlen), [OpenOffice](https://www.openoffice.org/de/) oder jedem Texteditor öffnen. 
 
-> **Anmerkung:** Nutzen Sie ausschließlich die Nummer aus den genannten Spalten. Die Zahlen in den restlichen beiden Spalten sind für andere Warnmeldungen in einem anderen Format bzw. seit dem 10/2015 nicht mehr aktiv. Sollten Sie die falsche Nummer verwenden, so kann das Script keine Wetterwarnungen finden.
-	
+Um die ```WARNCELLID``` zu finden, schaut manin der Spalte ```NAME``` bzw. ```KURZNAME``` nach dem Ort, für welchen man die Wettergefahren 
+gemeldet bekommen möchte. In der ersten Spalte findet man die zum Ort gehörende ```WARNCELLID```, welche in der Konfigurationsdatei benötigt wird.
 
-### Konfiguration des Script zum abrufen der Wetter-Warnungen:
+### Konfiguration des Script zum abrufen der Wetter-Warnungen *(neu)*:
 
-Bei dem eigentlichen Script zum abrufen der Wetter-Warnungen handelt es sich um die Datei ```WetterBot.php```. Das Script selber wird gesteuert über die ```config.inc.php``` Datei, welche sich im gleichen Verzeichnis befindet.
+Bei dem eigentlichen Script zum abrufen der Wetter-Warnungen handelt es sich um die Datei ```WetterBot.php```. Das Script selber wird gesteuert über die ```config.local.php``` Datei. Um diese Datei anzulegen, kopieren Sie bitte ```config.sample.php``` und nennen die neue Datei ```config.local.php```.
 
-Die anzupassenden Konfigurationsparameter in der *config.inc.php* lauten wie folgt:
+Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie folgt:
 
-1. Damit das Script Zugriff auf die Grundversorgungsdaten des DWD bekommt müssen zuerst die FTP Zugangsdaten hinterlegt werden:
+1. Damit das Script Zugriff auf die c des DWD bekommt müssen zuerst die FTP Zugangsdaten hinterlegt werden:
 
 	```php
 	// FTP Zugangsdaten:
-	$ftp["host"]        = "ftp-outgoing2.dwd.de";
-	$ftp["username"]    = "********************";
-	$ftp["password"]    = "********************";
+	$unwetterConfig["ftp"] = [
+		"host"      => "ftp-outgoing2.dwd.de",
+		"username"  => "************",
+		"password"  => "************"
+	];
 	```
 
-	Die benötigten Zugangsdaten und den Hostnamen wird vom DWD per E-Mail nach der Registrierung (siehe Vorbereitung) mitgeteilt. Bei ```$ftp["username"]``` handelt es sich um den Benutzername und bei ```$ftp["password"]``` um das zugeteilte Passwort. Der Hostname ```$ftp["hostname"]``` muss in der Regel nicht angepasst werden.
+	Die benötigten Zugangsdaten und den Hostnamen wird vom DWD per E-Mail nach der Registrierung (siehe Vorbereitung) mitgeteilt. 
+	Der erste Parameter ```"host"``` beinhaltet der vom DWD zugewiesene FTP-Server. Bei ```"username"``` handelt es sich um den Benutzername und bei ```"password"``` um das vom DWD zugeteilte Passwort.
 	
-2. Der zweite Konfigurationsparmaeter ist die Angabe für die Region, für welche die Wetterwarnungen ermittelt werden sollen:
+2. Der zweite Konfigurationsparmaeter ist die Angabe für die Region, für welche die Wetterwarnungen ermittelt werden sollen. Die WarnCellID ist dabei die Nummer, welche im vorherigen Schritt ermittelt wurde. 
 
 	```php
-	$unwetterConfig["WarnCellId"]      = "908215999";  
+	$unwetterConfig["WarnCellIds"]         = 908215999;  
 	```
 	
-	Die WarnCellID ist dabei die Nummer, welche im vorherigen Schritt ermittelt wurde.
+	Sie können auch mehrere WarnCellIDs angeben. Hierfür verwenden Sie ein einfaches Array für den Konfigurationsparameter.
+	
+	```php
+	$unwetterConfig["WarnCellIds"]         = [908215999, 108215000];  
+	```
+
 	
 3. Speicherpfad für die JSON Datei mit den Wetterwarnung-Daten:
 
 	```php
-	$unwetterConfig["localJsonWarnfile"]= "/pfad/zur/wetterwarnung.json";
+	$unwetterConfig["localJsonWarnfile"]   = "/pfad/zur/wetterwarnung.json";
 	```
 	
-	Der angegebene Pfad sollte - je nach Art der Auswertung der Wetterwarnung - innerhalb eines vom Webserver zugänglichen Ordner sich befinden.
+	Der angegebene Pfad sollte - je nach Art der Verwendung der Wetterwarnungen - innerhalb eines vom Webserver zugänglichen Ordner sich befinden.
 	
 4. Speicherpfade für die vom DWD Server heruntergeladenen Wetterwarnung-Dateien:
 
 	```php
-	$unwetterConfig["localFolder"]		= "/pfad/zum/speicherordner/fuer/wetterWarnungen";
-	//$unwetterConfig["localDebugFolder"]	= $unwetterConfig["localFolder"] . "/debug";
+	$unwetterConfig["localFolder"]			= "/pfad/zum/speicherordner/fuer/wetterWarnungen";
 	```
 	
-	Bei *localFolder* handelt es sich um den Pfad, der die aktuellste Datei mit Wetterwarnungen beinhaltet, welche vom DWD FTP Server heruntergeladen wurde.
+	Bei *localFolder* handelt es sich um den Pfad, der die aktuellste Datei mit Wetterwarnungen beinhaltet, welche vom DWD FTP Server heruntergeladen wurde. Die alten Wetterwarnungen werden automatisch durch das Script in diesem gelöscht.
 	
-	Der zweite (optionale) Konfigurationsparameter beinhaltet die Wetterwarnungen, welche das Script aufgrund des Nachrichten-Typs (z.B. Update) nicht verarbeitet werden konnte. Sie können zu Testzwecken wie in diesem Beispiel ein Unterordner angeben. Im normalen Betriebsverlauf können Sie *localDebugFolder* allerdings auskommentiert lassen.
-
-5. Ordner auf dem DWD FTP Server mit den zu verarbeitenden Wetterwarnungen:
-
-	```php
-	$unwetterConfig["remoteFolder"] = "/gds/gds/specials/alerts/cap/GER/status";
-	```
-	
-	Dieser Konfigurationsparameter muss in der Regel nicht angepasst werden, sofern sich die Verzeichnisstruktur auf dem FTP Server nicht ändert. Normalerweise werden solche Änderungen vom DWD per E-Mail vorher auch mitgeteilt.  
-
-6. (optional) Für Fehler-Debugging: im Fehlerfall eine E-Mail zustellen:
-
-	```php
-	$optFehlerMail		= array("empfaenger" => "deine.email@example.org",
-							"absender"	 => "deine.email@example.org");										
-	```
-	
-	Dieses Array beinhaltet die Absender- und Empfänger-Adresse die für den Versand von E-Mails im Fehlerfall verwendet werden. Die E-Mail Unterstützung sollte *ausschließlich* zu *Debug-Zwecken* aktiviert werden, da durchaus viele E-Mails generiert werden können. Es besteht auch die Möglichkeit die Fehler in eine Log-Datei aufzeichnen zu lassen. Näheres hierzu bei der Erklärung zur EInrichtung als Cronjob.
-	
-
-> **Hinweise:** Die hin 3 und 4 angegebenen Pfade müssen auf Ihrem System bereits existieren, da es ansonsten zu einer Fehlermeldung beim ausführen des Scripts kommt. 
+**Hinweise:** Die hin 3 und 4 angegebenen Speicher-Pfade müssen auf Ihrem System bereits existieren, da es ansonsten zu einer Fehlermeldung beim ausführen des Scripts kommt. 
 
 ### Das PHP-Script ausführbar machen und als Cronjob hinterlegen
 
@@ -132,32 +103,34 @@ Die anzupassenden Konfigurationsparameter in der *config.inc.php* lauten wie fol
 	
 2. Shell-Script für den Aufruf als Cronjob. Ein direkter Aufruf bietet sich nicht an, da es ansonsten zu parallelen Aufruf des Scripts kommen kann. Dies kann dabei zu unerwünschten Effekten führen bis zum kompletten hängen des Systems. 
 
-	Um dies zu verhindern bietet sich die Verwendung einer Lock-Datei an, wie in folgendem Beispiel exemplarisch gezeigt:
+	Um dies zu verhindern bietet sich die Verwendung einer Lock-Datei an, wie in folgendem Beispiel exemplarisch gezeigt.
+	
+	Im Beispiel-Shell-Script müssen Sie noch den Pfad zur ```WetterBot.php``` anpassen.
 	
 	```bash
 	#!/bin/bash
-	LOCKFILE=/tmp/$(whoami)_$(basename $0).lock
-	[ -f $LOCKFILE ] && { echo "$(basename $0) läuft schon"; exit 1; }
-
-	lock_file_loeschen() {
-    	    rm -f $LOCKFILE
+	TMPDIR=$(dirname $(mktemp tmp.XXXXXXXXXX -ut))
+	LOCKDIR=${TMPDIR}/$(whoami)_$(basename $0).lock
+	
+	function cleanup {
+		if rm $LOCKDIR; then
+			echo "Cronjob-Lauf beendet"
+		else
+			echo "Fehler beim entfernen der Lock-Datei '$LOCKDIR'"
+			exit 1
+		fi
 	}
-
-	trap "lock_file_loeschen ; exit 1" 2 9 15
-
-	# Lock-Datei anlegen
-	echo $$ > $LOCKFILE
-
-
-	# Starte Script
-	/pfad/zum/script/WetterBot.php
-
-	# Lösche Lockfile
-	lock_file_loeschen
-	exit 0
+	
+	if touch $LOCKDIR; then
+		trap "cleanup" EXIT
+	
+		echo "Lock erhalten, starte Cronjob"
+		/pfad/zum/script/WetterBot.php
+	else
+		echo "Lock-Datei konnte nicht angelegt werden '$LOCKDIR'"
+		exit 1
+	fi
 	```
-
-	In diesem Script müssen Sie selbstverständlich den Pfad zum WetterBot-Script entsprechend anpassen.
 	
 3. Cronjob anlegen 
 
@@ -170,21 +143,26 @@ Die anzupassenden Konfigurationsparameter in der *config.inc.php* lauten wie fol
 	
 #### Loggen der Ausgabe und Fehler-Handling:
 
-Es besteht die Möglichkeit die Ausgabe des Scripts in Log-Dateien aufzeichnen zu lassen. Hierfür existieren mehrere Möglichkeiten. 
+Es besteht die Möglichkeit die Ausgabe des Scripts in Log-Dateien aufzeichnen zu lassen oder sich im Fehler-Fall automatisch per E-Mail 
+informieren lassen.
 
-1. Sie können die komplette Ausgabe des Scripts aufzeichnen, indem Sie in der Cronjob-Zeile folgendes hinzufügen:
+Um dies zu aktivieren müssen Sie in der ```config.local.php``` folgende Parameter auskommentieren: 
 
-	```*/10 * * * * /pfad/zum/script/cron.WetterBot.sh 2>&1 >>/var/log/wetterwarnbot_log```
 
-	*2>&1* bewirkt, dass die Fehlermeldungen umgeleitet und zusammen mit der Standardmeldungen ausgegeben werden. *>>* wiederum bewirkt, dass die Standardmeldungen in die danachfolgende Datei fortlaufend geschrieben werden.
+1. Fehler in eine Log-Datei aufzeichnen:
 
-2. Es besteht aber auch die Möglichkeit nur Fehler aufzuzeichnen, indem Sie folgende Änderung vornehmen:
-
-	```*/10 * * * * /pfad/zum/script/cron.WetterBot.sh 2>>/var/log/wetterwarnbot_log >/dev/null```
-
-	*2>>* leitet in diesem Fall die Fehlermeldungen fortlaufend in die angegebene Datei um, während die Standard-Ausgaben über *>/dev/null* in den virtuellen Papierkorb übermittelt werden.
+	```php
+	$optFehlerLogfile	= "/pfad/zur/log/error_log";						
+	```
+	**Wichtig**: Der Speicher-Pfad zur Log-Datei muss bereits existieren. Zusätzlich sollten Sie z.B. mittels Log-Rotate die Log-Datei automatisch rotieren lassen um ein übergroße Log-Datei zu vermeiden.
 	
-Die zweite Variante empfiehlt sich dabei für den Live-Betrieb, während die erste Variante primär für Debug-Zwecke geeignet ist. Man sollte desweiteren beachten, dass die Log-Dateien regelmäßig bereinigt werden z.B. mittels logrotate (ähnlich den System-Logs). 
+2. Fehler per E-Mail melden:	
+
+	```php
+	$optFehlerMail		= [ "empfaenger" => "deine.email@example.org", "absender" => "deine.email@example.org" ];		
+	```
+	
+	Dieses Array beinhaltet die Absender- und Empfänger-Adresse die für den Versand von E-Mails im Fehlerfall verwendet werden. Die E-Mail Unterstützung sollte *ausschließlich* zu *Test-Zwecken* aktiviert werden, da durchaus viele E-Mails generiert werden können. 
 
 	
 ## Erklärung zur JSON Datei mit der Wetterwarnung
@@ -192,28 +170,31 @@ Die zweite Variante empfiehlt sich dabei für den Live-Betrieb, während die ers
 Das Script erzeugt eine JSON Datei mit, welche die Anzahl der Wetterrwarnungen *(anzahl)* sowie die Informationen zu den entsprechenden Wetterwarnungen *(wetterwarnungen)* enthält. Hier zwei Beispiele für diese Datei (exemplarisch mit einer Meldung, wobei das Array mit den Wetterwarnungen durchaus mehrere Meldungen beinhalten kann sowie ein Beispiel einer Datei falls keine Wetterwarnung aktuell existiert):
 
 ```json
-{  
-   "anzahl":1,
-   "wetterwarnungen":[  
-      {  
-         "severity":"Markante Wetterwarnung",
-         "urgency":"Immediate",
-         "warnstufe":0,
-         "startzeit":"O:8:\"DateTime\":3:{s:4:\"date\";s:26:\"2015-11-09 00:00:00.000000\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:13:\"Europe\/Berlin\";}",
-         "endzeit":"O:8:\"DateTime\":3:{s:4:\"date\";s:26:\"2015-11-10 00:00:00.000000\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:13:\"Europe\/Berlin\";}",
-         "headline":"Amtliche WARNUNG vor STURMB\u00d6EN",
-         "area":"Kreis Rastatt",
-         "stateShort":"BW",
-         "stateLong":"Baden-W\u00fcrtemberg",
-         "altutude":1000,
-         "ceiling":3000,
-         "hoehenangabe":"H\u00f6henlagen \u00fcber 1000m",
-         "description":"Es treten oberhalb 1000 m Sturmb\u00f6en mit Geschwindigkeiten um 75 km\/h (21m\/s, 41kn, Bft 9) aus s\u00fcdwestlicher Richtung auf.",
-         "instruction":"ACHTUNG! Hinweis auf m\u00f6gliche Gefahren: Es k\u00f6nnen zum Beispiel einzelne \u00c4ste herabst\u00fcrzen. Achten Sie besonders auf herabfallende Gegenst\u00e4nde.",
-         "event":"STURMB\u00d6EN",
-         "sender":"DWD \/ Nationales Warnzentrum Offenbach"
-      }
-   ]
+{
+    "anzahl": 1,
+    "wetterwarnungen": [
+        {
+            "event": "WINDB\u00d6EN",
+            "startzeit": "O:8:\"DateTime\":3:{s:4:\"date\";s:26:\"2017-03-19 08:00:00.000000\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:13:\"Europe\/Berlin\";}",
+            "endzeit": "O:8:\"DateTime\":3:{s:4:\"date\";s:26:\"2017-03-19 19:00:00.000000\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:13:\"Europe\/Berlin\";}",
+            "severity": "Wetterwarnung",
+            "warnstufe": 1,
+            "urgency": "Immediate",
+            "headline": "Amtliche WARNUNG vor WINDB\u00d6EN",
+            "description": "Es treten Windb\u00f6en mit Geschwindigkeiten um 55 km\/h (15m\/s, 30kn, Bft 7) aus westlicher Richtung auf. In exponierten Lagen muss mit Sturmb\u00f6en bis 65 km\/h (18m\/s, 35kn, Bft 8) gerechnet werden.",
+            "instruction": "",
+            "sender": "DWD \/ Nationales Warnzentrum Offenbach",
+            "web": "http:\/\/www.wettergefahren.de",
+            "warncellid": "808215103",
+            "area": "Gemeinde Karlsdorf-Neuthard",
+            "stateLong": "Baden-W\u00fcrtemberg",
+            "stateShort": "BW",
+            "altitude": 0,
+            "ceiling": 2999,
+            "hoehenangabe": "Alle H\u00f6henlagen",
+            "hash": "dade1be441248aa1c068230d2c5ab7e1"
+        }
+    ]
 }
 ```
 
@@ -249,22 +230,25 @@ Liegt aktuell keine Wetterwarnung für die aktuelle Warnregion vor, so sieht die
 | instruction	| Zusatztext zur Warnung und optional ein Verlängerungshinweis sowie Ersetzungshinweis ¹ |
 | event			| Art des Wettereignisses in Kurzform ¹ |
 | sender		| Ausstellendes Rechenzentrum des DWD |
+| web			| URL mit Webseite für weitere Informationen zur Warnung |
+| warncellid	| Zur Warnung gehörende WarnCellID |
 
-¹ Bei diesen Angaben handelt es sich die direkte unveränderte Übernahme aus der Wetterwarnung des DWD. Eine Erklärung der jeweiligen Werte findet sich in der unter *Vorbereitung* heruntergeladenen Datei [legend_warnings_CAP.pdf](https://werdis.dwd.de/infos/legend_warnings_CAP.pdf).
+¹ Bei diesen Angaben handelt es sich die direkte unveränderte Übernahme aus der Wetterwarnung des DWD. Eine Erklärung der jeweiligen Werte findet sich in der unter *Vorbereitung* heruntergeladenen Datei [cap_dwd_profile_de_pdf.pdf](http://www.dwd.de/DE/leistungen/gds/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile&v=2).
 
-² Die Warnstufen lauten wie folgt: 0 = Vorwarnung, 1 = Wetterwarnung, 2 = Markante Wetterwarnung, 3 = Unwetterwarnung, 4 = Extreme Unwetterwarnung
+² Die Warnstufen lauten wie folgt: 0 = Vorwarnung, 1 = Wetterwarnung, 2 = Markante Wetterwarnung, 3 = Unwetterwarnung, 4 = Extreme Unwetterwarnung, -1 = Unbekannter Warntyp
 
-³ Die Höhenangaben sind im Gegensatz zu der Orginal Wetterwarnung in Meter umgerechnet und können damit direkt verwendet werden. Zusätzliche Angaben zu den Höhenwerten findet sich ebenfalls in der [legend_warnings_CAP.pdf](https://werdis.dwd.de/infos/legend_warnings_CAP.pdf).
+³ Die Höhenangaben sind im Gegensatz zu der Orginal Wetterwarnung in Meter umgerechnet und können damit direkt verwendet werden. Zusätzliche Angaben zu den Höhenwerten findet sich ebenfalls in der [cap_dwd_profile_de_pdf.pdf](http://www.dwd.de/DE/leistungen/gds/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile&v=2).
 
-⁴ Um z.B. unter PHP auf das serialisierte DateTime Objekt zugreifen zu können, muss es für die Verwendung erst mittels [unserialize](http://php.net/manual/de/function.unserialize.php) in ein DateTime-Objekt deserialisiert werden. **Hinweis:** Ist *startzeit* identisch mit der *endzeit*, dann wurde keine Endzeit vom DWD für die Warnung angegeben und sollte daher bei einer Ausgabe ignoriert werden.
+⁴ Um z.B. unter PHP auf das serialisierte DateTime Objekt zugreifen zu können, muss es für die Verwendung erst mittels [unserialize](http://php.net/manual/de/function.unserialize.php) in ein DateTime-Objekt deserialisiert werden. 
+**Hinweis:** Ist *startzeit* identisch mit der *endzeit*, dann wurde keine Endzeit vom DWD für die Warnung angegeben und sollte daher bei einer Ausgabe ignoriert werden.
 
 ## Abschluss
 
-Es handelt sich bei dem Script um eine erste Vorab-Version des Downloader. Solltet Ihr Fragen oder Anregungen haben, so steht euch offen sich jederzeit an mich per E-Mail (siehe http://www.NeuthardWetter.de) zu wenden. Selbstverständlich könnt Ihr euch an der Weiterentwicklung des Scripts beteiligen und entsprechend Push-Requests senden. 
+Solltet Ihr Fragen oder Anregungen haben, so steht euch offen sich jederzeit an mich per E-Mail (siehe http://www.NeuthardWetter.de) zu wenden. Selbstverständlich könnt Ihr euch an der Weiterentwicklung des Scripts beteiligen und entsprechend Push-Requests senden. 
 
 
 --
 ##### Lizenz-Information:
 
-Copyright Jens Dutzi 2015 / Stand: 04.11.2015 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
+Copyright Jens Dutzi 2015-2017 / Stand: 24.03.2017 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
 
