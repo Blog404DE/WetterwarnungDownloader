@@ -28,7 +28,7 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 	das ShellScript *fetchManual.sh* einmalig auszuführen.  
 	
 	```sh
-	cd doc
+	cd docs
 	./fetchManual.sh
 	```
 	

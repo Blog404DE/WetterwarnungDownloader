@@ -5,10 +5,10 @@ WetterwarnungDownloader/config.inc.php
 tmp/
 
 # Dokumentation ausklammern
-doc/*.zip
-doc/*.pdf
-doc/*.csv
-doc/*.xls
+docs/*.zip
+docs/*.pdf
+docs/*.csv
+docs/*.xls
 /phpdoc.dist.xml
 
 # Eigene Konfigurationsdatei
