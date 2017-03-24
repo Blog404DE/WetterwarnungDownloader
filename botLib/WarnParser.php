@@ -2,11 +2,12 @@
 /**
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
  *
- * @version 2.0-dev 2.0.0-dev
- * @copyright (c) tf-network.de Jens Dutzi 2012-2017
- * @license MIT
- *
- * @package blog404de\WetterScripts
+ * @package    blog404de\WetterScripts
+ * @subpackage WarnParser
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  2012-2017 Jens Dutzi
+ * @version    2.0.0-dev
+ * @license    MIT
  *
  * Stand: 05.03.2017
  *
@@ -31,22 +32,14 @@
 
 namespace blog404de\WetterScripts;
 
-/**
- * Benötigte Module laden
- */
-
-require_once "Toolbox.php";
-
-use Exception, DateTime, DateTimeZone, \blog404de\Toolbox;
+use Exception, DateTime, DateTimeZone;
 
 /**
  * Parser für die Wetter-Warnungen des DWD
- *
- * @package blog404de\WetterScripts\WarnParser
  */
 class WarnParser extends ErrorLogging {
-	/** @var bool $strictMode Verarbeite Wetterwarnungen im Strict-Modus und unterbreche den Ablauf bei unbekanntem Warn-Typ */
-	public $strictMode = FALSE;
+	/** @var bool $strictMode Verarbeite Warnungen im Strict-Mode und unterbreche den Ablauf bei unbekanntem Warn-Typ */
+	public $strictMode = false;
 
 	/** @var string Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen */
 	private $remoteFolder = "/gds/gds/specials/alerts/cap/GER/community_status_geometry";
@@ -61,7 +54,7 @@ class WarnParser extends ErrorLogging {
 	private $localJsonFile = "";
 
 	/** @var string|bool $tmpFolder Ordner für temporäre Dateien */
-	private $tmpFolder = FALSE;
+	private $tmpFolder = false;
 
 	/** @var array $wetterWarnungen Aktuelle geparsten Wetterwarnungen */
 	private $wetterWarnungen = [];
@@ -87,10 +80,14 @@ class WarnParser extends ErrorLogging {
 		"DE"  => "Bundesrepublik Deutschland"
 	];
 
+
 	/**
 	 * WarnParser constructor.
+	 *
+	 * @param bool $allowRoot Ausführung mit Root-Rechten erlauben (NICHT! empfohlen)
+	 * @throws Exception
 	 */
-	function __construct() {
+	function __construct($allowRoot = false) {
 		// Setze Location-Informationen für Deutschland
 		setlocale(LC_TIME, "de_DE.UTF-8");
 		date_default_timezone_set("Europe/Berlin");
@@ -101,7 +98,7 @@ class WarnParser extends ErrorLogging {
 		}
 
 		// Root-User Check
-		if (0 == posix_getuid()) {
+		if (0 == posix_getuid() && $allowRoot === false) {
 			throw new Exception("Script darf nicht mit root-Rechten ausgeführt werden");
 		}
 
@@ -127,13 +124,13 @@ class WarnParser extends ErrorLogging {
 	 * @param string $password FTP Passwort des DWD
 	 * @param bool $passiv FTP passive oder aktive Verbindung verwenden
 	 */
-	public function connectToFTP(string $host, string $username, string $password, bool $passiv = FALSE) {
+	public function connectToFTP(string $host, string $username, string $password, bool $passiv = false) {
 		try {
 			echo "*** Baue Verbindung zum DWD-FTP Server auf." . PHP_EOL;
 
 			// FTP-Verbindung aufbauen
 			$this->ftpConnectionId = ftp_connect($host);
-			if($this->ftpConnectionId === FALSE) {
+			if($this->ftpConnectionId === false) {
 				throw new Exception( "FTP Verbindungsaufbau zu " . $host . " ist fehlgeschlagen" . PHP_EOL);
 			}
 
@@ -148,9 +145,9 @@ class WarnParser extends ErrorLogging {
 			}
 
 			// Auf Passive Nutzung umschalten
-			if($passiv == TRUE) {
+			if($passiv == true) {
 				echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
-				@ftp_pasv(($this->ftpConnectionId), TRUE);
+				@ftp_pasv(($this->ftpConnectionId), true);
 			}
 		} catch (Exception $e) {
 			$this->logError($e);
@@ -191,7 +188,7 @@ class WarnParser extends ErrorLogging {
 
 			// Verzeichnisliste auslesen und sortieren
 			$arrFTPContent = @ftp_nlist($this->ftpConnectionId, ".");
-			if ($arrFTPContent === FALSE) {
+			if ($arrFTPContent === false) {
 				throw new Exception("Fehler beim auslesen des Verezichnis " . $this->remoteFolder  . " auf dem DWD FTP-Server.");
 			} else {
 				echo("-> Liste der auf dem DWD Server vorhandenen Wetterdaten herunterladen" . PHP_EOL);
@@ -206,11 +203,12 @@ class WarnParser extends ErrorLogging {
 				echo("-> Erzeuge Download-Liste für " . @ftp_pwd($this->ftpConnectionId) . ":" . PHP_EOL);
 				foreach ($arrFTPContent as $filename) {
 					// Filtere nach den Wetterwarnungen vom heutigen Tag
-					if (strpos($filename , $fileFilter) !== FALSE) {
+					if (strpos($filename , $fileFilter) !== false) {
 						// Übernehme Datei in zu-bearbeiten Liste
-						if (preg_match('/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})(?<Postfix>_\w{3}_STATUS_AREA_UNION)(?<Extension>\.zip)$/' , $filename , $regs)) {
+						if (preg_match(/** @lang text */'/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})(?<Postfix>_\w{3}_STATUS_AREA_UNION)(?<Extension>\.zip)$/' , $filename , $regs)) {
+
 							$dateFileM = \DateTime::createFromFormat("YmdHis" , $regs['Datum'] , new \DateTimeZone("UTC"));
-							if ($dateFileM === FALSE) {
+							if ($dateFileM === false) {
 								$fileDate = @ftp_mdtm($this->ftpConnectionId, $filename);
 								$detectMode = "via FTP / Lesen des Datums fehlgeschlagen";
 							} else {
@@ -242,7 +240,7 @@ class WarnParser extends ErrorLogging {
 					// Ermittle Zeitpunkt der letzten Modifikation der lokalen Datei
 					$localFileMTime = @filemtime($localFile);
 
-					if ($localFileMTime === FALSE) {
+					if ($localFileMTime === false) {
 						// Da keine lokale Datei existiert, Zeitpunkt in die Vergangenheit setzen
 						$localFileMTime = -1;
 					}
@@ -297,12 +295,12 @@ class WarnParser extends ErrorLogging {
 			$localFiles = [];
 			$handle = opendir($this->localFolder);
 			if ($handle) {
-				while (FALSE !== ($entry = readdir($handle))) {
+				while (false !== ($entry = readdir($handle))) {
 					if (!is_dir($this->localFolder . DIRECTORY_SEPARATOR . $entry)) {
 						$fileinfo = pathinfo($this->localFolder . DIRECTORY_SEPARATOR . $entry);
 						if ($fileinfo["extension"] == "zip") {
 							$localFileMTime = @filemtime($this->localFolder . DIRECTORY_SEPARATOR . $entry);
-							if ($localFileMTime !== FALSE) $localFiles[$localFileMTime] = $entry;
+							if ($localFileMTime !== false) $localFiles[$localFileMTime] = $entry;
 						}
 					}
 				}
@@ -347,7 +345,7 @@ class WarnParser extends ErrorLogging {
 			echo PHP_EOL . "*** Führe abschließende Arbeiten durch: " . PHP_EOL;
 
 			// Lösche Cache-Folder
-			if($this->tmpFolder !== FALSE) {
+			if($this->tmpFolder !== false) {
 				echo "-> Lösche angelegten temporären Ordner" . PHP_EOL;
 				if(!Toolbox::removeTempDir($this->tmpFolder)) {
 					echo "\tLöschen des Ordner " . $this->tmpFolder . " fehlgeschlagen" . PHP_EOL;
@@ -414,7 +412,7 @@ class WarnParser extends ErrorLogging {
 	 * @param int $warnCellId Warn-Region mittels WarnCellID festlegen
 	 * @param bool $append Zu bestehenden Warnungen hinzufügen
 	 */
-	public function parseWetterWarnungen(int $warnCellId, bool $append=TRUE) {
+	public function parseWetterWarnungen(int $warnCellId, bool $append=true) {
 		try {
 			// Starte parsen der Wetterwarnungen des DWD
 			echo PHP_EOL . "*** Verarbeite die Wetterwarnungen:" . PHP_EOL;
@@ -429,7 +427,7 @@ class WarnParser extends ErrorLogging {
 			$localXmlFiles = array();
 			$handle = @opendir($this->tmpFolder);
 			if ($handle) {
-				while (FALSE !== ($entry = readdir($handle))) {
+				while (false !== ($entry = readdir($handle))) {
 					if (! is_dir($this->tmpFolder . DIRECTORY_SEPARATOR . $entry)) {
 						$fileinfo = pathinfo($this->tmpFolder . DIRECTORY_SEPARATOR . $entry);
 						if ($fileinfo["extension"] == "xml")
@@ -487,7 +485,7 @@ class WarnParser extends ErrorLogging {
 						if (!property_exists($wetterWarnung, "eventCode")) {
 							throw new Exception(PHP_EOL . "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'eventCode'-Node.");
 						} else {
-							$testWarnung = FALSE;
+							$testWarnung = false;
 							foreach ($wetterWarnung->{"eventCode"} as $eventCode) {
 								if (! isset($eventCode->{"valueName"}) || ! isset($eventCode->{"value"})) {
 									throw new Exception(PHP_EOL . "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'eventCode'->'valueName' bzw. 'value'-Node.");
@@ -495,7 +493,7 @@ class WarnParser extends ErrorLogging {
 
 								// Schaue nach EventName = "II" und prüfe ob der Wert auf 98/99 steht (=Testwarnung)
 								if ((string)$eventCode->{"valueName"} == "II") {
-									if ((string)$eventCode->{"value"} == "98" || (string)$eventCode->{"value"} == "99") $testWarnung = TRUE;
+									if ((string)$eventCode->{"value"} == "98" || (string)$eventCode->{"value"} == "99") $testWarnung = true;
 								}
 							}
 						}
@@ -533,7 +531,7 @@ class WarnParser extends ErrorLogging {
 			echo "-> Verarbeite alle gefundenen Wetterwarnungen (Anzahl: " . count($arrRohWarnungen) . ")" . PHP_EOL;
 			if (count($arrRohWarnungen) > 0) {
 				// Sollen die Wetterwarnungen hinzugefügt werden zu bestehenden?
-				if($append !== TRUE) $this->wetterWarnungen = [];
+				if($append !== true) $this->wetterWarnungen = [];
 
 				// Durchlaufe alle Warnungen
 				foreach ($arrRohWarnungen as $filename => $rawWarnung) {
@@ -757,17 +755,17 @@ class WarnParser extends ErrorLogging {
 			echo "-> Ermittle MD5-Hashs der bisherigen Wetterwarnung und der neuen Wetterwarnung um Änderungen festzustellen" . PHP_EOL;
 			$md5hashes = [];
 			$md5hashes["new"] = @md5($jsonWetterWarnung);
-			if(empty($md5hashes["new"] || $md5hashes["new"] === FALSE)) {
+			if(empty($md5hashes["new"] || $md5hashes["new"] === false)) {
 				throw new Exception("Fehler beim erzeugen des MD5-Hashs der neuen Wetterwarnungen");
 			}
 
 			$md5hashes["old"] = @md5_file($this->localJsonFile);
-			if(empty($md5hashes["old"] || $md5hashes["old"] === FALSE)) {
+			if(empty($md5hashes["old"] || $md5hashes["old"] === false)) {
 				throw new Exception("Fehler beim erzeugen des MD5-Hashs der bisherigen Wetterwarnungen");
 			}
 
 			echo "\t\tMD5-Hashs der bisherigen Wetterwarnungen:\t" . $md5hashes["old"] . PHP_EOL;
-			echo "\t\tMD5-Hashs der neuenWetterwarnungen:\t\t" . $md5hashes["new"] . PHP_EOL;
+			echo "\t\tMD5-Hashs der neuen Wetterwarnungen:\t\t" . $md5hashes["new"] . PHP_EOL;
 
 
 			// Gab es eine Änderung?
@@ -778,10 +776,10 @@ class WarnParser extends ErrorLogging {
 					throw new Exception("Fehler beim speichern der verarbeiteten Wetterwarnungen (Pfad: " . $this->localJsonFile . ")");
 				}
 
-				$fileupdated = TRUE;
+				$fileupdated = true;
 			} else {
 				echo "-> Keine Änderung bei den Wetterwarnungen vorhanden - kein speichern notwendig" . PHP_EOL;
-				$fileupdated = FALSE;
+				$fileupdated = false;
 			}
 
 			return $fileupdated ;
@@ -789,7 +787,7 @@ class WarnParser extends ErrorLogging {
 			// Fehler an Logging-Modul übergeben
 			$this->logError($e, $this->tmpFolder);
 
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -807,7 +805,7 @@ class WarnParser extends ErrorLogging {
 	private function searchForWarnAreaInCAP(\SimpleXMLElement $WarnInfoNode, int $warnCellId) {
 		try {
 			// Lege Result- und Hits-Variable an
-			$result = FALSE;
+			$result = false;
 			$hits = 0;
 
 			// Durchlaufe den gesamten Info-Node
@@ -870,7 +868,7 @@ class WarnParser extends ErrorLogging {
 						}
 
 						// Treffer als XML Objekt zusammenstellen (XML um durchgehend den gleichen Objekt-Typ zu haben) falls noch keine Geo-Informationen existieren
-						$result = new \SimpleXMLElement("<geoInfo/>");
+						$result = new \SimpleXMLElement("<geoInfo></geoInfo>");
 						$result->addChild("warncellid",	$currentWarnCellID);
 						$result->addChild("areaDesc",		$currentAreaDesc);
 						$result->addChild("stateCode",	$currentStateCode);
@@ -892,7 +890,7 @@ class WarnParser extends ErrorLogging {
 			// Fehler-Handling
 			$this->logError($e, $this->tmpFolder);
 
-			return FALSE;
+			return false;
 		}
 	}
 
@@ -997,178 +995,6 @@ class WarnParser extends ErrorLogging {
 	public function clearWetterWarnungen() {
 		$this->wetterWarnungen = [];
 
-		return TRUE;
-	}
-}
-
-/**
- * Error-Logging Klasse
- *
- * @package blog404de\WetterScripts\WarnParser
- */
-class ErrorLogging {
-	/** @var array E-Mail Absender/Empfänger in ["empfaenger"] und ["absender"] */
-	private $logToMail = [];
-
-	/** @var string Pfad zur Log-Datei */
-	private $logToFile = "";
-
-	/**
-	 * Fehler innerhalb der Anwendung verarbeiten
-	 *
-	 * @param Exception $e
-	 * @param string $tmpPath
-	 */
-	protected function logError(Exception $e, string $tmpPath = NULL) {
-		// Zeitpunkt
-		$strDate = date("Y-m-d H:i:s");
-
-		// Fehler-Ausgabe erzeugen:
-		$longText = sprintf("Fehler im Programmablauf:" . PHP_EOL .
-			"\tZeitpunkt: %s" . PHP_EOL .
-			"\tFehlermeldung: %s" . PHP_EOL .
-			"\tPosition: %s:%d",
-			$strDate, $e->getMessage(), $e->getFile(), $e->getLine()
-		);
-
-
-		$shortText = sprintf("%s - %s:%d - %s",
-			date("Y-m-d H:i:s"),
-			$e->getFile(),
-			$e->getLine(),
-			$e->getMessage()
-		);
-
-		// Lösche evntuell vorhandenes Temporäre Verzeichnis
-		if($tmpPath !== FALSE && !is_null($tmpPath)) {
-			$tmpclean = Toolbox::removeTempDir($tmpPath);
-			if(!$tmpclean) {
-				$shortText = $shortText . " - Cleanup: temporärer Ordner (" . $tmpPath . ") konnte nicht gelöscht werden";
-				$longText = $longText . PHP_EOL . "\tCleanup: Fehler beim löschen des temporären Ordner (" . $tmpPath . ")";
-			} else {
-				$shortText = $shortText . " - Cleanup: temporärer Ordner gelöscht";
-				$longText = $longText . PHP_EOL . "\tCleanup:temporärer Ordner gelöscht";
-			}
-		}
-
-		// Loggen in Datei
-		if(!empty($this->logToFile)) {
-			$writeFile = file_put_contents($this->logToFile, $shortText . PHP_EOL, FILE_APPEND);
-			if($writeFile === FALSE) {
-				$longText = $longText . PHP_EOL . "\tLogdatei schreiben: Fehler beim schreiben der Log-Datei in: " . $this->logToFile . PHP_EOL;
-			}
-		}
-
-		// Loggen per E-Mail
-		if (is_array($this->logToMail)) {
-			if (array_key_exists("empfaenger" , $this->logToMail) && array_key_exists("absender", $this->logToMail )) {
-				$mailHeader = sprintf("From: Wetterwarn-Bot <%s>\r\n" .
-					"Reply-To: Wetter-Bot <%s>\r\n" .
-					"X-Mailer: Wetter-Bot by tfnApps.de\r\n" .
-					"X-Priority: 1 (Higuest)\r\n" .
-					"X-MSMail-Priority: High\r\n" .
-					"Importance: High\r\n" ,
-					$this->logToMail["absender"] ,
-					$this->logToMail["empfaenger"]
-				);
-				$mailBetreff = "Fehler beim verarbeiten der Wetterwarndaten: " . $strDate;
-
-				$sentMail = mail($this->logToMail["empfaenger"] , $mailBetreff , $longText , $mailHeader);
-				if ($sentMail === FALSE) {
-					$longText = $longText . PHP_EOL . "\tE-Mail Versand: Fehler beim senden der Fehler E-Mail an: " . $this->logToMail["empfaenger"] . PHP_EOL;
-				} else {
-					$longText = $longText . PHP_EOL . "\tE-Mail Versand: Fehler E-Mail wurde erfolgreich an " . $this->logToMail["empfaenger"] . " versendet." . PHP_EOL;
-				}
-			}
-		}
-
-		// Ausgabe auf die Konsole
-		fwrite(STDOUT, PHP_EOL);
-		fwrite(STDERR, $longText);
-		fwrite(STDOUT, PHP_EOL);
-
-		exit(1);
-	}
-
-	/*
-	 * Getter / Setter-Methoden
-	 */
-
-	/**
-	 * Setter-Methode für logToMail
-	 *
-	 * @param array $logToMail
-	 * @return ErrorLogging
-	 */
-	public function setLogToMail(array $logToMail): ErrorLogging {
-
-		try {
-			if (is_array($logToMail)) {
-				if (array_key_exists("empfaenger" , $logToMail) && array_key_exists("absender", $logToMail )) {
-					if (filter_var($logToMail["empfaenger"], FILTER_VALIDATE_EMAIL) && filter_var($logToMail["absender"], FILTER_VALIDATE_EMAIL)) {
-						$this->logToMail = $logToMail;
-					} else {
-						throw new Exception("LogToMail beinhaltet für die Array-Keys 'empfaenger' oder 'absender' keine gültige E-Mail Adresse");
-					}
-				} else {
-					// Error-Logging Konfiguration ist falsch
-					$this->logToMail = [];
-					throw new Exception("LogToMail benötigt ein Array mit den Keys 'empfaenger' und 'absender'");
-				}
-			} else {
-				// Error Logging an E-Mail deaktivieren
-				$this->logToMail = [];
-			}
-		} catch (\Exception $e) {
-			$this->logError($e);
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Setter-Methode für LogToFile
-	 *
-	 * @param string $logToFile
-	 * @return ErrorLogging
-	 * @throws \Exception
-	 */
-	public function setLogToFile(string $logToFile): ErrorLogging {
-		try {
-			if(file_exists($logToFile) && is_writeable($logToFile)) {
-				// Datei existiert und kann geschrieben werden
-				$this->logToFile = $logToFile;
-			} else if (!file_exists($logToFile) && is_writeable(dirname($logToFile))) {
-				if(touch($logToFile)) {
-					// Nicht existierende Log-Datei erfolgreich angelegt
-					$this->logToFile = $logToFile;
-				} else {
-					// Log-Datei kann nicht neu angelegt werden
-					throw new Exception("Fehler beim anlegen der Log-Datei in: " . $logToFile);
-				}
-			} else {
-				throw new Exception("Fehler beim schreiben der Log-Datei in: " . $logToFile);
-			}
-		} catch (\Exception $e) {
-			$this->logError($e);
-		}
-
-		return $this;
-	}
-
-	/**
-	 * Getter-Methode für logToMail
-	 * @return array
-	 */
-	public function getLogToMail(): array {
-		return $this->logToMail;
-	}
-
-	/**
-	 * Getter-Methode für LogToFile
-	 * @return string
-	 */
-	public function getLogToFile(): string {
-		return $this->logToFile;
+		return true;
 	}
 }
