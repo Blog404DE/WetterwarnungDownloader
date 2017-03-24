@@ -3,14 +3,15 @@
 /**
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
  *
- * @version 2.0-dev 2.0.0-dev
- * @copyright (c) tf-network.de Jens Dutzi 2012-2017
- * @license MIT
- *
- * @package blog404de\WetterScripts
+ * @package    blog404de\WetterScripts
+ * @subpackage WarnParser
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  2012-2017 Jens Dutzi
+ * @version    2.0.0-dev
+ * @license    MIT
  *
  * Stand: 05.03.2017
- *
+  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation files (the "Software"), to deal in the Software
@@ -37,13 +38,19 @@
  * ======================================================
  * ======================================================
  */
+// Root-Verzeichnis festlegen
 try {
-	// Root-Verzeichnis festlegen
-	define( 'ROOT_PATH', dirname( __FILE__ ) . "/" );
+	$unwetterConfig = [];
+	if(is_readable(dirname( __FILE__ ) . "/config.local.php")) {
+		require_once dirname( __FILE__ ) . "/config.local.php";
+	} else {
+		throw new Exception("Konfigurationsdatei 'config.local.php' existiert nicht. Zur Konfiguration lesen Sie README.md");
+	}
 
 	// Notwendige Libs laden
-	$unwetterConfig = [];
-	require_once ROOT_PATH . "botLib/WarnParser.class.php";
+	require_once  ROOT_PATH . "botLib/Toolbox.php";
+	require_once  ROOT_PATH . "botLib/ErrorLogging.php";
+	require_once  ROOT_PATH . "botLib/WarnParser.php";
 
 	/*
  	 * Script-Header ausgeben
@@ -53,12 +60,6 @@ try {
 	$header  = "Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL;
 	$header .= str_repeat("=", strlen(trim($header))) . PHP_EOL;
 	echo $header;
-
-	if(is_readable(ROOT_PATH . "config.local.php")) {
-		require_once ROOT_PATH . "config.local.php";
-	} else {
-		throw new Exception("Konfigurationsdatei 'config.local.php' existiert nicht. Zur Konfiguration lesen Sie README.md");
-	}
 
 	// Prüfe Konfigurationsdatei auf Vollständigkeit
 	$configKeysNeeded = ["WarnCellIds", "localJsonWarnfile", "localFolder", "ftp"];
@@ -87,7 +88,7 @@ try {
 
 	if(!array_key_exists("passiv", $unwetterConfig["ftp"])) {
 		// Passiv/Aktive Verbindung zum FTP Server ist nicht konfiguriert -> daher aktive Verbindung
-		$unwetterConfig["ftp"]["passiv"] = FALSE;
+		$unwetterConfig["ftp"]["passiv"] = false;
 	}
 
 	// Neue Wetterwarnungen vom DWD FTP Server holen
@@ -104,11 +105,11 @@ try {
 	// Wetterwarnungen parsen
 	if(is_numeric($unwetterConfig["WarnCellIds"])) {
 		// Nach einer einzelnen WarnCellId suchen
-		$warnBot->parseWetterWarnungen($unwetterConfig["WarnCellIds"], FALSE);
+		$warnBot->parseWetterWarnungen($unwetterConfig["WarnCellIds"], false);
 	} else if(is_array($unwetterConfig["WarnCellIds"])) {
 		// Nach mehreren WarnCellIds suchen
 		foreach ($unwetterConfig["WarnCellIds"] as $warnCellId) {
-			$warnBot->parseWetterWarnungen($warnCellId, TRUE);
+			$warnBot->parseWetterWarnungen($warnCellId, true);
 		}
 	} else {
 		// Variablen-Typ ist falssch
