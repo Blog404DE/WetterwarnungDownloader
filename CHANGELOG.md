@@ -1,6 +1,11 @@
 # Changelog
 
-2017-03.19, 2.0.0 beta
+2017-03-24, 2.0.1 stable
+----------
+- Laden der Klassen etwas optimiert
+- Code-Style auf PSR-0 geprüft und korrigiert
+
+2017-03-19, 2.0.0 beta
 ----------
 - Unterstützung der genaueren Gemeinde-Wetterwarnungen (neu vom DWD - [Detail-Informationen](http://www.dwd.de/DE/wetter/warnungen_aktuell/neuerungen/gemeindewarnungen_node.html))
 - Konfigurationsdatei vereinfacht *(install.md beachten!)*

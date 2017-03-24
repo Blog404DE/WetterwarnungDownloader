@@ -6,7 +6,7 @@
  * @subpackage ErrorLogging
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  2012-2017 Jens Dutzi
- * @version    2.0.0-dev
+ * @version    2.0.1-dev
  * @license    MIT
  *
  * Stand: 05.03.2017
