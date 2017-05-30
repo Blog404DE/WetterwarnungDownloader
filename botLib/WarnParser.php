@@ -310,7 +310,7 @@ class WarnParser extends ErrorLogging {
 			}
 
 			// Dateiliste sortieren
-			asort($localFiles , SORT_NUMERIC);
+			ksort($localFiles , SORT_NUMERIC);
 			$localFiles = array_reverse($localFiles);
 
 			// Array $localFiles aufsplitten in zu behaltende und zu löschende Dateien

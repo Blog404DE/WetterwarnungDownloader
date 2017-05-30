@@ -1,5 +1,9 @@
 # Changelog
 
+2017-05-30, 2.0.2 stable
+----------
+- Bugfix: unter umständen wurde nicht die neuste Wetterwarnung verarbeitet
+
 2017-03-24, 2.0.1 stable
 ----------
 - Laden der Klassen etwas optimiert
