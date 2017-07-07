@@ -83,7 +83,7 @@ class WarnParser extends ErrorLogging {
 	/** @var array Array mit MySQL Zugangsdaten */
 	private $mysqlConfig = [];
 
-	/** @var null|PDO  */
+	/** @var null|PDO MySQL Connection ResourceID */
 	private $mysqlConId = null;
 
 
