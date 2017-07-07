@@ -1,6 +1,6 @@
 # Changelog
 
-2017-05-30, 2.5.0 dev
+2017-05-30, 2.5.1 dev
 ----------
 - Wichtig: Umstellung die geänderten Warnprodukte (siehe Newsletter vom GDS-Newsletter 07.07.2017)
 - Neu: Optionales speichern der Wetterwarnungen in eine MySQL Datenbank
@@ -13,14 +13,14 @@
 ----------
 - Bugfix: unter umständen wurde nicht die neuste Wetterwarnung verarbeitet
 
-2017-03-24, 2.0.1 stable
+2017-03-24, 2.0.1 dev
 ----------
 - Laden der Klassen etwas optimiert
 - Code-Style auf PSR-0 geprüft und korrigiert
 - Kleinere Bugfixes
 - ErrorLog-Klasse ausgelagert in eigenständige Datei
 
-2017-03-19, 2.0.0 beta
+2017-03-19, 2.0.0 dev
 ----------
 - Unterstützung der genaueren Gemeinde-Wetterwarnungen (neu vom DWD - [Detail-Informationen](http://www.dwd.de/DE/wetter/warnungen_aktuell/neuerungen/gemeindewarnungen_node.html))
 - Konfigurationsdatei vereinfacht *(install.md beachten!)*

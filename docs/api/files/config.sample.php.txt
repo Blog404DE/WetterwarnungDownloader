@@ -6,10 +6,10 @@
  * @subpackage ConfigFile
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  2012-2017 Jens Dutzi
- * @version    2.0.1-dev
+ * @version    2.5.1-dev
  * @license    MIT
  *
- * Stand: 05.03.2017
+ * Stand: 07.07.2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
