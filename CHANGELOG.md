@@ -1,5 +1,18 @@
 # Changelog
 
+2017-05-30, 2.5.0 dev
+----------
+- Wichtig: Umstellung die geänderten Warnprodukte (siehe Newsletter vom GDS-Newsletter 07.07.2017)
+- Neu: Optionales speichern der Wetterwarnungen in eine MySQL Datenbank
+- Neu: Ausgabe beinhaltet Typ der Aussendung (Alert = Neue Meldung, Update = Aktualisierung einer bestehenden Meldung)
+- Neu: Ausgabe beinhaltet den Identifier der Aussendung (bezieht sich auf eine Aussendung, nicht auf einzelne Wetterwarnungen und kann daher mehreren Meldungen zugeordnet sein)
+- Neu: Ausgabe beinhaltet bei Update-Meldungen den Identifier der Meldung, die aktualisiert wurde
+- Bugfix: Phrase für markantes Wetter korrigiert
+
+2017-05-30, 2.0.2 stable
+----------
+- Bugfix: unter umständen wurde nicht die neuste Wetterwarnung verarbeitet
+
 2017-03-24, 2.0.1 stable
 ----------
 - Laden der Klassen etwas optimiert

@@ -14,6 +14,7 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 
 - Linux oder OS X (unter Debian und OS X getestet)
 - PHP 7.0.0 (oder neuer) inklusive ftp-, mhash und zip-Modul aktiv
+- (optional) MySQL-Datenbank
 - wget
 
 ### Vorbereitung:
@@ -28,7 +29,7 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 	das ShellScript *fetchManual.sh* einmalig auszuführen.  
 	
 	```sh
-	cd doc
+	cd docs
 	./fetchManual.sh
 	```
 	
@@ -58,16 +59,69 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 		"password"  => "************"
 	];
 	```
-
 	Die benötigten Zugangsdaten und den Hostnamen wird vom DWD per E-Mail nach der Registrierung (siehe Vorbereitung) mitgeteilt. 
 	Der erste Parameter ```"host"``` beinhaltet der vom DWD zugewiesene FTP-Server. Bei ```"username"``` handelt es sich um den Benutzername und bei ```"password"``` um das vom DWD zugeteilte Passwort.
 	
-2. Der zweite Konfigurationsparmaeter ist die Angabe für die Region, für welche die Wetterwarnungen ermittelt werden sollen. Die WarnCellID ist dabei die Nummer, welche im vorherigen Schritt ermittelt wurde. 
+2. Mit dem zweiten Konfigurationsparameter kann die Archiv-Funktion (speichern in einer MySQL Datenbak) aktiviert werden (true oder false). 
+
+	````php
+	$unwetterConfig["Archive"] 			= false;
+	````
+	Bei aktivierter Archiv-Funktion müssen die darauffolgenden MySQL Zugangsdaten sowie den Namen der Datenbank  hinterlegt werden.
+	
+	````php
+	$unwetterConfig["MySQL"] = [
+		"host"			=> "mysql.example",
+		"username"		=> "testuser",
+		"password"		=> "testpasswort",
+		"database"		=> "testdatenbank"
+	];
+	````
+	Die angegebene Datenbank muss auf dem MySQL-Server bereits existieren. Mittels folgendem SQL Query (auch zu finden unter *doc/table.sql*) wird das Archiv-Table angelegt.
+	
+	````sql
+	DROP TABLE IF EXISTS `warnarchiv`;
+	CREATE TABLE `warnarchiv` (
+		`id` int(11) NOT NULL AUTO_INCREMENT,
+		`datum` datetime NOT NULL,
+		`hash` varchar(32) NOT NULL,
+		`identifier` varchar(1024) NOT NULL,
+		`reference` varchar(1024) DEFAULT NULL,
+		`msgType` varchar(32) NOT NULL,
+		`event` varchar(255) NOT NULL,
+		`startzeit` datetime NOT NULL,
+		`endzeit` datetime NOT NULL,
+		`severity` varchar(255) NOT NULL,
+		`warnstufe` int(11) NOT NULL,
+		`urgency` varchar(255) NOT NULL,
+		`headline` varchar(1024) NOT NULL,
+		`description` text NOT NULL,
+		`instruction` text NOT NULL,
+		`sender` varchar(255) NOT NULL,
+		`web` varchar(255) NOT NULL,
+		`warncellid` int(10) unsigned NOT NULL,
+		`area` varchar(255) NOT NULL,
+		`stateLong` varchar(255) NOT NULL,
+		`stateShort` varchar(3) NOT NULL,
+		`altitude` int(10) unsigned NOT NULL,
+		`ceiling` int(10) unsigned NOT NULL,
+		`hoehenangabe` varchar(255) NOT NULL,
+		PRIMARY KEY (`id`),
+		UNIQUE KEY `hash` (`hash`),
+		KEY `datum` (`datum`)
+	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+````
+	Zum anlegen der Tabelle können Sie neben einem Verwaltungstool Ihrer Wahl (z.B. phpMyAdmin, MySQL Workbench) als  auch die Konsole Ihres Systems verwenden.
+
+	```bash
+	mysql -h {hostname} -u {username} -p {datenbankname} < doc/table.sql
+	```
+	
+2. Der folgende Parameter ist die Angabe für die Region, für welche die Wetterwarnungen ermittelt werden sollen. Die WarnCellID ist dabei die Nummer, welche im vorherigen Schritt ermittelt wurde. 
 
 	```php
 	$unwetterConfig["WarnCellIds"]         = 908215999;  
 	```
-	
 	Sie können auch mehrere WarnCellIDs angeben. Hierfür verwenden Sie ein einfaches Array für den Konfigurationsparameter.
 	
 	```php
@@ -91,13 +145,13 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 	
 	Bei *localFolder* handelt es sich um den Pfad, der die aktuellste Datei mit Wetterwarnungen beinhaltet, welche vom DWD FTP Server heruntergeladen wurde. Die alten Wetterwarnungen werden automatisch durch das Script in diesem gelöscht.
 	
-**Hinweise:** Die hin 3 und 4 angegebenen Speicher-Pfade müssen auf Ihrem System bereits existieren, da es ansonsten zu einer Fehlermeldung beim ausführen des Scripts kommt. 
+**Hinweise:** Die hin 4 und 5 angegebenen Speicher-Pfade müssen auf Ihrem System bereits existieren, da es ansonsten zu einer Fehlermeldung beim ausführen des Scripts kommt. 
 
 ### Das PHP-Script ausführbar machen und als Cronjob hinterlegen
 
 1. Das konfigurierte Scripte startfähig machen
 
-	```sh
+	```bash
 	chmod +x WetterBot.php
 	```
 	
@@ -174,25 +228,28 @@ Das Script erzeugt eine JSON Datei mit, welche die Anzahl der Wetterrwarnungen *
     "anzahl": 1,
     "wetterwarnungen": [
         {
-            "event": "WINDB\u00d6EN",
-            "startzeit": "O:8:\"DateTime\":3:{s:4:\"date\";s:26:\"2017-03-19 08:00:00.000000\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:13:\"Europe\/Berlin\";}",
-            "endzeit": "O:8:\"DateTime\":3:{s:4:\"date\";s:26:\"2017-03-19 19:00:00.000000\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:13:\"Europe\/Berlin\";}",
+            "identifier": "2.49.0.1.276.0.DWD.PVW.1499440080000.c71497d9-4e95-4bed-afee-fed7c37f3215",
+            "reference": "",
+            "msgType": "Alert",
+            "event": "HITZE",
+            "startzeit": "O:8:\"DateTime\":3:{s:4:\"date\";s:26:\"2017-07-07 11:00:00.000000\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:13:\"Europe\/Berlin\";}",
+            "endzeit": "O:8:\"DateTime\":3:{s:4:\"date\";s:26:\"2017-07-08 19:00:00.000000\";s:13:\"timezone_type\";i:3;s:8:\"timezone\";s:13:\"Europe\/Berlin\";}",
             "severity": "Wetterwarnung",
             "warnstufe": 1,
             "urgency": "Immediate",
-            "headline": "Amtliche WARNUNG vor WINDB\u00d6EN",
-            "description": "Es treten Windb\u00f6en mit Geschwindigkeiten um 55 km\/h (15m\/s, 30kn, Bft 7) aus westlicher Richtung auf. In exponierten Lagen muss mit Sturmb\u00f6en bis 65 km\/h (18m\/s, 35kn, Bft 8) gerechnet werden.",
-            "instruction": "",
-            "sender": "DWD \/ Nationales Warnzentrum Offenbach",
+            "headline": "Amtliche WARNUNG vor HITZE",
+            "description": "Am Freitag wird bis zu einer H\u00f6he von 400m eine starke W\u00e4rmebelastung erwartet.\nAm Samstag wird eine starke W\u00e4rmebelastung erwartet.\n",
+            "instruction": " An beiden Tagen ist mit einer zus\u00e4tzlichen Belastung aufgrund verringerter n\u00e4chtlicher Abk\u00fchlung insbesondere im dicht bebauten Stadtgebiet von Karlsruhe zu rechnen.Heute ist der 2. Tag der Warnsituation in Folge.\n",
+            "sender": "Zentrum f\u00fcr Medizin-Meteorologische Forschung",
             "web": "http:\/\/www.wettergefahren.de",
             "warncellid": "808215103",
             "area": "Gemeinde Karlsdorf-Neuthard",
             "stateLong": "Baden-W\u00fcrtemberg",
             "stateShort": "BW",
             "altitude": 0,
-            "ceiling": 2999,
-            "hoehenangabe": "Alle H\u00f6henlagen",
-            "hash": "dade1be441248aa1c068230d2c5ab7e1"
+            "ceiling": 599,
+            "hoehenangabe": "H\u00f6henlagen unter 599m",
+            "hash": "9714fc3d39b291b561e12ad3494d24e3"
         }
     ]
 }
@@ -204,42 +261,46 @@ Liegt aktuell keine Wetterwarnung für die aktuelle Warnregion vor, so sieht die
 {  
    "anzahl":0,
    "wetterwarnungen":[  
-
    ]
 }
 ```
 
-### Erklärung der einzelnen Werte des Wetterwarnung-Array
+### Erklärung der einzelnen Werte des Wetterwarnung-Datei
 
 | Wert        	| Erklärung     |
 | ------------- | ------------- |
-| hash			| md5-Hash erzeugt aus den Angaben der Meldung |
-| severity      | Warnstufe der Meldung ¹ |
-| urgency       | Soll Wetterwarnung sofort ausgegeben werden oder in der Zukunft ¹  |
-| warnstufe		| Die Warnstufe (0 = Vorabinformation bis 4 = Extreme Unwetterwarnung) ² |
-| startzeit		| Beginn der Wetterwarnung als *serialisiertes DateTime* Objekt ⁴|
-| endzeit		| Ablauf-Datum der Wetterwarnung als *serialisiertes* DateTime Objekt. **Wichtig:** Ist *startzeit und *endzeit* identisch, dann existiert keine Endzeit und der Wert sollte in der Ausgabe ignoriert werden) ⁴|
-| headline		| Überschrift der Wetterwarnung|
-| area			| Bezeichnung der Region auf die die Wetterwarnung zutrifft |
-| stateShort	| Abkürzung des Bundesland in dem die Warnregion sich befindet |
-| stateLong		| Ausgeschriebener Name des Bundeslandes in dem sich die Warnregion befindet |
-| altitude		| Unterer Wert des Höhenbereichs in **Meter** ³ |
-| ceiling		| Oberer Wert Wert des Höhenbereichs in **Meter** ³ |
-| hoehenangabe	| Höhenangabe in Text-Form (ebenfalls in Meter) ³ |
-| description	| Beschreibungstext der Warnung bzw. Vorwarnung ¹ |
-| instruction	| Zusatztext zur Warnung und optional ein Verlängerungshinweis sowie Ersetzungshinweis ¹ |
-| event			| Art des Wettereignisses in Kurzform ¹ |
-| sender		| Ausstellendes Rechenzentrum des DWD |
-| web			| URL mit Webseite für weitere Informationen zur Warnung |
-| warncellid	| Zur Warnung gehörende WarnCellID |
+| identifier			| Die Kennung des DWD der ausgegebenen Wetterwarnung ¹ |
+| reference			| Bei Update: Identifier des ehemaligen Identifier ¹ |
+| msgType			| Typ der Meldung *Alert* = Neue Meldung, *Update* = Aktualisierung |
+| event				| Art des Wettereignisses in Kurzform ² |
+| startzeit			| Beginn der Wetterwarnung als *serialisiertes DateTime* Objekt ⁵ |
+| endzeit			| Ablauf-Datum der Wetterwarnung als *serialisiertes* DateTime Objekt ⁵ |
+| severity			| Warnstufe der Meldung ¹ |
+| warnstufe			| Die Warnstufe (0 = Vorabinformation bis 4 = Extreme Unwetterwarnung) ² |
+| urgency			| Soll Wetterwarnung sofort ausgegeben werden oder in der Zukunft ³  |
+| headline			| Überschrift der Wetterwarnung ² |
+| description		| Beschreibungstext der Warnung bzw. Vorwarnung ² |
+| instruction		| Zusatztext zur Warnung und optional ein Verlängerungshinweis sowie Ersetzungshinweis ² |
+| sender			| Ausstellendes Rechenzentrum des DWD |
+| web				| URL mit Webseite für weitere Informationen zur Warnung |
+| warncellid		| Zur Warnung gehörende WarnCellID |
+| area				| Bezeichnung der Region auf die die Wetterwarnung zutrifft |
+| stateLong			| Ausgeschriebener Name des Bundeslandes in dem sich die Warnregion befindet |
+| stateShort		| Abkürzung des Bundesland in dem die Warnregion sich befindet |
+| altitude			| Unterer Wert des Höhenbereichs in **Meter** ⁴ |
+| ceiling			| Oberer Wert Wert des Höhenbereichs in **Meter** ⁴ |
+| hoehenangabe	| Höhenangabe in Text-Form (ebenfalls in Meter) ⁴ |
+| hash				| Automatisch erzeugte einmalige Kennung der Meldung |
 
-¹ Bei diesen Angaben handelt es sich die direkte unveränderte Übernahme aus der Wetterwarnung des DWD. Eine Erklärung der jeweiligen Werte findet sich in der unter *Vorbereitung* heruntergeladenen Datei [cap_dwd_profile_de_pdf.pdf](http://www.dwd.de/DE/leistungen/gds/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile&v=2).
+¹ Jede Ausswendung des DWD kann aus mehreren einzelnen Wetterwarnungen bestehen. Dadurch kann der gleiche Identifier für mehrere Meldungen gleichzeitig gültig sein. Im Falle eines Updates (siehe msgType) ist unter *reference* der Identifier der Meldungen hinterlegt, die durch das Update ersetzt werden
 
-² Die Warnstufen lauten wie folgt: 0 = Vorwarnung, 1 = Wetterwarnung, 2 = Markante Wetterwarnung, 3 = Unwetterwarnung, 4 = Extreme Unwetterwarnung, -1 = Unbekannter Warntyp
+² Bei diesen Angaben handelt es sich die direkte unveränderte Übernahme aus der Wetterwarnung des DWD. Eine Erklärung der jeweiligen Werte findet sich in der unter *Vorbereitung* heruntergeladenen Datei [cap_dwd_profile_de_pdf.pdf](http://www.dwd.de/DE/leistungen/gds/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile).
 
-³ Die Höhenangaben sind im Gegensatz zu der Orginal Wetterwarnung in Meter umgerechnet und können damit direkt verwendet werden. Zusätzliche Angaben zu den Höhenwerten findet sich ebenfalls in der [cap_dwd_profile_de_pdf.pdf](http://www.dwd.de/DE/leistungen/gds/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile&v=2).
+³ Die Warnstufen lauten wie folgt: 0 = Vorwarnung, 1 = Wetterwarnung, 2 = Markante Wetterwarnung, 3 = Unwetterwarnung, 4 = Extreme Unwetterwarnung, -1 = Unbekannter Warntyp
 
-⁴ Um z.B. unter PHP auf das serialisierte DateTime Objekt zugreifen zu können, muss es für die Verwendung erst mittels [unserialize](http://php.net/manual/de/function.unserialize.php) in ein DateTime-Objekt deserialisiert werden. 
+⁴ Die Höhenangaben sind im Gegensatz zu der Orginal Wetterwarnung in Meter umgerechnet und können damit direkt verwendet werden. Zusätzliche Angaben zu den Höhenwerten findet sich ebenfalls in der [cap_dwd_profile_de_pdf.pdf](http://www.dwd.de/DE/leistungen/gds/help/warnungen/cap_dwd_profile_de_pdf.pdf?__blob=publicationFile).
+
+⁵ Um z.B. unter PHP auf das serialisierte DateTime Objekt zugreifen zu können, muss es für die Verwendung erst mittels [unserialize](http://php.net/manual/de/function.unserialize.php) in ein DateTime-Objekt deserialisiert werden. 
 **Hinweis:** Ist *startzeit* identisch mit der *endzeit*, dann wurde keine Endzeit vom DWD für die Warnung angegeben und sollte daher bei einer Ausgabe ignoriert werden.
 
 ## Abschluss
@@ -250,5 +311,5 @@ Solltet Ihr Fragen oder Anregungen haben, so steht euch offen sich jederzeit an 
 --
 ##### Lizenz-Information:
 
-Copyright Jens Dutzi 2015-2017 / Stand: 24.03.2017 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
+Copyright Jens Dutzi 2015-2017 / Stand: 07.07.2017 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
 

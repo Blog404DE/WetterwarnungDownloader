@@ -6,10 +6,10 @@
  * @subpackage WarnParser
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  2012-2017 Jens Dutzi
- * @version    2.0.1-dev
+ * @version    2.5.0-dev
  * @license    MIT
  *
- * Stand: 05.03.2017
+ * Stand: 07.07.2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -32,7 +32,7 @@
 
 namespace blog404de\WetterScripts;
 
-use Exception, DateTime, DateTimeZone;
+use Exception, DateTime, DateTimeZone, PDO;
 
 /**
  * Parser für die Wetter-Warnungen des DWD
@@ -42,7 +42,7 @@ class WarnParser extends ErrorLogging {
 	public $strictMode = false;
 
 	/** @var string Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen */
-	private $remoteFolder = "/gds/gds/specials/alerts/cap/GER/community_status_geometry";
+	private $remoteFolder = "/gds/gds/specials/alerts/cap/GER/COMMUNEUNION_DWD_STAT";
 
 	/** @var string Lokaler Ordner in dem die Wetterwarnungen gespeichert werden */
 	private $localFolder = "";
@@ -79,6 +79,12 @@ class WarnParser extends ErrorLogging {
 		"TH"  => "Thüringen",
 		"DE"  => "Bundesrepublik Deutschland"
 	];
+
+	/** @var array Array mit MySQL Zugangsdaten */
+	private $mysqlConfig = [];
+
+	/** @var null|PDO  */
+	private $mysqlConId = null;
 
 
 	/**
@@ -205,7 +211,7 @@ class WarnParser extends ErrorLogging {
 					// Filtere nach den Wetterwarnungen vom heutigen Tag
 					if (strpos($filename , $fileFilter) !== false) {
 						// Übernehme Datei in zu-bearbeiten Liste
-						if (preg_match(/** @lang text */'/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})(?<Postfix>_\w{3}_STATUS_AREA_UNION)(?<Extension>\.zip)$/' , $filename , $regs)) {
+						if (preg_match(/** @lang text */'/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})(?<Postfix>_\w{3}_STATUS_PREMIUMDWD_COMMUNEUNION_)(?<Language>DE|EN)(?<Filetype>.zip)$/' , $filename , $regs)) {
 
 							$dateFileM = \DateTime::createFromFormat("YmdHis" , $regs['Datum'] , new \DateTimeZone("UTC"));
 							if ($dateFileM === false) {
@@ -219,8 +225,15 @@ class WarnParser extends ErrorLogging {
 							$fileDate = @ftp_mdtm($this->ftpConnectionId , $filename);
 							$detectMode = "via FTP / Lesen des Dateinamens fehlgeschlagen";
 						}
-						echo "\t" . $filename . " => " . date("d.m.Y H:i" , $fileDate) . " (" . $detectMode . ")" . PHP_EOL;
-						$arrDownloadList[$filename] = $fileDate;
+
+						// Sprache feststellen
+						$language = $regs["Language"];
+
+						// Bei deutscher Sprache -> verarbeiten
+						if(strtoupper($language) === "DE") {
+							echo "\t" . $filename . " => " . date("d.m.Y H:i" , $fileDate) . " (" . $language . " / " . $detectMode . ")" . PHP_EOL;
+							$arrDownloadList[$filename] = $fileDate;
+						}
 					}
 				}
 			}
@@ -310,7 +323,7 @@ class WarnParser extends ErrorLogging {
 			}
 
 			// Dateiliste sortieren
-			asort($localFiles , SORT_NUMERIC);
+			ksort($localFiles , SORT_NUMERIC);
 			$localFiles = array_reverse($localFiles);
 
 			// Array $localFiles aufsplitten in zu behaltende und zu löschende Dateien
@@ -444,7 +457,7 @@ class WarnParser extends ErrorLogging {
 
 			// Parse XML Dateien
 			foreach ($localXmlFiles as $xmlFile) {
-				echo "\tPrüfe " . basename($xmlFile) . " (" . round(filesize($xmlFile) / 1024 , 2) . " kbyte): ";
+				echo "\tPrüfe " . basename($xmlFile) . " (" . number_format(round(filesize($xmlFile) / 1024 , 2), 2) . " kbyte): ";
 
 				// Datei kann geöffnet werden?
 				if (!is_readable($xmlFile)) {
@@ -469,7 +482,7 @@ class WarnParser extends ErrorLogging {
 				}
 
 				// Prüfe um welche Art von Wetter-Warnung es sich handelt (Alert oder Cancel)
-				if (strtolower($xml->{"msgType"}) == "alert") {
+				if (strtolower($xml->{"msgType"}) == "alert" || strtolower($xml->{"msgType"}) =="update") {
 					// Verarbeite Inhalt der XML Datei (Typ: Alert)
 
 					// Prüfe ob Info-Node existiert
@@ -552,6 +565,26 @@ class WarnParser extends ErrorLogging {
 							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'region' das XML-Node '" . $field . "'");
 						}
 					}
+
+					// Ermittle Identifier und Referenz
+					if (!property_exists($xml, "identifier")) {
+						throw new Exception(PHP_EOL . "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'identifier'-Node.");
+					} else {
+						$parsedWarnInfo["identifier"] =  (string)$xml->{"identifier"};
+					}
+
+					if(strtolower($xml->{"msgType"}) =="update") {
+						if (!property_exists($xml, "references")) {
+							throw new Exception(PHP_EOL . "Fehler beim parsen der Wetterwarnung: Die XML Datei mit Typ 'update' beinhaltet kein 'references'-Node.");
+						} else {
+							$parsedWarnInfo["reference"] = (string)$xml->{"references"};
+						}
+					} else {
+						$parsedWarnInfo["reference"] = "";
+					}
+
+					// Message-Typ feststellen
+					$parsedWarnInfo["msgType"] = ucfirst($xml->{"msgType"});
 
 					// Ermittle Event-Typ
 					if (!property_exists($currentWarnung, "event")) {
@@ -707,12 +740,28 @@ class WarnParser extends ErrorLogging {
 						}
 
 						// MD5Hash erzeugen aus Angaben der Wetterwarnung
-						$strForHash  = $parsedWarnInfo["warnstufe"] . $parsedWarnInfo["event"] . $objDateOnset->getTimestamp() . $objDateExpires->getTimestamp();
+						$strForHash  = $parsedWarnInfo["msgType"];
+						$strForHash .= $parsedWarnInfo["warnstufe"] . $parsedWarnInfo["event"] . $objDateOnset->getTimestamp() . $objDateExpires->getTimestamp();
 						$strForHash .= $parsedWarnInfo["area"] . $parsedWarnInfo["headline"] . $parsedWarnInfo["description"] . $parsedWarnInfo["instruction"];
 						$parsedWarnInfo["hash"] = md5($strForHash);
 
 						// Ausgabe der Anwendung:
-						echo "\t\t* Wetterwarnung für '" . $parsedWarnInfo["event"] . "' verarbeitet" . PHP_EOL;
+						echo "\t\t* Wetterwarnung für '" . $parsedWarnInfo["event"] . "' verarbeitet";
+
+						// Speichern er aktuellen Warnung in MySQL-Datenbank
+						if(!is_null($this->mysqlConId)) {
+							$saveResult = $this->saveToArchive($parsedWarnInfo, $this->mysqlConId);
+							if($saveResult === true) {
+								echo " (Archiviert)";
+							} else {
+								echo " (Bereits in Archiv)";
+							}
+						} else {
+							echo " (keine Archivierung)";
+						}
+
+						// Zeilenumbruch
+						echo PHP_EOL;
 
 						// Wetterwarnung übernehmen und neu sortieren
 						$this->wetterWarnungen[$parsedWarnInfo["hash"]] = $parsedWarnInfo;
@@ -725,6 +774,82 @@ class WarnParser extends ErrorLogging {
 		} catch (Exception $e) {
 			// Fehler an Logging-Modul übergeben
 			$this->logError($e, $this->tmpFolder);
+		}
+	}
+
+	/**
+	 * Speichere Wetterwarnung in Archiv
+	 * @param array $parsedWarnInfo
+	 * @param PDO $pdomysql
+	 * @return bool
+	 */
+	private function saveToArchive(array $parsedWarnInfo, PDO $pdomysql) {
+		try {
+			if(!is_array($parsedWarnInfo)) throw new Exception("Die im Archiv zu speicherenden Wetter-Informationen sind ungültig");
+
+			// Prüfe ob die bereits in der Datenbank ist
+			$sth = $pdomysql->prepare(
+				"SELECT count(id) from warnarchiv WHERE hash = :hash LIMIT 1",
+				array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)
+			);
+			$sth->bindParam(":hash", $parsedWarnInfo["hash"], PDO::PARAM_STR, 32);
+			if(!$sth->execute()) throw new Exception("Fehler beim prüfen ob Warnung bereits im Archiv ist: ". $pdomysql->errorInfo());
+
+			if($sth->fetchColumn() == "0") {
+				// Start-/Enddatum verarbeiten
+				$startZeit =  unserialize($parsedWarnInfo["startzeit"])->getTimestamp();
+				$endzeit = unserialize($parsedWarnInfo["endzeit"])->getTimestamp();
+
+				// Eingabe speichern
+				$sql  = "INSERT INTO warnarchiv 
+							(`datum`, `hash`, `identifier`,  `reference`, `event`, `msgType`, `startzeit`, `endzeit`, `severity`, `warnstufe`, `urgency`, 
+							 `headline`, `description`, `instruction`, `sender`, `web`, `warncellid`, `area`, 
+							 `stateLong`, `stateShort`, `altitude`, `ceiling`, `hoehenangabe`) 
+						VALUES (
+							NOW(), :hash, :identifier, :reference, :event, :msgType, FROM_UNIXTIME(:startzeit), FROM_UNIXTIME(:endzeit), :severity, 
+							:warnstufe, :urgency, :headline, :description, :instruction, :sender, :web, :warncellid, 
+							:area, :stateLong, :stateShort, :altitude, :ceiling, :hoehenangabe
+						)";
+				$sth = $pdomysql->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY));
+
+				// Parameter binden
+				$sth->bindParam(':hash',        $parsedWarnInfo["hash"],        PDO::PARAM_STR, 32);
+				$sth->bindParam(':identifier',  $parsedWarnInfo["identifier"],  PDO::PARAM_STR, 1024);
+				$sth->bindParam(':reference',   $parsedWarnInfo["reference"],   PDO::PARAM_STR, 1024);
+				$sth->bindParam(':event',       $parsedWarnInfo["event"],       PDO::PARAM_STR, 255);
+				$sth->bindParam(':msgType',     $parsedWarnInfo["msgType"],     PDO::PARAM_STR, 32);
+				$sth->bindParam(':startzeit',   $startZeit,                     PDO::PARAM_STR, 255);
+				$sth->bindParam(':endzeit',     $endzeit,                       PDO::PARAM_STR, 255);
+				$sth->bindParam(':severity',    $parsedWarnInfo["severity"],    PDO::PARAM_STR, 255);
+				$sth->bindParam(':warnstufe',   $parsedWarnInfo["warnstufe"],   PDO::PARAM_INT);
+				$sth->bindParam(':urgency',     $parsedWarnInfo["urgency"],     PDO::PARAM_STR, 255);
+				$sth->bindParam(':headline',    $parsedWarnInfo["headline"],    PDO::PARAM_STR, 1024);
+				$sth->bindParam(':description', $parsedWarnInfo["description"], PDO::PARAM_STR);
+				$sth->bindParam(':instruction', $parsedWarnInfo["instruction"], PDO::PARAM_STR);
+				$sth->bindParam(':sender',      $parsedWarnInfo["sender"],      PDO::PARAM_STR, 255);
+				$sth->bindParam(':web',         $parsedWarnInfo["web"],         PDO::PARAM_STR, 255);
+				$sth->bindParam(':warncellid',  $parsedWarnInfo["warncellid"],  PDO::PARAM_INT);
+				$sth->bindParam(':area',        $parsedWarnInfo["area"],        PDO::PARAM_STR, 255);
+				$sth->bindParam(':stateLong',   $parsedWarnInfo["stateLong"],   PDO::PARAM_STR, 255);
+				$sth->bindParam(':stateShort',  $parsedWarnInfo["stateShort"],  PDO::PARAM_STR, 3);
+				$sth->bindParam(':altitude',    $parsedWarnInfo["altitude"],    PDO::PARAM_INT);
+				$sth->bindParam(':ceiling',     $parsedWarnInfo["ceiling"],     PDO::PARAM_INT);
+				$sth->bindParam(':hoehenangabe',$parsedWarnInfo["hoehenangabe"],PDO::PARAM_STR, 255);
+
+				// In Datenbank eintragen
+				if(!$sth->execute()) throw new Exception("Fehler beim prüfen ob Warnung bereits im Archiv ist: ". $pdomysql->errorInfo());
+
+				return true;
+			} else {
+				// Eintrag schon in der Datenbank
+				return false;
+			}
+
+		} catch (Exception $e) {
+			// Fehler an Logging-Modul übergeben
+			$this->logError($e, $this->tmpFolder);
+
+			return false;
 		}
 	}
 
@@ -997,5 +1122,35 @@ class WarnParser extends ErrorLogging {
 
 		return true;
 	}
-}
 
+	/**
+	 * Setter für MySQL Zugangsdaten
+	 * Setze MySQL Zugangsdaten
+	 * @param array $mysqlConfig
+	 */
+	public function setMysqlConfig(array $mysqlConfig) {
+		try {
+			// MySQL Support vorhanden?
+			if (!extension_loaded("pdo_mysql")) {
+				throw new Exception("Für die Archiv-Funktion wird das mysqli-Modul in PHP benötigt");
+			}
+
+			// Alle Paramter verfügbar?
+			if(!array_key_exists("host", $mysqlConfig))     throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"host\"] wurde nicht gesetzt.");
+			if(!array_key_exists("username", $mysqlConfig)) throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"username\"] wurde nicht gesetzt.");
+			if(!array_key_exists("password", $mysqlConfig)) throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"username\"] wurde nicht gesetzt.");
+			if(!array_key_exists("database", $mysqlConfig)) throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"host\"] wurde nicht gesetzt.");
+
+			// Verbindung aufbauen zur MySQL Datenbank
+			$dsn = "mysql:dbname=" . $mysqlConfig["database"] . ";host=" . $mysqlConfig["host"];
+			$this->mysqlConId = new PDO($dsn, $mysqlConfig["username"], $mysqlConfig["password"]);
+			$this->mysqlConId->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+			// Werte setzen
+			$this->mysqlConfig = $mysqlConfig;
+		} catch (Exception $e) {
+			$this->logError($e);
+		}
+	}
+
+}

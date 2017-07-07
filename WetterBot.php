@@ -7,11 +7,11 @@
  * @subpackage WarnParser
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  2012-2017 Jens Dutzi
- * @version    2.0.1-dev
+ * @version    2.5.0-dev
  * @license    MIT
  *
- * Stand: 05.03.2017
-  *
+ * Stand: 07.07.2017
+ *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation files (the "Software"), to deal in the Software
@@ -82,6 +82,11 @@ try {
 	// Konfiguriere Bot
 	$warnBot->setLocalFolder($unwetterConfig["localFolder"]);
 	$warnBot->setLocalJsonFile($unwetterConfig["localJsonWarnfile"]);
+
+	if($unwetterConfig["Archive"]) {
+		// MySQL Zugangsdaten setzen für Archiv-Funktion
+		$warnBot->setMysqlConfig($unwetterConfig["MySQL"]);
+	}
 
 	if(!empty($optFehlerMail)) $warnBot->setLogToMail($optFehlerMail);
 	if(!empty($optFehlerLogfile)) $warnBot->setLogToFile($optFehlerLogfile);
