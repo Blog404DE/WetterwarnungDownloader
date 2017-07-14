@@ -7,10 +7,10 @@
  * @subpackage WarnParser
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  2012-2017 Jens Dutzi
- * @version    2.5.1-dev
+ * @version    2.5.3-dev
  * @license    MIT
  *
- * Stand: 07.07.2017
+ * Stand: 14.07.2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -62,7 +62,7 @@ try {
 	echo $header;
 
 	// Prüfe Konfigurationsdatei auf Vollständigkeit
-	$configKeysNeeded = ["WarnCellIds", "localJsonWarnfile", "localFolder", "ftp"];
+	$configKeysNeeded = ["WarnCells", "localJsonWarnfile", "localFolder", "ftp"];
 	foreach ($configKeysNeeded as $configKey) {
 		if (array_key_exists($configKey, $unwetterConfig)) {
 		} else {
@@ -108,18 +108,24 @@ try {
 	$warnBot->prepareWetterWarnungen();
 
 	// Wetterwarnungen parsen
-	if(is_numeric($unwetterConfig["WarnCellIds"])) {
-		// Nach einer einzelnen WarnCellId suchen
-		$warnBot->parseWetterWarnungen($unwetterConfig["WarnCellIds"], false);
-	} else if(is_array($unwetterConfig["WarnCellIds"])) {
-		// Nach mehreren WarnCellIds suchen
-		foreach ($unwetterConfig["WarnCellIds"] as $warnCellId) {
-			$warnBot->parseWetterWarnungen($warnCellId, true);
-		}
-	} else {
-		// Variablen-Typ ist falssch
-		throw new Exception("Der Konfigurationsparameter für die WarnCellId ist kein numerischer Wert oder ");
-	}
+    if(is_array($unwetterConfig["WarnCells"]) && count($unwetterConfig["WarnCells"]) > 0) {
+        foreach ($unwetterConfig["WarnCells"] as $warnCell) {
+            if(array_key_exists("warnCellId", $warnCell) && array_key_exists("stateShort", $warnCell)) {
+                $warnBot->parseWetterWarnungen($warnCell["warnCellId"], $warnCell["stateShort"]);
+            } else {
+                // WarnCell-Konfiguration fehlen die benötigten Angaben
+                throw new Exception(
+                    "Der Konfigurationsparameterfür die WarnCellId-Array beinhaltet nicht die "  .
+                    "notwendigen Informationen (siehe README.md)"
+                );
+            }
+            }
+    } else {
+        // Variablen-Typ ist falsch
+        throw new Exception(
+            "Der Konfigurationsparameter für die WarnCellId ist kein Array oder Array beinhaltet kein Eintrag"
+        );
+    }
 
 	// Speichere Wetterwarnungen
 	$test = $warnBot->saveToLocalJsonFile();

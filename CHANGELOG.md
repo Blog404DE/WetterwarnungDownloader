@@ -1,8 +1,19 @@
 # Changelog
 
-2017-05-30, 2.5.1 dev
+2017-07-14, 2.5.3 dev
 ----------
-- Wichtig: Umstellung die geänderten Warnprodukte (siehe Newsletter vom GDS-Newsletter 07.07.2017)
+
+**Wichtig: Anpassung an der Konfigurationsdatei beachten!**
+
+- (BUGFIX) Zwingend notwendige Anpassung des Scripts an das CAP DWD Profil  v1.2
+	
+	-> Änderung zwingend notwendig, da neu als optional markierte Felder bereits nicht mehr durch den DWD ausgeliefert werden (z.B. Bundesland-Code)
+
+
+2017-07-07, 2.5.1 dev
+----------
+**Wichtig: Umstellung die geänderten Warnprodukte (siehe Newsletter vom GDS-Newsletter 07.07.2017)**
+
 - Neu: Optionales speichern der Wetterwarnungen in eine MySQL Datenbank
 - Neu: Ausgabe beinhaltet Typ der Aussendung (Alert = Neue Meldung, Update = Aktualisierung einer bestehenden Meldung)
 - Neu: Ausgabe beinhaltet den Identifier der Aussendung (bezieht sich auf eine Aussendung, nicht auf einzelne Wetterwarnungen und kann daher mehreren Meldungen zugeordnet sein)
@@ -31,7 +42,8 @@
 - Alle Bestandteile sind in eine Klasse ausgelagert
 - Script ist nun auch innerhalb komplexerer Projekte nutzbar
 
-**Geänderte Software-Vorraussetzungen beachten:** 
+**Geänderte Software-Vorraussetzungen und veränderte Konfigurationsdatei beachten:** 
+
 - PHP >=7.0.0
 - ftp-, mhash und zip-Modul wird benötigt
 

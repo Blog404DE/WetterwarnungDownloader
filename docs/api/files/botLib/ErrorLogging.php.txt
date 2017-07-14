@@ -6,10 +6,10 @@
  * @subpackage ErrorLogging
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  2012-2017 Jens Dutzi
- * @version    2.5.1-dev
+ * @version    2.5.3-dev
  * @license    MIT
  *
- * Stand: 07.07.2017
+ * Stand: 14.07.2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this

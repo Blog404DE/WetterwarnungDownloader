@@ -1,6 +1,8 @@
 # Wetterwarnung Downloader Script
 
-> **Wichtige Änderung:** Die Konfigurations-Datei der aktuellste Version des Wetterwarnung Downloader ist nicht kompatibel zur Konfigurations-Datei der bisherigen Version 1.x. Weitere Informationen hierzu finden Sie hier in der README.md. 
+> **Wichtige Änderung:** Die Konfigurations-Datei der aktuellste Version des Wetterwarnung Downloader ist nicht kompatibel zur Konfigurations-Datei der bisherigen Version 2.0.1. Weitere Informationen hierzu finden Sie hier in der README.md.
+>  
+> Die Änderung ist in der Dokumentation fett markiert. 
 
 ## Einleitung
 
@@ -35,15 +37,40 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 	
 	Nach dem ausführen des Scripts befindet sich eine CSV-Datei, sowie mehrere PDF- und eine XLS-Datei im aktuellen Verzeichnis. Es handelt sich dabei um verschiedene Anleitungen und eine Liste der Warn-Regionen des DWD, welche später unter anderem für die Konfiguration notwendig sind. Zusätzlich sind diese Dokumente auch interessant für eventuelle Anpassungen des Scripts.
 
-### WarnCell ID ermitteln
+### WarnCell ID und das dazugehörige Bundesland ermitteln ermitteln
 
 Wichtig für das Script ist zu ermitteln, für welche Kennung die Warnregion besitzt, für welche man die Wetterwarnungen ermitteln möchte. Eine Liste der Regionen findet sich in der im vorherigen Schritt heruntergeladenen ```cap_warncellids_csv.csv```. Die CSV Datei können Sie mittels 
 [LibreOffice](https://de.libreoffice.org/) (empfohlen), [OpenOffice](https://www.openoffice.org/de/) oder jedem Texteditor öffnen. 
 
-Um die ```WARNCELLID``` zu finden, schaut manin der Spalte ```NAME``` bzw. ```KURZNAME``` nach dem Ort, für welchen man die Wettergefahren 
+Um die ```WARNCELLID``` zu finden, schaut man in der Spalte ```NAME``` bzw. ```KURZNAME``` nach dem Ort, für welchen man die Wettergefahren 
 gemeldet bekommen möchte. In der ersten Spalte findet man die zum Ort gehörende ```WARNCELLID```, welche in der Konfigurationsdatei benötigt wird.
 
-### Konfiguration des Script zum abrufen der Wetter-Warnungen *(neu)*:
+**ÄNDERUNG:** Da die Wetterwarnungen keine Informationen mehr ausliefert über den Code (Kürzel)  des Bundeslandes in dem sich die ```WARNCELLID``` befindet, muss der Code für die nachfolgende Konfigurationsdatei selber bestimmt werden. 
+
+Den Bundesland-Code können Sie anhand der folgenden Tabelle bestimmen:
+
+| Bundesland        				| Kürzel	|
+| ------------------------------------- | ------------- |
+| Brandenburg					| BB		|
+| Berlin							| BL		|
+| Baden-Württemberg			| BW		|
+| Bayern						| BY		|
+| Bremen						| HB		|
+| Hessen						| HE		|
+| Hamburg						| HH		|
+| Mecklenburg-Vorpommern	| MV		|
+| Nordrhein-Westfalen			| NRW		|
+| Niedersachsen				| NS		|	
+| Rheinland-Pfalz				| RP		|
+| Sachsen-Anhalt				| SA		|
+| Schleswig-Holstein			| SH		|
+| Saarland						| SL		|
+| Sachsen						| SN		|
+| Thüringen					| TH		|
+| Bundesrepublik Deutschland| DE		|
+
+
+### Konfiguration des Script zum abrufen der Wetter-Warnungen:
 
 Bei dem eigentlichen Script zum abrufen der Wetter-Warnungen handelt es sich um die Datei ```WetterBot.php```. Das Script selber wird gesteuert über die ```config.local.php``` Datei. Um diese Datei anzulegen, kopieren Sie bitte ```config.sample.php``` und nennen die neue Datei ```config.local.php```.
 
@@ -64,22 +91,23 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 	
 2. Mit dem zweiten Konfigurationsparameter kann die Archiv-Funktion (speichern in einer MySQL Datenbak) aktiviert werden (true oder false). 
 
-	````php
+	```php
 	$unwetterConfig["Archive"] 			= false;
-	````
+	```
 	Bei aktivierter Archiv-Funktion müssen die darauffolgenden MySQL Zugangsdaten sowie den Namen der Datenbank  hinterlegt werden.
 	
-	````php
+	```php
 	$unwetterConfig["MySQL"] = [
 		"host"			=> "mysql.example",
 		"username"		=> "testuser",
 		"password"		=> "testpasswort",
 		"database"		=> "testdatenbank"
 	];
-	````
+	```
+	
 	Die angegebene Datenbank muss auf dem MySQL-Server bereits existieren. Mittels folgendem SQL Query (auch zu finden unter *doc/table.sql*) wird das Archiv-Table angelegt.
 	
-	````sql
+	```sql
 	DROP TABLE IF EXISTS `warnarchiv`;
 	CREATE TABLE `warnarchiv` (
 		`id` int(11) NOT NULL AUTO_INCREMENT,
@@ -110,25 +138,24 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 		UNIQUE KEY `hash` (`hash`),
 		KEY `datum` (`datum`)
 	) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-````
+	```
+	
 	Zum anlegen der Tabelle können Sie neben einem Verwaltungstool Ihrer Wahl (z.B. phpMyAdmin, MySQL Workbench) als  auch die Konsole Ihres Systems verwenden.
 
 	```bash
 	mysql -h {hostname} -u {username} -p {datenbankname} < doc/table.sql
 	```
 	
-2. Der folgende Parameter ist die Angabe für die Region, für welche die Wetterwarnungen ermittelt werden sollen. Die WarnCellID ist dabei die Nummer, welche im vorherigen Schritt ermittelt wurde. 
+3. **(ÄNDERUNG)** Der folgende Parameter ist die Angabe für die Gemeinde bzw. Stadt oder Landkreis, für welche die Wetterwarnungen ermittelt werden sollen. 
+
+	Die ```warnCellId``` ist dabei die Nummer, welche im vorherigen Schritt ermittelt wurde. Der 	```stateShort``` beinhaltet den ebenfalls ermittelten Bundesland-Code.
 
 	```php
-	$unwetterConfig["WarnCellIds"]         = 908215999;  
-	```
-	Sie können auch mehrere WarnCellIDs angeben. Hierfür verwenden Sie ein einfaches Array für den Konfigurationsparameter.
-	
-	```php
-	$unwetterConfig["WarnCellIds"]         = [908215999, 108215000];  
+		$unwetterConfig["WarnCells"] = [
+			[ "warnCellId" => 808212000, "stateShort" => "BW" ]
+		];
 	```
 
-	
 3. Speicherpfad für die JSON Datei mit den Wetterwarnung-Daten:
 
 	```php
@@ -280,15 +307,15 @@ Liegt aktuell keine Wetterwarnung für die aktuelle Warnregion vor, so sieht die
 | urgency			| Soll Wetterwarnung sofort ausgegeben werden oder in der Zukunft ³  |
 | headline			| Überschrift der Wetterwarnung ² |
 | description		| Beschreibungstext der Warnung bzw. Vorwarnung ² |
-| instruction		| Zusatztext zur Warnung und optional ein Verlängerungshinweis sowie Ersetzungshinweis ² |
+| instruction		| Zusatztext zur Warnung und optional ein Verlängerungshinweis sowie Ersetzungshinweis ² |
 | sender			| Ausstellendes Rechenzentrum des DWD |
 | web				| URL mit Webseite für weitere Informationen zur Warnung |
 | warncellid		| Zur Warnung gehörende WarnCellID |
 | area				| Bezeichnung der Region auf die die Wetterwarnung zutrifft |
 | stateLong			| Ausgeschriebener Name des Bundeslandes in dem sich die Warnregion befindet |
 | stateShort		| Abkürzung des Bundesland in dem die Warnregion sich befindet |
-| altitude			| Unterer Wert des Höhenbereichs in **Meter** ⁴ |
-| ceiling			| Oberer Wert Wert des Höhenbereichs in **Meter** ⁴ |
+| altitude			| Unterer Wert des Höhenbereichs in **Meter** ⁴ |
+| ceiling			| Oberer Wert Wert des Höhenbereichs in **Meter** ⁴ |
 | hoehenangabe	| Höhenangabe in Text-Form (ebenfalls in Meter) ⁴ |
 | hash				| Automatisch erzeugte einmalige Kennung der Meldung |
 
@@ -311,5 +338,4 @@ Solltet Ihr Fragen oder Anregungen haben, so steht euch offen sich jederzeit an 
 --
 ##### Lizenz-Information:
 
-Copyright Jens Dutzi 2015-2017 / Stand: 07.07.2017 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
-
+Copyright Jens Dutzi 2015-2017 / Stand: 14.07.2017 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)

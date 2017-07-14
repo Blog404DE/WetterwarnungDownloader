@@ -6,10 +6,10 @@
  * @subpackage WarnParser
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  2012-2017 Jens Dutzi
- * @version    2.5.1-dev
+ * @version    2.5.3-dev
  * @license    MIT
  *
- * Stand: 07.07.2017
+ * Stand: 14.07.2017
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -63,7 +63,7 @@ class WarnParser extends ErrorLogging {
 	private $regionames = [
 		"BB"  => "Brandenburg",
 		"BL"  => "Berlin",
-		"BW"  => "Baden-Würtemberg",
+		"BW"  => "Baden-Württemberg",
 		"BY"  => "Bayern",
 		"HB"  => "Bremen",
 		"HE"  => "Hessen",
@@ -423,9 +423,9 @@ class WarnParser extends ErrorLogging {
 	 * Parsen der Wetterwarnungen
 	 *
 	 * @param int $warnCellId Warn-Region mittels WarnCellID festlegen
-	 * @param bool $append Zu bestehenden Warnungen hinzufügen
+	 * @param string $stateCode Kürzel des Bundeslandes
 	 */
-	public function parseWetterWarnungen(int $warnCellId, bool $append=true) {
+	public function parseWetterWarnungen(int $warnCellId, string $stateCode) {
 		try {
 			// Starte parsen der Wetterwarnungen des DWD
 			echo PHP_EOL . "*** Verarbeite die Wetterwarnungen:" . PHP_EOL;
@@ -456,6 +456,7 @@ class WarnParser extends ErrorLogging {
 			$arrRohWarnungen = array();
 
 			// Parse XML Dateien
+            $xml = NULL;
 			foreach ($localXmlFiles as $xmlFile) {
 				echo "\tPrüfe " . basename($xmlFile) . " (" . number_format(round(filesize($xmlFile) / 1024 , 2), 2) . " kbyte): ";
 
@@ -492,7 +493,11 @@ class WarnParser extends ErrorLogging {
 						$info = $xml->{"info"};
 					}
 
-					// Verarbeite den Info-Node in einer Schleife (falls mehrere einmal existieren für eine Alert-Datei) und prüfe ob eine Wetter-Warnung für die angegebene WarnCellId vorhanden ist
+                    if (!property_exists($xml, "identifier")) {
+                        throw new Exception(PHP_EOL . "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'identifier'-Node.");
+                    }
+
+                    // Verarbeite den Info-Node in einer Schleife (falls mehrere einmal existieren für eine Alert-Datei) und prüfe ob eine Wetter-Warnung für die angegebene WarnCellId vorhanden ist
 					foreach ($info as $wetterWarnung) {
 						// Prüfe ob es sich um eine Testwarnung handelt
 						if (!property_exists($wetterWarnung, "eventCode")) {
@@ -517,7 +522,7 @@ class WarnParser extends ErrorLogging {
 								$warnRegonFound = $this->searchForWarnAreaInCAP($info->{"area"}, $warnCellId);
 								if($warnRegonFound) {
 									// Treffer gefunden
-									echo sprintf("\tTreffer für %s (%s) / WarnCellID %d gefunden", $warnRegonFound->{"areaDesc"}, $warnRegonFound->{"stateCode"}, $warnRegonFound->{"warncellid"}) . PHP_EOL;
+									echo sprintf("\tTreffer für %s / WarnCellID %d gefunden", $warnRegonFound->{"areaDesc"}, $warnRegonFound->{"warncellid"}) . PHP_EOL;
 									$arrRohWarnungen[basename($xmlFile)] = ["warnung" => $wetterWarnung, "region" => $warnRegonFound];
 								} else {
 									// Kein Treffer
@@ -543,9 +548,6 @@ class WarnParser extends ErrorLogging {
 
 			echo "-> Verarbeite alle gefundenen Wetterwarnungen (Anzahl: " . count($arrRohWarnungen) . ")" . PHP_EOL;
 			if (count($arrRohWarnungen) > 0) {
-				// Sollen die Wetterwarnungen hinzugefügt werden zu bestehenden?
-				if($append !== true) $this->wetterWarnungen = [];
-
 				// Durchlaufe alle Warnungen
 				foreach ($arrRohWarnungen as $filename => $rawWarnung) {
 					echo("\tWetterwarnung aus " . $filename . ":" . PHP_EOL);
@@ -559,7 +561,7 @@ class WarnParser extends ErrorLogging {
 					}
 
 					// Prüfe-Geo-Felder
-					$geoFields = ["warncellid", "areaDesc", "stateCode", "stateName", "altitude", "ceiling"];
+					$geoFields = ["warncellid", "areaDesc", "altitude", "ceiling"];
 					foreach ($geoFields as $field) {
 						if(!property_exists($currentGeo, $field)) {
 							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'region' das XML-Node '" . $field . "'");
@@ -567,13 +569,9 @@ class WarnParser extends ErrorLogging {
 					}
 
 					// Ermittle Identifier und Referenz
-					if (!property_exists($xml, "identifier")) {
-						throw new Exception(PHP_EOL . "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'identifier'-Node.");
-					} else {
-						$parsedWarnInfo["identifier"] =  (string)$xml->{"identifier"};
-					}
+                    $parsedWarnInfo["identifier"] =  (string)$xml->{"identifier"};
 
-					if(strtolower($xml->{"msgType"}) =="update") {
+					if(strtolower($xml->{"msgType"}) == "update") {
 						if (!property_exists($xml, "references")) {
 							throw new Exception(PHP_EOL . "Fehler beim parsen der Wetterwarnung: Die XML Datei mit Typ 'update' beinhaltet kein 'references'-Node.");
 						} else {
@@ -712,16 +710,14 @@ class WarnParser extends ErrorLogging {
 						} else {
 							$parsedWarnInfo["area"] = (string)$rawWarnung["region"]->{"areaDesc"};
 						}
-						if (!property_exists($rawWarnung["region"], "stateName")) {
-							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'region' das XML-Node 'stateName'.");
-						} else {
-							$parsedWarnInfo["stateLong"] = (string)$rawWarnung["region"]->{"stateName"};
-						}
-						if (!property_exists($rawWarnung["region"], "stateCode")) {
-							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'stateCode' das XML-Node 'stateName'.");
-						} else {
-							$parsedWarnInfo["stateShort"] = (string)$rawWarnung["region"]->{"stateCode"};
-						}
+
+						// Vom Nutzer übergebene Daten zum Bundesland
+                        $parsedWarnInfo["stateShort"] = strtoupper($stateCode);
+						if(array_key_exists($stateCode, $this->regionames)) {
+                            $parsedWarnInfo["stateLong"] = $this->regionames[$parsedWarnInfo["stateShort"]];
+                        } else {
+                            $parsedWarnInfo["stateLong"] = $parsedWarnInfo["stateShort"];
+                        }
 
 						// Höhenangnaben ermitteln umd umrechnen
 						if (!property_exists($rawWarnung["region"], "altitude") || !property_exists($rawWarnung["region"], "ceiling")) {
@@ -970,18 +966,18 @@ class WarnParser extends ErrorLogging {
 							throw new Exception("Fehler beim durchsuchen der Geo-Informationen: XML-Nodes 'area'->'geocode'->'valueName' oder 'value' fehlen.");
 						}
 
-						if ($geocode->{"valueName"} == "STATE") {
-							$currentStateCode = (string)$geocode->{"value"};
-						} else if ($geocode->{"valueName"} == "WARNCELLID") {
+	                    if ($geocode->{"valueName"} == "WARNCELLID") {
 							$currentWarnCellID = (string)$geocode->{"value"};
 						}
-
 					}
 
 					// Prüfe ob mindestens ein gültiger Eintrag existiert in dem geprüften Area-Node
-					if (is_null($currentStateCode) || is_null($currentWarnCellID)) {
+					if (is_null($currentWarnCellID)) {
 						throw new Exception("Fehler beim durchsuchen der Geo-Informationen: Ein 'GeoCode'-Node beinhaltete keine State/WarncellID-Informationen");
 					}
+
+					// Bundesland setzen aus Konfiguration
+
 
 					// Gehört die WarnCellID zu der gesuchten und existiert noch kein Result-Objekt?
 					if ($warnCellId == $currentWarnCellID && !is_object($result) ) {
@@ -996,8 +992,8 @@ class WarnParser extends ErrorLogging {
 						$result = new \SimpleXMLElement("<geoInfo></geoInfo>");
 						$result->addChild("warncellid",	$currentWarnCellID);
 						$result->addChild("areaDesc",		$currentAreaDesc);
-						$result->addChild("stateCode",	$currentStateCode);
-						$result->addChild("stateName",	$currentStateName);
+						//$result->addChild("stateCode",	$currentStateCode);
+						//$result->addChild("stateName",	$currentStateName);
 						$result->addChild("altitude",		$currentAltitude);
 						$result->addChild("ceiling",		$currentCeiling);
 					}
