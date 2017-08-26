@@ -34,15 +34,8 @@
  *Konfiguration für die Unwetter-Informationen
  */
 
-// FTP Zugangsdaten:
-$unwetterConfig["ftp"] = [
-	"host"		=>	"ftp-outgoing2.dwd.de",
-	"username"	=>  "************",
-	"password"	=>	"************"
-];
-
 // Für passive FTP Verbindung aktivieren (falls FTP Transfer fehlschlägt)
-$unwetterConfig["ftp"]["passiv"]		= true;
+$unwetterConfig["ftpmode"]["passiv"]		= true;
 
 // Archivierungs-FUnktion in MySQL Datenbank aktivieren
 $unwetterConfig["Archive"] = false;

@@ -3,13 +3,13 @@
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
  *
  * @package    blog404de\WetterScripts
- * @subpackage ToolBox
+ * @subpackage ConfigFile
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  2012-2017 Jens Dutzi
- * @version    2.5.3-dev
+ * @version    2.5.5-dev
  * @license    MIT
  *
- * Stand: 14.07.2017
+ * Stand: 2017-08-26
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this

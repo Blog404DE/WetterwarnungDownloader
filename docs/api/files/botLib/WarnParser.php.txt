@@ -3,13 +3,13 @@
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
  *
  * @package    blog404de\WetterScripts
- * @subpackage WarnParser
+ * @subpackage ConfigFile
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  2012-2017 Jens Dutzi
- * @version    2.5.3-dev
+ * @version    2.5.5-dev
  * @license    MIT
  *
- * Stand: 14.07.2017
+ * Stand: 2017-08-26
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -42,7 +42,7 @@ class WarnParser extends ErrorLogging {
 	public $strictMode = false;
 
 	/** @var string Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen */
-	private $remoteFolder = "/gds/gds/specials/alerts/cap/GER/COMMUNEUNION_DWD_STAT";
+	private $remoteFolder = "/weather/alerts/cap/COMMUNEUNION_DWD_STAT";
 
 	/** @var string Lokaler Ordner in dem die Wetterwarnungen gespeichert werden */
 	private $localFolder = "";
@@ -200,47 +200,66 @@ class WarnParser extends ErrorLogging {
 				echo("-> Liste der auf dem DWD Server vorhandenen Wetterdaten herunterladen" . PHP_EOL);
 			}
 
-			// Filtern der Dateinamen um nicht für alle den Zeitstempel ermittelen zu müssen
-			$searchTime = new \DateTime( "now", new \DateTimeZone('GMT'));
-			$fileFilter = $searchTime->format("Ymd");
+			// Erstelle Download-Liste
+            $arrDownloadList = [];
+            if (count($arrFTPContent) > 0) {
+                $defaultfilename = "Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_DE.zip";
+                if(in_array($defaultfilename, $arrFTPContent)) {
+                    //
+                    // Verwende vom DWD erzeugte Symlink
+                    //
+                    echo("-> Erzeuge Download-Liste für " . @ftp_pwd($this->ftpConnectionId) . " im Standard-Modus:" . PHP_EOL);
 
-			// Ermittle das Datum für die Dateien
-			if (count($arrFTPContent) > 0) {
-				echo("-> Erzeuge Download-Liste für " . @ftp_pwd($this->ftpConnectionId) . ":" . PHP_EOL);
-				foreach ($arrFTPContent as $filename) {
-					// Filtere nach den Wetterwarnungen vom heutigen Tag
-					if (strpos($filename , $fileFilter) !== false) {
-						// Übernehme Datei in zu-bearbeiten Liste
-						if (preg_match(/** @lang text */'/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})(?<Postfix>_\w{3}_STATUS_PREMIUMDWD_COMMUNEUNION_)(?<Language>DE|EN)(?<Filetype>.zip)$/' , $filename , $regs)) {
+                    $fileDate = @ftp_mdtm($this->ftpConnectionId, $defaultfilename);
+                    $detectMode = "via FTP / Lesen des Datums fehlgeschlagen";
 
-							$dateFileM = \DateTime::createFromFormat("YmdHis" , $regs['Datum'] , new \DateTimeZone("UTC"));
-							if ($dateFileM === false) {
-								$fileDate = @ftp_mdtm($this->ftpConnectionId, $filename);
-								$detectMode = "via FTP / Lesen des Datums fehlgeschlagen";
-							} else {
-								$fileDate = $dateFileM->getTimestamp();
-								$detectMode = "via RegExp";
-							}
-						} else {
-							$fileDate = @ftp_mdtm($this->ftpConnectionId , $filename);
-							$detectMode = "via FTP / Lesen des Dateinamens fehlgeschlagen";
-						}
+                    echo "\t" . $defaultfilename . " => " . date("d.m.Y H:i" , $fileDate) . " (" . $language . " / " . $detectMode . ")" . PHP_EOL;
+                    $arrDownloadList[$defaultfilename] = $fileDate;
+                } else {
+                    //
+                    // Fall-Back: Symlink zur aktuellsten Besser
+                    //
+                    $searchTime = new \DateTime( "now", new \DateTimeZone('GMT'));
+                    $fileFilter = $searchTime->format("Ymd");
 
-						// Sprache feststellen
-						$language = $regs["Language"];
+                    // Ermittle das Datum für die Dateien
+                    echo("-> Erzeuge Download-Liste für " . @ftp_pwd($this->ftpConnectionId) . " im Fail-Safe Modus:" . PHP_EOL);
+                    foreach ($arrFTPContent as $filename) {
+                        // Filtere nach den Wetterwarnungen vom heutigen Tag
+                        if (strpos($filename , $fileFilter) !== false) {
+                            // Übernehme Datei in zu-bearbeiten Liste
+                            if (preg_match(/** @lang text */'/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})(?<Postfix>_\w{3}_STATUS_PREMIUMDWD_COMMUNEUNION_)(?<Language>DE|EN)(?<Filetype>.zip)$/' , $filename , $regs)) {
 
-						// Bei deutscher Sprache -> verarbeiten
-						if(strtoupper($language) === "DE") {
-							echo "\t" . $filename . " => " . date("d.m.Y H:i" , $fileDate) . " (" . $language . " / " . $detectMode . ")" . PHP_EOL;
-							$arrDownloadList[$filename] = $fileDate;
-						}
-					}
-				}
-			}
+                                $dateFileM = \DateTime::createFromFormat("YmdHis" , $regs['Datum'] , new \DateTimeZone("UTC"));
+                                if ($dateFileM === false) {
+                                    $fileDate = @ftp_mdtm($this->ftpConnectionId, $filename);
+                                    $detectMode = "via FTP / Lesen des Datums fehlgeschlagen";
+                                } else {
+                                    $fileDate = $dateFileM->getTimestamp();
+                                    $detectMode = "via RegExp";
+                                }
+                            } else {
+                                $fileDate = @ftp_mdtm($this->ftpConnectionId , $filename);
+                                $detectMode = "via FTP / Lesen des Dateinamens fehlgeschlagen";
+                            }
 
-			// Dateiliste sortieren
-			arsort($arrDownloadList , SORT_NUMERIC);
-			array_splice($arrDownloadList , 1);
+                            // Sprache feststellen
+                            $language = $regs["Language"];
+
+                            // Bei deutscher Sprache -> verarbeiten
+                            if(strtoupper($language) === "DE") {
+                                echo "\t" . $filename . " => " . date("d.m.Y H:i" , $fileDate) . " (" . $language . " / " . $detectMode . ")" . PHP_EOL;
+                                $arrDownloadList[$filename] = $fileDate;
+                            }
+                        }
+                    }
+
+                    // Dateiliste sortieren
+                    arsort($arrDownloadList , SORT_NUMERIC);
+                    array_splice($arrDownloadList , 1);
+                }
+            }
+
 
 			// Starte Download der aktuellsten Warn-Datei
 			if (count($arrDownloadList) > 0) {
@@ -981,19 +1000,10 @@ class WarnParser extends ErrorLogging {
 
 					// Gehört die WarnCellID zu der gesuchten und existiert noch kein Result-Objekt?
 					if ($warnCellId == $currentWarnCellID && !is_object($result) ) {
-						// Klartext-Ländername ermitteln
-						if(array_key_exists(strtoupper($currentStateCode), $this->regionames)) {
-							$currentStateName = $this->regionames[strtoupper($currentStateCode)];
-						} else {
-							$currentStateName = $currentStateCode;
-						}
-
 						// Treffer als XML Objekt zusammenstellen (XML um durchgehend den gleichen Objekt-Typ zu haben) falls noch keine Geo-Informationen existieren
 						$result = new \SimpleXMLElement("<geoInfo></geoInfo>");
 						$result->addChild("warncellid",	$currentWarnCellID);
 						$result->addChild("areaDesc",		$currentAreaDesc);
-						//$result->addChild("stateCode",	$currentStateCode);
-						//$result->addChild("stateName",	$currentStateName);
 						$result->addChild("altitude",		$currentAltitude);
 						$result->addChild("ceiling",		$currentCeiling);
 					}

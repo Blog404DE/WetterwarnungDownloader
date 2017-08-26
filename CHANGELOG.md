@@ -1,9 +1,16 @@
 # Changelog
 
+2017-08-26, 2.5.5 dev
+----------
+**Wichtig: Umstellung auf den frei zugänglichen OpenData Server des DWD. Dadurch sind Änderungen an der Konfigurationsdateien im Zusammenhang mit den FTP Daten notwendig.**
+
+* (NEU) Verwendung des frei zugänglichen DWD OpenData Server. *Keine Anmeldung beim DWD mehr notwendig.*
+* (NEU) Anpassung an der Logik zur Erkennung der neusten Wetterwarnung-Datei für ein schnelleres verarbeiten der Dateien (ermöglicht durch Änderung der Datei-Struktur auf dem DWD-Server)
+
 2017-07-14, 2.5.3 dev
 ----------
 
-**Wichtig: Anpassung an der Konfigurationsdatei beachten!**
+**Wichtig: Anpassung an der Konfigurationsdatei beachten.**
 
 - (BUGFIX) Zwingend notwendige Anpassung des Scripts an das CAP DWD Profil  v1.2
 	

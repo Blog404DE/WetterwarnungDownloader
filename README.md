@@ -6,7 +6,7 @@
 
 ## Einleitung
 
-Bei dem Wetterwarnung-Downloader handelt es sich um ein Script zum automatischen herunterladen aktueller Wetterwarnungen für eine bestimmte Warnregion. Die Wetterwarnungen werden im Rahmen der Grundversorgung des DWD bereitgestellt. Details zur Grundversorgung finden sich auf der [NeuthardWetterScripts Hauptseite](https://github.com/Blog404DE/NeuthardWetter-Scripts).
+Bei dem Wetterwarnung-Downloader handelt es sich um ein Script zum automatischen herunterladen aktueller Wetterwarnungen für eine bestimmte Warnregion. Die Wetterwarnungen werden im Rahmen der OpenData-Initiative des DWD bereitgestellt. Details hierzu finden sich auf der [NeuthardWetterScripts Hauptseite](https://github.com/Blog404DE/NeuthardWetter-Scripts).
 
 Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch wenn das Script ausführlich getestet wurde, so kann niemand garantieren, dass keine Fehler oder Probleme auftreten. 
 
@@ -21,12 +21,9 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 
 ### Vorbereitung:
 
-1. Anmeldung für die Grundversorgungsdaten des Deutschen Wetterdienstes (siehe Einleitung)
+1. Download des Script-Pakets [https://github.com/Blog404DE/WetterwarnungDownloader/archive/master.zip](https://github.com/Blog404DE/WetterwarnungDownloader/archive/master.zip) und entpacken der ZIP Datei mittels unzip.
 
-2. Download des Script-Pakets [https://github.com/Blog404DE/WetterwarnungDownloader/archive/master.zip](https://github.com/Blog404DE/WetterwarnungDownloader/archive/master.zip) und entpacken der ZIP Datei mittels unzip.
-
-3. Download der Liste mit den Warngebieten (WarnCellID) des Deutschen Wetterdienstes
-
+2. Download der Liste mit den Warngebieten (WarnCellID) des Deutschen Wetterdienstes
 	Um die WarnCellID Liste zusammen mit der Entwickler-Dokumentation zu erhalten ist es notwendig 
 	das ShellScript *fetchManual.sh* einmalig auszuführen.  
 	
@@ -76,20 +73,14 @@ Bei dem eigentlichen Script zum abrufen der Wetter-Warnungen handelt es sich um 
 
 Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie folgt:
 
-1. Damit das Script Zugriff auf die c des DWD bekommt müssen zuerst die FTP Zugangsdaten hinterlegt werden:
-
+1. **(ÄNDERUNG)** Der erste Konfigurationsparameter steuert den Zugriff auf den DWD OpenData Server. Standardmäßig wird eine aktive FTP Verbindung aufgebaut. Sollte die Verbindungsaufbau oder der Download der Warndatei fehlschlagen bzw. aufhängen, kann eventuell das aktivieren des Passiv-Modus notwendig sein.
+ 
 	```php
-	// FTP Zugangsdaten:
-	$unwetterConfig["ftp"] = [
-		"host"      => "ftp-outgoing2.dwd.de",
-		"username"  => "************",
-		"password"  => "************"
-	];
+	// Für passive FTP Verbindung aktivieren (falls FTP Transfer fehlschlägt)
+	$unwetterConfig["ftpmode"]["passiv"]		= false;
 	```
-	Die benötigten Zugangsdaten und den Hostnamen wird vom DWD per E-Mail nach der Registrierung (siehe Vorbereitung) mitgeteilt. 
-	Der erste Parameter ```"host"``` beinhaltet der vom DWD zugewiesene FTP-Server. Bei ```"username"``` handelt es sich um den Benutzername und bei ```"password"``` um das vom DWD zugeteilte Passwort.
-	
-2. Mit dem zweiten Konfigurationsparameter kann die Archiv-Funktion (speichern in einer MySQL Datenbak) aktiviert werden (true oder false). 
+
+2. Mit dem zweiten Konfigurationsparameter kann die Archiv-Funktion (speichern in einer MySQL Datenbank) aktiviert werden (true oder false). 
 
 	```php
 	$unwetterConfig["Archive"] 			= false;
@@ -156,7 +147,7 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 		];
 	```
 
-3. Speicherpfad für die JSON Datei mit den Wetterwarnung-Daten:
+4. Speicherpfad für die JSON Datei mit den Wetterwarnung-Daten:
 
 	```php
 	$unwetterConfig["localJsonWarnfile"]   = "/pfad/zur/wetterwarnung.json";
@@ -164,7 +155,7 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 	
 	Der angegebene Pfad sollte - je nach Art der Verwendung der Wetterwarnungen - innerhalb eines vom Webserver zugänglichen Ordner sich befinden.
 	
-4. Speicherpfade für die vom DWD Server heruntergeladenen Wetterwarnung-Dateien:
+5. Speicherpfade für die vom DWD Server heruntergeladenen Wetterwarnung-Dateien:
 
 	```php
 	$unwetterConfig["localFolder"]			= "/pfad/zum/speicherordner/fuer/wetterWarnungen";
@@ -172,7 +163,7 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 	
 	Bei *localFolder* handelt es sich um den Pfad, der die aktuellste Datei mit Wetterwarnungen beinhaltet, welche vom DWD FTP Server heruntergeladen wurde. Die alten Wetterwarnungen werden automatisch durch das Script in diesem gelöscht.
 	
-**Hinweise:** Die hin 4 und 5 angegebenen Speicher-Pfade müssen auf Ihrem System bereits existieren, da es ansonsten zu einer Fehlermeldung beim ausführen des Scripts kommt. 
+**Hinweise:** Die bei 4 und 5 angegebenen Speicher-Pfade müssen auf Ihrem System bereits existieren, da es ansonsten zu einer Fehlermeldung beim ausführen des Scripts kommt. 
 
 ### Das PHP-Script ausführbar machen und als Cronjob hinterlegen
 
