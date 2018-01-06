@@ -69,7 +69,7 @@ class WarnParser extends ErrorLogging {
 		"HE"  => "Hessen",
 		"HH"  => "Hamburg",
 		"MV"  => "Mecklenburg-Vorpommern",
-		"NRW" => "Nordrhein-Westfalen",
+		"NR" => "Nordrhein-Westfalen",
 		"NS"  => "Niedersachsen",
 		"RP"  => "Rheinland-Pfalz",
 		"SA"  => "Sachsen-Anhalt",
@@ -211,19 +211,24 @@ class WarnParser extends ErrorLogging {
                     echo("-> Erzeuge Download-Liste für " . @ftp_pwd($this->ftpConnectionId) . " im Standard-Modus:" . PHP_EOL);
 
                     $fileDate = @ftp_mdtm($this->ftpConnectionId, $defaultfilename);
-                    $detectMode = "via FTP / Lesen des Datums fehlgeschlagen";
+                    $detectMode = "via FTP";
+                    if(!$fileDate) {
+                        throw new Exception("Fehler beim ermitteln des Zeitpunkts der letzten Änderung der Datei '" . $defaultfilename . "'");
+                    }
 
-                    echo "\t" . $defaultfilename . " => " . date("d.m.Y H:i" , $fileDate) . " (" . $language . " / " . $detectMode . ")" . PHP_EOL;
+                    echo "\t" . $defaultfilename . " => " . date("d.m.Y H:i" , $fileDate) . " (DE / " . $detectMode . ")" . PHP_EOL;
                     $arrDownloadList[$defaultfilename] = $fileDate;
                 } else {
                     //
                     // Fall-Back: Symlink zur aktuellsten Besser
                     //
+                    echo("-> Erzeuge Download-Liste für " . @ftp_pwd($this->ftpConnectionId) . " im Fail-Safe Modus:" . PHP_EOL);
+
+                    // Filter erzeugen um die Dateien zu ermitteln die heute erzeugt wurden
                     $searchTime = new \DateTime( "now", new \DateTimeZone('GMT'));
                     $fileFilter = $searchTime->format("Ymd");
 
                     // Ermittle das Datum für die Dateien
-                    echo("-> Erzeuge Download-Liste für " . @ftp_pwd($this->ftpConnectionId) . " im Fail-Safe Modus:" . PHP_EOL);
                     foreach ($arrFTPContent as $filename) {
                         // Filtere nach den Wetterwarnungen vom heutigen Tag
                         if (strpos($filename , $fileFilter) !== false) {
@@ -1160,3 +1165,4 @@ class WarnParser extends ErrorLogging {
 	}
 
 }
+

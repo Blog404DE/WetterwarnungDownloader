@@ -69,7 +69,7 @@ class WarnParser extends ErrorLogging {
 		"HE"  => "Hessen",
 		"HH"  => "Hamburg",
 		"MV"  => "Mecklenburg-Vorpommern",
-		"NRW" => "Nordrhein-Westfalen",
+		"NR" => "Nordrhein-Westfalen",
 		"NS"  => "Niedersachsen",
 		"RP"  => "Rheinland-Pfalz",
 		"SA"  => "Sachsen-Anhalt",
@@ -90,26 +90,25 @@ class WarnParser extends ErrorLogging {
 	/**
 	 * WarnParser constructor.
 	 *
-	 * @param bool $allowRoot Ausführung mit Root-Rechten erlauben (NICHT! empfohlen)
 	 * @throws Exception
 	 */
-	function __construct($allowRoot = false) {
+	function __construct() {
 		// Setze Location-Informationen für Deutschland
 		setlocale(LC_TIME, "de_DE.UTF-8");
 		date_default_timezone_set("Europe/Berlin");
 
 		// Via CLI gestartet?
-		if(php_sapi_name() !== "cli") {
+		if (php_sapi_name() !== "cli") {
 			throw new Exception("Script darf ausschließlich über die Kommandozeile gestartet werden.");
 		}
 
 		// Root-User Check
-		if (0 == posix_getuid() && $allowRoot === false) {
-			throw new Exception("Script darf nicht mit root-Rechten ausgeführt werden");
-		}
+        if (0 == posix_getuid() && defined("ALLOWROOT") === false) {
+            throw new Exception("Script darf nicht mit root-Rechten ausgeführt werden");
+        }
 
 		// FTP Modul vorhanden?
-		if(!extension_loaded("ftp")) {
+		if (!extension_loaded("ftp")) {
 			throw new Exception("PHP Modul 'ftp' steht nicht zur Verfügung");
 		}
 
@@ -136,7 +135,7 @@ class WarnParser extends ErrorLogging {
 
 			// FTP-Verbindung aufbauen
 			$this->ftpConnectionId = ftp_connect($host);
-			if($this->ftpConnectionId === false) {
+			if ($this->ftpConnectionId === false) {
 				throw new Exception( "FTP Verbindungsaufbau zu " . $host . " ist fehlgeschlagen" . PHP_EOL);
 			}
 
@@ -151,7 +150,7 @@ class WarnParser extends ErrorLogging {
 			}
 
 			// Auf Passive Nutzung umschalten
-			if($passiv == true) {
+			if ($passiv == true) {
 				echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
 				@ftp_pasv(($this->ftpConnectionId), true);
 			}
@@ -165,7 +164,7 @@ class WarnParser extends ErrorLogging {
 	 */
 	public function disconnectFromFTP() {
 		// Schließe Verbindung sofern notwendig
-		if(is_resource($this->ftpConnectionId)) {
+		if (is_resource($this->ftpConnectionId)) {
 			echo PHP_EOL . "*** Schließe Verbindung zum DWD-FTP Server" . PHP_EOL;
 			ftp_close($this->ftpConnectionId);
 			echo "\t-> Verbindung zu erfolgreich geschlossen." . PHP_EOL;
@@ -181,7 +180,7 @@ class WarnParser extends ErrorLogging {
 			echo PHP_EOL . "*** Verarbeite alle Dateien auf dem DWD FTP Server" . PHP_EOL;
 
 			// Prüfe ob Verbindung aktiv ist
-			if(!is_resource($this->ftpConnectionId)) {
+			if (!is_resource($this->ftpConnectionId)) {
 				throw new Exception("FTP Verbindung steht nicht mehr zur Verfügung.");
 			};
 
@@ -204,7 +203,7 @@ class WarnParser extends ErrorLogging {
             $arrDownloadList = [];
             if (count($arrFTPContent) > 0) {
                 $defaultfilename = "Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_DE.zip";
-                if(in_array($defaultfilename, $arrFTPContent)) {
+                if (in_array($defaultfilename, $arrFTPContent)) {
                     //
                     // Verwende vom DWD erzeugte Symlink
                     //
@@ -212,7 +211,7 @@ class WarnParser extends ErrorLogging {
 
                     $fileDate = @ftp_mdtm($this->ftpConnectionId, $defaultfilename);
                     $detectMode = "via FTP";
-                    if(!$fileDate) {
+                    if (!$fileDate) {
                         throw new Exception("Fehler beim ermitteln des Zeitpunkts der letzten Änderung der Datei '" . $defaultfilename . "'");
                     }
 
@@ -252,7 +251,7 @@ class WarnParser extends ErrorLogging {
                             $language = $regs["Language"];
 
                             // Bei deutscher Sprache -> verarbeiten
-                            if(strtoupper($language) === "DE") {
+                            if (strtoupper($language) === "DE") {
                                 echo "\t" . $filename . " => " . date("d.m.Y H:i" , $fileDate) . " (" . $language . " / " . $detectMode . ")" . PHP_EOL;
                                 $arrDownloadList[$filename] = $fileDate;
                             }
@@ -285,7 +284,7 @@ class WarnParser extends ErrorLogging {
 					if ($remoteFileMTime !== $localFileMTime) {
 						// Öffne lokale Datei
 						$localFileHandle = fopen($localFile , 'w');
-						if(!$localFileHandle) throw new Exception("Kann " . $localFile . " nicht zum schreiben öffnen");
+						if (!$localFileHandle) throw new Exception("Kann " . $localFile . " nicht zum schreiben öffnen");
 
 						if (ftp_fget($this->ftpConnectionId , $localFileHandle , $filename , FTP_BINARY , 0)) {
 							if ($localFileMTime === -1) {
@@ -382,9 +381,9 @@ class WarnParser extends ErrorLogging {
 			echo PHP_EOL . "*** Führe abschließende Arbeiten durch: " . PHP_EOL;
 
 			// Lösche Cache-Folder
-			if($this->tmpFolder !== false) {
+			if ($this->tmpFolder !== false) {
 				echo "-> Lösche angelegten temporären Ordner" . PHP_EOL;
-				if(!Toolbox::removeTempDir($this->tmpFolder)) {
+				if (!Toolbox::removeTempDir($this->tmpFolder)) {
 					echo "\tLöschen des Ordner " . $this->tmpFolder . " fehlgeschlagen" . PHP_EOL;
 					throw new Exception("Löschen des Temporären Ordner (" . $this->tmpFolder . ") ist fehlgeschlagen.");
 				};
@@ -415,10 +414,10 @@ class WarnParser extends ErrorLogging {
 			}
 
 			// Zugriff auf JSON Datei möglich
-			if(empty($this->localJsonFile)) {
+			if (empty($this->localJsonFile)) {
 				throw new Exception("Es wurde keine JSON-Datei als Ziel für die Wetterwarnungen angegeben.");
 			} else {
-				if(file_exists($this->localJsonFile) && !is_writeable($this->localJsonFile)) {
+				if (file_exists($this->localJsonFile) && !is_writeable($this->localJsonFile)) {
 					throw new Exception("Auf die JSON Datei " . $this->localJsonFile . " mit den geparsten Wetterwarnungen kann nicht schreibend zugegriffen werden");
 				} else if (!is_writeable(dirname($this->localJsonFile))) {
 					throw new Exception("JSON Datei für die geparsten Wetterwarnungen kann nicht in " . dirname($this->localJsonFile) . " geschrieben werden");
@@ -427,7 +426,7 @@ class WarnParser extends ErrorLogging {
 
 			echo "\tLege temporären Ordner an: ";
 			$this->tmpFolder = Toolbox::tempdir();
-			if(!$this->tmpFolder && is_string($this->tmpFolder)) {
+			if (!$this->tmpFolder && is_string($this->tmpFolder)) {
 				// Temporär-Ordner kann nicht angelegt werden
 				echo "fehlgeschlagen" . PHP_EOL;
 				throw new Exception("Temporär-Ordner kann nicht angelegt werden. Bitte prüfen Sie ob in der php.ini 'sys_tmp_dir' oder die Umgebungsvariable 'TMPDIR' gesetzt ist.");
@@ -456,7 +455,7 @@ class WarnParser extends ErrorLogging {
 			echo "-> Lese die heruntergeladenen Wetterwarnungen ein und suche nach der WarnCellID " . $warnCellId . PHP_EOL;
 
 			// WarnCellID gültig?
-			if(!is_numeric($warnCellId)) {
+			if (!is_numeric($warnCellId)) {
 				throw new Exception("Die übergebene WarnCellID beinhaltete keine gültige Nummer");
 			}
 
@@ -542,9 +541,9 @@ class WarnParser extends ErrorLogging {
 
 						if (!$testWarnung) {
 							// Da keine Test-Warnung: beginne Suche nach WarnCellID
-							if(property_exists($info, "area")) {
+							if (property_exists($info, "area")) {
 								$warnRegonFound = $this->searchForWarnAreaInCAP($info->{"area"}, $warnCellId);
-								if($warnRegonFound) {
+								if ($warnRegonFound) {
 									// Treffer gefunden
 									echo sprintf("\tTreffer für %s / WarnCellID %d gefunden", $warnRegonFound->{"areaDesc"}, $warnRegonFound->{"warncellid"}) . PHP_EOL;
 									$arrRohWarnungen[basename($xmlFile)] = ["warnung" => $wetterWarnung, "region" => $warnRegonFound];
@@ -566,7 +565,7 @@ class WarnParser extends ErrorLogging {
 				} else {
 					// Verarbeite Inhalt der XML Datei (Typ: Unbekannt)
 					echo "\t\t-> Stoppe Verarbeitung da der Warn-Typ unbekannt ist" . PHP_EOL;
-					if($this->strictMode) throw new Exception("Strict-Mode Fehler: Wetterwarnung mit unbekannten Wetter-Typ " . (string)$xml->{"msgType"});
+					if ($this->strictMode) throw new Exception("Strict-Mode Fehler: Wetterwarnung mit unbekannten Wetter-Typ " . (string)$xml->{"msgType"});
 				}
 			}
 
@@ -587,7 +586,7 @@ class WarnParser extends ErrorLogging {
 					// Prüfe-Geo-Felder
 					$geoFields = ["warncellid", "areaDesc", "altitude", "ceiling"];
 					foreach ($geoFields as $field) {
-						if(!property_exists($currentGeo, $field)) {
+						if (!property_exists($currentGeo, $field)) {
 							throw new Exception("Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'region' das XML-Node '" . $field . "'");
 						}
 					}
@@ -595,7 +594,7 @@ class WarnParser extends ErrorLogging {
 					// Ermittle Identifier und Referenz
                     $parsedWarnInfo["identifier"] =  (string)$xml->{"identifier"};
 
-					if(strtolower($xml->{"msgType"}) == "update") {
+					if (strtolower($xml->{"msgType"}) == "update") {
 						if (!property_exists($xml, "references")) {
 							throw new Exception(PHP_EOL . "Fehler beim parsen der Wetterwarnung: Die XML Datei mit Typ 'update' beinhaltet kein 'references'-Node.");
 						} else {
@@ -737,7 +736,7 @@ class WarnParser extends ErrorLogging {
 
 						// Vom Nutzer übergebene Daten zum Bundesland
                         $parsedWarnInfo["stateShort"] = strtoupper($stateCode);
-						if(array_key_exists($stateCode, $this->regionames)) {
+						if (array_key_exists($stateCode, $this->regionames)) {
                             $parsedWarnInfo["stateLong"] = $this->regionames[$parsedWarnInfo["stateShort"]];
                         } else {
                             $parsedWarnInfo["stateLong"] = $parsedWarnInfo["stateShort"];
@@ -750,9 +749,9 @@ class WarnParser extends ErrorLogging {
 							// abrunden, anstatt wie laut CAPS Doku aufruden -> das Ergebnis passt sonst nicht zum Text
 							$parsedWarnInfo["altitude"] = floor($rawWarnung["region"]->{"altitude"} * 0.3048);
 							$parsedWarnInfo["ceiling"] = floor($rawWarnung["region"]->{"ceiling"} * 0.3048 );
-							if($rawWarnung["region"]->{"altitude"} == 0 & $rawWarnung["region"]->{"ceiling"} != 9842.5197) {
+							if ($rawWarnung["region"]->{"altitude"} == 0 & $rawWarnung["region"]->{"ceiling"} != 9842.5197) {
 								$parsedWarnInfo["hoehenangabe"] = "Höhenlagen unter " . $parsedWarnInfo["ceiling"] . "m";
-							} else if($rawWarnung["region"]->{"altitude"} != 0 & $rawWarnung["region"]->{"ceiling"} == 9842.5197) {
+							} else if ($rawWarnung["region"]->{"altitude"} != 0 & $rawWarnung["region"]->{"ceiling"} == 9842.5197) {
 								$parsedWarnInfo["hoehenangabe"] = "Höhenlagen über " . $parsedWarnInfo["altitude"] . "m";
 							} else {
 								$parsedWarnInfo["hoehenangabe"] = "Alle Höhenlagen";
@@ -769,9 +768,9 @@ class WarnParser extends ErrorLogging {
 						echo "\t\t* Wetterwarnung für '" . $parsedWarnInfo["event"] . "' verarbeitet";
 
 						// Speichern er aktuellen Warnung in MySQL-Datenbank
-						if(!is_null($this->mysqlConId)) {
+						if (!is_null($this->mysqlConId)) {
 							$saveResult = $this->saveToArchive($parsedWarnInfo, $this->mysqlConId);
-							if($saveResult === true) {
+							if ($saveResult === true) {
 								echo " (Archiviert)";
 							} else {
 								echo " (Bereits in Archiv)";
@@ -805,7 +804,7 @@ class WarnParser extends ErrorLogging {
 	 */
 	private function saveToArchive(array $parsedWarnInfo, PDO $pdomysql) {
 		try {
-			if(!is_array($parsedWarnInfo)) throw new Exception("Die im Archiv zu speicherenden Wetter-Informationen sind ungültig");
+			if (!is_array($parsedWarnInfo)) throw new Exception("Die im Archiv zu speicherenden Wetter-Informationen sind ungültig");
 
 			// Prüfe ob die bereits in der Datenbank ist
 			$sth = $pdomysql->prepare(
@@ -813,9 +812,9 @@ class WarnParser extends ErrorLogging {
 				array(PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY)
 			);
 			$sth->bindParam(":hash", $parsedWarnInfo["hash"], PDO::PARAM_STR, 32);
-			if(!$sth->execute()) throw new Exception("Fehler beim prüfen ob Warnung bereits im Archiv ist: ". $pdomysql->errorInfo());
+			if (!$sth->execute()) throw new Exception("Fehler beim prüfen ob Warnung bereits im Archiv ist: ". $pdomysql->errorInfo());
 
-			if($sth->fetchColumn() == "0") {
+			if ($sth->fetchColumn() == "0") {
 				// Start-/Enddatum verarbeiten
 				$startZeit =  unserialize($parsedWarnInfo["startzeit"])->getTimestamp();
 				$endzeit = unserialize($parsedWarnInfo["endzeit"])->getTimestamp();
@@ -857,7 +856,7 @@ class WarnParser extends ErrorLogging {
 				$sth->bindParam(':hoehenangabe',$parsedWarnInfo["hoehenangabe"],PDO::PARAM_STR, 255);
 
 				// In Datenbank eintragen
-				if(!$sth->execute()) throw new Exception("Fehler beim prüfen ob Warnung bereits im Archiv ist: ". $pdomysql->errorInfo());
+				if (!$sth->execute()) throw new Exception("Fehler beim prüfen ob Warnung bereits im Archiv ist: ". $pdomysql->errorInfo());
 
 				return true;
 			} else {
@@ -882,7 +881,7 @@ class WarnParser extends ErrorLogging {
 			echo PHP_EOL . "*** Beginne speichern der Wetterwarnungen:" . PHP_EOL;
 
 			// Prüfe ob Zugriff auf json-Datei existiert
-			if(empty($this->localJsonFile) || !is_writeable($this->localJsonFile)) {
+			if (empty($this->localJsonFile) || !is_writeable($this->localJsonFile)) {
 				throw new Exception("Es ist kein Pfad zu der lokalen JSON-Datei mit den Wetterwarnungen vorhanden oder es besteht kein Schreibzugriff auf die Datei (Pfad: " . $this->localJsonFile . ")");
 			}
 
@@ -892,7 +891,7 @@ class WarnParser extends ErrorLogging {
 			// Wandle in JSON um
 			echo "-> Konvertiere Wetterwarnungen in JSON-Daten" . PHP_EOL;
 			$jsonWetterWarnung = @json_encode( $wetterWarnungen, JSON_PRETTY_PRINT);
-			if(json_last_error() > 0) {
+			if (json_last_error() > 0) {
 				throw new Exception("Fehler während der JSON Kodierung der Wetter-Warnungen (Fehler: " . Toolbox::getJsonErrorMessage(json_last_error()) . ")");
 			}
 
@@ -900,12 +899,12 @@ class WarnParser extends ErrorLogging {
 			echo "-> Ermittle MD5-Hashs der bisherigen Wetterwarnung und der neuen Wetterwarnung um Änderungen festzustellen" . PHP_EOL;
 			$md5hashes = [];
 			$md5hashes["new"] = @md5($jsonWetterWarnung);
-			if(empty($md5hashes["new"] || $md5hashes["new"] === false)) {
+			if (empty($md5hashes["new"] || $md5hashes["new"] === false)) {
 				throw new Exception("Fehler beim erzeugen des MD5-Hashs der neuen Wetterwarnungen");
 			}
 
 			$md5hashes["old"] = @md5_file($this->localJsonFile);
-			if(empty($md5hashes["old"] || $md5hashes["old"] === false)) {
+			if (empty($md5hashes["old"] || $md5hashes["old"] === false)) {
 				throw new Exception("Fehler beim erzeugen des MD5-Hashs der bisherigen Wetterwarnungen");
 			}
 
@@ -914,10 +913,10 @@ class WarnParser extends ErrorLogging {
 
 
 			// Gab es eine Änderung?
-			if($md5hashes["old"] !== $md5hashes["new"]) {
+			if ($md5hashes["old"] !== $md5hashes["new"]) {
 				echo "-> Änderung bei den Wetterwarnungen gefunden - speichere neue Wetterwarnung" . PHP_EOL;
 				$saveJson = file_put_contents($this->localJsonFile, $jsonWetterWarnung);
-				if(!$saveJson) {
+				if (!$saveJson) {
 					throw new Exception("Fehler beim speichern der verarbeiteten Wetterwarnungen (Pfad: " . $this->localJsonFile . ")");
 				}
 
@@ -956,7 +955,6 @@ class WarnParser extends ErrorLogging {
 			// Durchlaufe den gesamten Info-Node
 			foreach ($WarnInfoNode as $area) {
 				// Ermittle WarnCell-ID und State
-				$currentStateCode = null;
 				$currentWarnCellID = null;
 
 				// Prüfe ob es sich um kein Node mit Polygon-Informationen ist, sondern mit Orts-Informationen
@@ -1000,9 +998,6 @@ class WarnParser extends ErrorLogging {
 						throw new Exception("Fehler beim durchsuchen der Geo-Informationen: Ein 'GeoCode'-Node beinhaltete keine State/WarncellID-Informationen");
 					}
 
-					// Bundesland setzen aus Konfiguration
-
-
 					// Gehört die WarnCellID zu der gesuchten und existiert noch kein Result-Objekt?
 					if ($warnCellId == $currentWarnCellID && !is_object($result) ) {
 						// Treffer als XML Objekt zusammenstellen (XML um durchgehend den gleichen Objekt-Typ zu haben) falls noch keine Geo-Informationen existieren
@@ -1016,7 +1011,7 @@ class WarnParser extends ErrorLogging {
 			}
 
 			// Prüfe ob überhaupt ein Feld mit Orts-Informationen gefunden wurden.
-			if($hits == 0) {
+			if ($hits == 0) {
 				throw new Exception("Fehler beim durchsuchen der Geo-Informationen: Die Geo-Informationen beinhalteten überhaupt keine State/WarnCellID-Informationen");
 			}
 
@@ -1049,7 +1044,7 @@ class WarnParser extends ErrorLogging {
 	public function setLocalFolder(string $localFolder) {
 		try {
 			if (is_dir($localFolder)) {
-				if(is_writeable($localFolder)) {
+				if (is_writeable($localFolder)) {
 					$this->localFolder = $localFolder;
 				} else {
 					throw new Exception("In den lokale Ordner " . $localFolder . " kann nicht geschrieben werden.");
@@ -1076,15 +1071,15 @@ class WarnParser extends ErrorLogging {
 	 */
 	public function setLocalJsonFile(string $localJsonFile) {
 		try {
-			if(empty($localJsonFile)) {
+			if (empty($localJsonFile)) {
 				throw new Exception("Es wurde keine JSON-Datei zals Ziel für die Wetterwarnungen angegeben.");
 			} else {
-				if(file_exists($localJsonFile) && !is_writeable($localJsonFile)) {
+				if (file_exists($localJsonFile) && !is_writeable($localJsonFile)) {
 					// Datei existiert - aber die Schreibrechte fehlen
 					throw new Exception("Auf die JSON Datei " . $localJsonFile . " mit den geparsten Wetterwarnungen kann nicht schreibend zugegriffen werden");
 				} else if (is_writeable(dirname($localJsonFile))) {
 					// Datei existiert nicht - Schreibrechte auf den Ordner existieren
-					if(!@touch($localJsonFile)) {
+					if (!@touch($localJsonFile)) {
 						// Leere Datei anlegen ist nicht erfolgreich
 						throw new Exception("Leere JSON Datei für die geparsten Wetterwarnungen konnte nicht angelegt werden");
 					}
@@ -1147,10 +1142,10 @@ class WarnParser extends ErrorLogging {
 			}
 
 			// Alle Paramter verfügbar?
-			if(!array_key_exists("host", $mysqlConfig))     throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"host\"] wurde nicht gesetzt.");
-			if(!array_key_exists("username", $mysqlConfig)) throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"username\"] wurde nicht gesetzt.");
-			if(!array_key_exists("password", $mysqlConfig)) throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"username\"] wurde nicht gesetzt.");
-			if(!array_key_exists("database", $mysqlConfig)) throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"host\"] wurde nicht gesetzt.");
+			if (!array_key_exists("host", $mysqlConfig))     throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"host\"] wurde nicht gesetzt.");
+			if (!array_key_exists("username", $mysqlConfig)) throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"username\"] wurde nicht gesetzt.");
+			if (!array_key_exists("password", $mysqlConfig)) throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"username\"] wurde nicht gesetzt.");
+			if (!array_key_exists("database", $mysqlConfig)) throw new Exception("Der Konfigurationsparamter [\"MySQL\"][\"host\"] wurde nicht gesetzt.");
 
 			// Verbindung aufbauen zur MySQL Datenbank
 			$dsn = "mysql:dbname=" . $mysqlConfig["database"] . ";host=" . $mysqlConfig["host"];

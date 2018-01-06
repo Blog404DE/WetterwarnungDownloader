@@ -5,11 +5,11 @@
  * @package    blog404de\WetterScripts
  * @subpackage ConfigFile
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
- * @copyright  2012-2017 Jens Dutzi
- * @version    2.5.5-dev
+ * @copyright  2012-2018 Jens Dutzi
+ * @version    2.6.0-stable
  * @license    MIT
  *
- * Stand: 2017-08-26
+ * Stand: 2018-01-06
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this

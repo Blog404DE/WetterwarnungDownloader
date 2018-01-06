@@ -1,5 +1,14 @@
 # Changelog
 
+2018-01-04, 2.6.0 stable
+----------
+**Wichtig: Umstellung auf den frei zugänglichen OpenData Server des DWD. Dadurch sind Änderungen an der Konfigurationsdateien im Zusammenhang mit den FTP Daten notwendig.**
+
+ * (NEU) Erste Stable Version mit Unterstützung des DWD OpenData Programm
+ * (NEU) Anleitung erweitert mit Beispiel für das verarbeiten des DateTime-Felds
+ * (NEU) Script zum herunterladen der DWD-Dokumentation und der WarnCellID-Datenbank verbessert 
+
+
 2017-08-26, 2.5.5 dev
 ----------
 **Wichtig: Umstellung auf den frei zugänglichen OpenData Server des DWD. Dadurch sind Änderungen an der Konfigurationsdateien im Zusammenhang mit den FTP Daten notwendig.**

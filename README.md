@@ -14,7 +14,7 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 
 ### Vorraussetzungen:
 
-- Linux oder OS X (unter Debian und OS X getestet)
+- Linux oder macOS (unter Debian und macOS 10.13.2 getestet)
 - PHP 7.0.0 (oder neuer) inklusive ftp-, mhash und zip-Modul aktiv
 - (optional) MySQL-Datenbank
 - wget
@@ -23,7 +23,7 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 
 1. Download des Script-Pakets [https://github.com/Blog404DE/WetterwarnungDownloader/archive/master.zip](https://github.com/Blog404DE/WetterwarnungDownloader/archive/master.zip) und entpacken der ZIP Datei mittels unzip.
 
-2. Download der Liste mit den Warngebieten (WarnCellID) des Deutschen Wetterdienstes
+2. (optional) Download der aktuellsten Liste mit den Warngebieten (WarnCellID) des Deutschen Wetterdienstes
 	Um die WarnCellID Liste zusammen mit der Entwickler-Dokumentation zu erhalten ist es notwendig 
 	das ShellScript *fetchManual.sh* einmalig auszuführen.  
 	
@@ -32,40 +32,40 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 	./fetchManual.sh
 	```
 	
-	Nach dem ausführen des Scripts befindet sich eine CSV-Datei, sowie mehrere PDF- und eine XLS-Datei im aktuellen Verzeichnis. Es handelt sich dabei um verschiedene Anleitungen und eine Liste der Warn-Regionen des DWD, welche später unter anderem für die Konfiguration notwendig sind. Zusätzlich sind diese Dokumente auch interessant für eventuelle Anpassungen des Scripts.
+	Nach dem ausführen des Scripts befindet sich zusätzlich eine dbf-Datei (dB ase), sowie mehrere PDF- und eine XLS-Datei im aktuellen Verzeichnis. Es handelt sich dabei um verschiedene Anleitungen und eine Liste der Warn-Regionen des DWD.
 
 ### WarnCell ID und das dazugehörige Bundesland ermitteln ermitteln
 
-Wichtig für das Script ist zu ermitteln, für welche Kennung die Warnregion besitzt, für welche man die Wetterwarnungen ermitteln möchte. Eine Liste der Regionen findet sich in der im vorherigen Schritt heruntergeladenen ```cap_warncellids_csv.csv```. Die CSV Datei können Sie mittels 
-[LibreOffice](https://de.libreoffice.org/) (empfohlen), [OpenOffice](https://www.openoffice.org/de/) oder jedem Texteditor öffnen. 
+Wichtig für das Script ist zu ermitteln, für welche Kennung die Warnregion besitzt, für welche man die Wetterwarnungen ermitteln möchte. Eine Liste mit Ortschaften befindet sich bereits in ```./docs/DWD-COMMUNITY.csv```. Die CSV Datei können Sie mittels [LibreOffice](https://de.libreoffice.org/) (empfohlen), [OpenOffice](https://www.openoffice.org/de/) oder jedem Texteditor öffnen. 
 
-Um die ```WARNCELLID``` zu finden, schaut man in der Spalte ```NAME``` bzw. ```KURZNAME``` nach dem Ort, für welchen man die Wettergefahren 
-gemeldet bekommen möchte. In der ersten Spalte findet man die zum Ort gehörende ```WARNCELLID```, welche in der Konfigurationsdatei benötigt wird.
+Sollten Sie im vorherigen Schritt eine neue Version der warnCellID-Datenbank heruntergeladen haben, so können Sie diese neue dBase-Datei ```./docs/DWD-COMMUNITY.dbf``` für die Suche verwenden. Die dBase-Datei kann ebenfalls mittels [LibreOffice](https://de.libreoffice.org/) (empfohlen) oder [OpenOffice](https://www.openoffice.org/de/) geöffnet werden.
 
-**ÄNDERUNG:** Da die Wetterwarnungen keine Informationen mehr ausliefert über den Code (Kürzel)  des Bundeslandes in dem sich die ```WARNCELLID``` befindet, muss der Code für die nachfolgende Konfigurationsdatei selber bestimmt werden. 
+In beiden Fällen erhalten Sie eine Liste, in der Sie nach Ihrer Gemeinde/Stadt oder Regierungsbezirk suchen können. In der Spalte ```NAME``` befindet sich die Kurzform und in ```TYPED_NAME``` wiederum der voll ausgeschriebene Namen. In der Spalte ```STATE``` wiederum befindet sich die Kurzform des Bundeslandes, in dem sich die Gemeinde/Stadt bzw. der Regierungsbzirk befindet. In der nachfolgenden Tabelle findet sich die jeweils ausgeschriebene Name des Bundeslandes.  
 
-Den Bundesland-Code können Sie anhand der folgenden Tabelle bestimmen:
+| Kürzel	| Bundesland        				|
+| --------- | --------------------------------- |
+| BB		| Brandenburg					    |
+| BL		| Berlin							|
+| BW		| Baden-Württemberg			        |
+| BY		| Bayern					    	|
+| HB		| Bremen					    	|
+| HE		| Hessen					    	|
+| HH		| Hamburg					    	|
+| MV		| Mecklenburg-Vorpommern	        |
+| NR		| Nordrhein-Westfalen		    	|
+| NS		| Niedersachsen				        |
+| RP		| Rheinland-Pfalz			      	|
+| SA		| Sachsen-Anhalt			    	|
+| SH		| Schleswig-Holstein			    |
+| SL		| Saarland						    |
+| SN		| Sachsen						    |
+| TH		| Thüringen					        |
+| DE		| Bundesrepublik Deutschland        |
 
-| Bundesland        				| Kürzel	|
-| ------------------------------------- | ------------- |
-| Brandenburg					| BB		|
-| Berlin							| BL		|
-| Baden-Württemberg			| BW		|
-| Bayern						| BY		|
-| Bremen						| HB		|
-| Hessen						| HE		|
-| Hamburg						| HH		|
-| Mecklenburg-Vorpommern	| MV		|
-| Nordrhein-Westfalen			| NRW		|
-| Niedersachsen				| NS		|	
-| Rheinland-Pfalz				| RP		|
-| Sachsen-Anhalt				| SA		|
-| Schleswig-Holstein			| SH		|
-| Saarland						| SL		|
-| Sachsen						| SN		|
-| Thüringen					| TH		|
-| Bundesrepublik Deutschland| DE		|
-
+Um die ```WARNCELLID``` zu finden, schaut man in der Spalte ```NAME``` bzw. ```TYPED_NAME``` nach dem Ort, für welchen man die Wettergefahren 
+gemeldet bekommen möchte. Bitte beachtet, dass mehrere Ortschaftsnamen (z.B. Forst) in verschiedenen Bundesländern existiert. Daher sollte man unbedint sicherstellen, den richtigen Eintrag zu verwenden. 
+ 
+Für die Konfigurationsdatei wird im Anschluss der Wert aus der Spalte ```WARNCELLID``` sowie das Länderkürzel aus ```STATE``` benötigt.
 
 ### Konfiguration des Script zum abrufen der Wetter-Warnungen:
 
@@ -134,7 +134,7 @@ Die anzupassenden Konfigurationsparameter in der *config.local.php* lauten wie f
 	Zum anlegen der Tabelle können Sie neben einem Verwaltungstool Ihrer Wahl (z.B. phpMyAdmin, MySQL Workbench) als  auch die Konsole Ihres Systems verwenden.
 
 	```bash
-	mysql -h {hostname} -u {username} -p {datenbankname} < doc/table.sql
+	mysql -h {hostname} -u {username} -p {datenbankname} < docs/table.sql
 	```
 	
 3. **(ÄNDERUNG)** Der folgende Parameter ist die Angabe für die Gemeinde bzw. Stadt oder Landkreis, für welche die Wetterwarnungen ermittelt werden sollen. 
@@ -329,4 +329,4 @@ Solltet Ihr Fragen oder Anregungen haben, so steht euch offen sich jederzeit an 
 --
 ##### Lizenz-Information:
 
-Copyright Jens Dutzi 2015-2017 / Stand: 14.07.2017 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
+Copyright Jens Dutzi 2015-2018 / Stand: 06.01.2018 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
