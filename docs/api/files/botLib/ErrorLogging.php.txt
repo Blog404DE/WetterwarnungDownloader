@@ -3,13 +3,13 @@
  * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
  *
  * @package    blog404de\WetterScripts
- * @subpackage ErrorLogging
+ * @subpackage ConfigFile
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
- * @copyright  2012-2017 Jens Dutzi
- * @version    2.0.1-dev
+ * @copyright  2012-2018 Jens Dutzi
+ * @version    2.6.0-stable
  * @license    MIT
  *
- * Stand: 05.03.2017
+ * Stand: 2018-01-06
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -203,3 +203,4 @@ class ErrorLogging {
 		return $this->logToFile;
 	}
 }
+

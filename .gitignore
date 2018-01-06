@@ -1,14 +1,23 @@
 # Test-Konfigurationsdatei
 WetterwarnungDownloader/config.inc.php
 
+# CodeTest-Script / Composer
+codetest.sh
+vendor/
+composer.lock
+composer.json
+phpmd.xml
+
 # Temporär-Ordner für Tests
 tmp/
 
 # Dokumentation ausklammern
-docs/*.zip
-docs/*.pdf
-docs/*.csv
-docs/*.xls
+docs/cap_warncellids_csv.csv
+docs/cap_dwd_profile_de_pdf.pdf
+docs/cap_faq_de_pdf.pdf
+docs/warnings_codes_xls.xls
+docs/DWD-COMMUNITY.dbf
+docs/cap_community_shape_dwd_zip.zip
 /phpdoc.dist.xml
 
 # Eigene Konfigurationsdatei

@@ -69,3 +69,4 @@ $unwetterConfig["localFolder"]		= "/pfad/zum/speicherordner/fuer/wetterWarnungen
 
 // Fehler in Log-Datei schreiben
 // $optFehlerLogfile	= "/pfad/zur/log/error_log";
+
