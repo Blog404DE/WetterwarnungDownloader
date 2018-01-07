@@ -1,0 +1,27 @@
+{
+  "name": "Blog404DE/wetterwarnungdownloader",
+  "description": "Registration info to admin",
+  "keywords": [
+    "DWD",
+    "Regenradar",
+    "Satellitenbild"
+  ],
+  "type": "project",
+  "homepage": "https://github.com/Blog404DE/WetterwarnungDownloader",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jens Dutzi",
+      "email": "info@tf-network.de",
+      "homepage": "https://www.tf-network.de",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/Blog404DE/WetterwarnungDownloader/issues"
+  },
+  "require-dev": {
+    "squizlabs/PHP_CodeSniffer":    "@stable",
+    "phpmd/phpmd" : "@stable"
+  }
+}

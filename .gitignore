@@ -5,8 +5,6 @@ WetterwarnungDownloader/config.inc.php
 codetest.sh
 vendor/
 composer.lock
-composer.json
-phpmd.xml
 
 # Temporär-Ordner für Tests
 tmp/

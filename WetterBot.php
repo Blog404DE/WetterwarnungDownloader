@@ -7,10 +7,10 @@
  * @subpackage ConfigFile
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  2012-2018 Jens Dutzi
- * @version    2.6.0-stable
+ * @version    2.7.0-dev
  * @license    MIT
  *
- * Stand: 2018-01-06
+ * Stand: 2018-01-07
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -40,73 +40,80 @@
  */
 // Root-Verzeichnis festlegen
 try {
-	$unwetterConfig = [];
-	if(is_readable(dirname( __FILE__ ) . "/config.local.php")) {
-		require_once dirname( __FILE__ ) . "/config.local.php";
-	} else {
-		throw new Exception("Konfigurationsdatei 'config.local.php' existiert nicht. Zur Konfiguration lesen Sie README.md");
-	}
+    $unwetterConfig = [];
+    if (is_readable(dirname(__FILE__) . "/config.local.php")) {
+        require_once dirname(__FILE__) . "/config.local.php";
+    } else {
+        throw new Exception(
+            "Konfigurationsdatei 'config.local.php' existiert nicht. Zur Konfiguration lesen Sie README.md"
+        );
+    }
 
-	// Notwendige Libs laden
-	require_once  dirname( __FILE__ ) . "/botLib/Toolbox.php";
-	require_once  dirname( __FILE__ ) . "/botLib/ErrorLogging.php";
-	require_once  dirname( __FILE__ ) . "/botLib/WarnParser.php";
+    // Autoloader initialisieren
+    require_once  dirname(__FILE__) . "/botLib/autoload.php";
 
-	/*
- 	 * Script-Header ausgeben
- 	 */
+    /*
+      * Script-Header ausgeben
+      */
 
-	echo(PHP_EOL);
-	$header  = "Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL;
-	$header .= str_repeat("=", strlen(trim($header))) . PHP_EOL;
-	echo $header;
+    echo(PHP_EOL);
+    $header  = "Starte Warnlage-Update " . date("d.m.Y H:i:s") . ":" . PHP_EOL;
+    $header .= str_repeat("=", strlen(trim($header))) . PHP_EOL;
+    echo $header;
 
-	// Prüfe Konfigurationsdatei auf Vollständigkeit
-	$configKeysNeeded = ["WarnCells", "localJsonWarnfile", "localFolder", "ftpmode"];
-	foreach ($configKeysNeeded as $configKey) {
-		if (array_key_exists($configKey, $unwetterConfig)) {
-		} else {
-			throw new Exception("Die Konfigurationsdatei config.local.php ist unvollständig ('" . $configKey . "' ist nicht vorhanden)");
-		}
-	}
-	/*
-	 *  WarnParser instanzieren
-	 */
-	$warnBot = new \blog404de\WetterScripts\WarnParser();
+    // Prüfe Konfigurationsdatei auf Vollständigkeit
+    $configKeysNeeded = ["WarnCells", "localJsonWarnfile", "localFolder", "ftpmode"];
+    foreach ($configKeysNeeded as $configKey) {
+        if (array_key_exists($configKey, $unwetterConfig)) {
+        } else {
+            throw new Exception(
+                "Die Konfigurationsdatei config.local.php ist unvollständig ('" . $configKey . "' ist nicht vorhanden)"
+            );
+        }
+    }
+    /*
+     *  WarnParser instanzieren
+     */
+    $warnBot = new \blog404de\WetterScripts\WarnParser();
 
 
-	// Konfiguriere Bot
-	$warnBot->setLocalFolder($unwetterConfig["localFolder"]);
-	$warnBot->setLocalJsonFile($unwetterConfig["localJsonWarnfile"]);
+    // Konfiguriere Bot
+    $warnBot->setLocalFolder($unwetterConfig["localFolder"]);
+    $warnBot->setLocalJsonFile($unwetterConfig["localJsonWarnfile"]);
 
-	if($unwetterConfig["Archive"]) {
-		// MySQL Zugangsdaten setzen für Archiv-Funktion
-		$warnBot->setMysqlConfig($unwetterConfig["MySQL"]);
-	}
+    if ($unwetterConfig["Archive"]) {
+        // MySQL Zugangsdaten setzen für Archiv-Funktion
+        $warnBot->setMysqlConfig($unwetterConfig["MySQL"]);
+    }
 
-	if(!empty($optFehlerMail)) $warnBot->setLogToMail($optFehlerMail);
-	if(!empty($optFehlerLogfile)) $warnBot->setLogToFile($optFehlerLogfile);
+    if (!empty($optFehlerMail)) {
+        $warnBot->setLogToMail($optFehlerMail);
+    }
+    if (!empty($optFehlerLogfile)) {
+        $warnBot->setLogToFile($optFehlerLogfile);
+    }
 
-	if(!array_key_exists("passiv", $unwetterConfig["ftpmode"])) {
-		// Passiv/Aktive Verbindung zum FTP Server ist nicht konfiguriert -> daher aktive Verbindung
-		$unwetterConfig["ftpmode"]["passiv"] = false;
-	}
+    if (!array_key_exists("passiv", $unwetterConfig["ftpmode"])) {
+        // Passiv/Aktive Verbindung zum FTP Server ist nicht konfiguriert -> daher aktive Verbindung
+        $unwetterConfig["ftpmode"]["passiv"] = false;
+    }
 
-	// Neue Wetterwarnungen vom DWD FTP Server holen
-	if(!defined("BLOCKFTP")) {
-		$warnBot->connectToFTP("opendata.dwd.de", "Anonymous", "Anonymous", $unwetterConfig["ftpmode"]["passiv"]);
-		$warnBot->updateFromFTP();
-		$warnBot->disconnectFromFTP();
-		$warnBot->cleanLocalDownloadFolder();
-	}
+    // Neue Wetterwarnungen vom DWD FTP Server holen
+    if (!defined("BLOCKFTP")) {
+        $warnBot->ftpPassiv = $unwetterConfig["ftpmode"]["passiv"];
+        $warnBot->connectToFTP("opendata.dwd.de", "Anonymous", "Anonymous");
+        $warnBot->updateFromFTP();
+        $warnBot->disconnectFromFTP();
+        $warnBot->cleanLocalDownloadFolder();
+    }
 
-	// Wetterwarnungen vorbereiten
-	$warnBot->prepareWetterWarnungen();
+    // Wetterwarnungen vorbereiten
+    $warnBot->prepareWetterWarnungen();
 
-	// Wetterwarnungen parsen
-    if(is_array($unwetterConfig["WarnCells"]) && count($unwetterConfig["WarnCells"]) > 0) {
+    // Wetterwarnungen parsen
+    if (is_array($unwetterConfig["WarnCells"]) && count($unwetterConfig["WarnCells"]) > 0) {
         foreach ($unwetterConfig["WarnCells"] as $warnCell) {
-            if(array_key_exists("warnCellId", $warnCell) && array_key_exists("stateShort", $warnCell)) {
+            if (array_key_exists("warnCellId", $warnCell) && array_key_exists("stateShort", $warnCell)) {
                 $warnBot->parseWetterWarnungen($warnCell["warnCellId"], $warnCell["stateShort"]);
             } else {
                 // WarnCell-Konfiguration fehlen die benötigten Angaben
@@ -115,7 +122,7 @@ try {
                     "notwendigen Informationen (siehe README.md)"
                 );
             }
-            }
+        }
     } else {
         // Variablen-Typ ist falsch
         throw new Exception(
@@ -123,14 +130,14 @@ try {
         );
     }
 
-	// Speichere Wetterwarnungen
-	$test = $warnBot->saveToLocalJsonFile();
+    // Speichere Wetterwarnungen
+    $test = $warnBot->saveToLocalJsonFile();
 
-	// Cache aufräumen
-	$warnBot->cleanLocalCache();
+    // Cache aufräumen
+    $warnBot->cleanLocalCache();
 } catch (Exception $e) {
-	// Fehler-Handling
-	fwrite(STDERR,"Fataler Fehler: " . $e->getFile() . ":" . $e->getLine() . " - " .  $e->getMessage());
-	exit(-1);
+    // Fehler-Handling
+    fwrite(STDERR, "Fataler Fehler: " . $e->getFile() . ":" . $e->getLine() . " - " .  $e->getMessage());
+    exit(-1);
 }
 ?>

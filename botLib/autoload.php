@@ -9,7 +9,7 @@
  * @version    2.7.0-dev
  * @license    MIT
  *
- * Stand: 2018-01-07
+ * Stand: 2018-01-06
  *
  * Lizenzinformationen (MIT License):
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -31,41 +31,12 @@
  */
 
 /*
- *Konfiguration für die Unwetter-Informationen
- */
+spl_autoload_register(function ($class_name) {
+    $filename = $class_name . ".php";
+    include  dirname( __FILE__ ) . "/" . $filename;
+});
+*/
 
-// Für passive FTP Verbindung aktivieren (falls FTP Transfer fehlschlägt)
-$unwetterConfig["ftpmode"]["passiv"] = true;
-
-// Archivierungs-FUnktion in MySQL Datenbank aktivieren
-$unwetterConfig["Archive"] = false;
-$unwetterConfig["MySQL"] = [
-    "host"      => "",
-    "username"  => "",
-    "password"  => "",
-    "database"  => ""
-];
-
-// Array mit den zu verarbeiteten Landkreisen
-// - siehe Erklärung in: README.md
-// - Beispiel: Stadt Karlsruhe (WarnCellID 808212000)
-$unwetterConfig["WarnCells"] = [
-    [ "warnCellId" => 808212000, "stateShort" => "BW" ]
-];
-
-
-// Speicherpfad für JSON Datei mit den aktuellen Wetterwarnungen
-$unwetterConfig["localJsonWarnfile"]= "/pfad/zur/wetterwarnung.json";
-
-// Speicherordner für die Orginal Wetterwarnungen vom DWD
-$unwetterConfig["localFolder"] = "/pfad/zum/speicherordner/fuer/wetterWarnungen";
-
-/* Sonstige Konfigurationsparameter für Fehler-Behandlung */
-
-/* Konfiguration für das zusenden von E-Mails bzw. das loggen in eine Datei (optional) */
-
-// Fehler per E-Mail melden
-// $optFehlerMail		= [ "empfaenger" => "deine.email@example.org", "absender" => "deine.email@example.org" ];
-
-// Fehler in Log-Datei schreiben
-// $optFehlerLogfile	= "/pfad/zur/log/error_log";
+set_include_path(dirname(__FILE__).PATH_SEPARATOR.get_include_path());
+spl_autoload_extensions(".php");
+spl_autoload_register("spl_autoload");
