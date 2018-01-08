@@ -8,6 +8,7 @@ composer.lock
 
 # Temporär-Ordner für Tests
 tmp/
+test/
 
 # Dokumentation ausklammern
 docs/cap_warncellids_csv.csv

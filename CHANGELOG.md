@@ -1,5 +1,22 @@
 # Changelog
 
+2018-01-25, 3.0.0 dev
+----------
+
+**Durch ein kompletter Rewrite des Programmcodes und der Implementierung vieler neuen Funktionen wurde es notwendig die Konfigurationsdateien zu überarbeiten bzw. zu erweitern.**
+
+* (NEU) Kompletter Re-Write für eine deutlich größere Erweiterbarkeit des Scripts
+* (NEU) Archiv-Erweiterung: Unterstützung der Archivierung vorhandener Wettergefahren in eine MySQL Datenbank
+* (NEU) Action-Erweiterung 1: Bei einer Änderung der Warnwetter-Lage automatisch ein Tweet absetzen 
+* (NEU) Action-Erweiterung 2: Eine IFTTT-Aktion (http://www.ifttt.com) auslösen wie z.B. das versenden einer Push-Nachricht an eine Benutzergruppe oder das versenden einer SMS.
+* (NEU) Möglichkeit die vorhandenen mittels "Action"- und "Archiv"-Klassen zu erweitern und mit neuen Funktionen versehen
+* (NEU) Unterstützung mehrere Action-Klassen gleichzeitig ermöglicht
+* (NEU) Deutlich verbesserte Fehlerbehandlung (z.B. Log-Datei anlegen oder per E-Mail informieren im Fehlerfall)
+* (NEU) Script deutlich modularisierter erstellt und damit eine bessere Übersichtlichkeit gewährleistet über den Programmcode
+* (NEU) Durchgehende Unterstützung des PSR-2 Coding-Standards
+* (NEU) Integration von Travis-CI zur automatischen Prüfung des Programmcodes auf Fehler und Einhaltung diverser Coding-Standards 
+* (NEU) Verbessertes Ladeverhalten von neuen Warn-Dateien des DWD durch ein vom DWD gesetzten Symlink zur aktuellsten gültigen Warn-Datei (Falls Symlink fehlt erfolgt FallBack auf die bisherige Methode zum erkennen der aktuellsten Warn-Datei).
+
 2018-01-04, 2.6.0 stable
 ----------
 **Wichtig: Umstellung auf den frei zugänglichen OpenData Server des DWD. Dadurch sind Änderungen an der Konfigurationsdateien im Zusammenhang mit den FTP Daten notwendig.**

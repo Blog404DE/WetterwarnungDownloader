@@ -1,33 +1,13 @@
 <?php
 /**
- * Wetterwarnung-Downloader für neuthardwetter.de by Jens Dutzi
+ * WetterwarnungDownloader für neuthardwetter.de by Jens Dutzi - config.sample.php
  *
- * @package    blog404de\WetterScripts
- * @subpackage ConfigFile
+ * @package    blog404de\WetterWarnung
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
- * @copyright  2012-2018 Jens Dutzi
- * @version    2.7.0-dev
- * @license    MIT
- *
- * Stand: 2018-01-07
- *
- * Lizenzinformationen (MIT License):
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this
- * software and associated documentation files (the "Software"), to deal in the Software
- * without restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be included in all copies
- * or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
- * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
- * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ * @version    3.0.0-dev
+ * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
 /*
@@ -36,15 +16,6 @@
 
 // Für passive FTP Verbindung aktivieren (falls FTP Transfer fehlschlägt)
 $unwetterConfig["ftpmode"]["passiv"] = true;
-
-// Archivierungs-FUnktion in MySQL Datenbank aktivieren
-$unwetterConfig["Archive"] = false;
-$unwetterConfig["MySQL"] = [
-    "host"      => "",
-    "username"  => "",
-    "password"  => "",
-    "database"  => ""
-];
 
 // Array mit den zu verarbeiteten Landkreisen
 // - siehe Erklärung in: README.md
@@ -60,12 +31,58 @@ $unwetterConfig["localJsonWarnfile"]= "/pfad/zur/wetterwarnung.json";
 // Speicherordner für die Orginal Wetterwarnungen vom DWD
 $unwetterConfig["localFolder"] = "/pfad/zum/speicherordner/fuer/wetterWarnungen";
 
-/* Sonstige Konfigurationsparameter für Fehler-Behandlung */
-
-/* Konfiguration für das zusenden von E-Mails bzw. das loggen in eine Datei (optional) */
-
-// Fehler per E-Mail melden
-// $optFehlerMail		= [ "empfaenger" => "deine.email@example.org", "absender" => "deine.email@example.org" ];
+/*
+ * Optionale Konfigurationsparameter für Fehler-Behandlung / Logging
+ */
 
 // Fehler in Log-Datei schreiben
-// $optFehlerLogfile	= "/pfad/zur/log/error_log";
+// $optFehlerLogfile    = [ "filename" => "/pfad/zur/log/error_log" ];
+
+// Fehler per E-Mail melden
+// $optFehlerMail       = [ "empfaenger" => "deine.email@example.org",
+//                          "absender" => "deine.email@example.org" ];
+
+
+/*
+ * Optionale Module für Archivierung der Wetterwarnungen und senden der Warnung per Twitter
+ */
+
+// Optional: Action-Module ür WetterWarnung aktivieren
+$unwetterConfig["Archive"] = false;
+
+// Optional: Konfiguration der Archiv-Klasse
+$unwetterConfig["ArchiveConfig"]["ArchiveToMySQL"] = [
+    "host"      => "",
+    "username"  => "",
+    "password"  => "",
+    "database"  => ""
+];
+
+/*
+ * Optionale Action Module aktivieren um Aktionen bei neuen Warnwetterlagen zu signalisieren
+ */
+
+$unwetterConfig["Action"] = false;
+
+// Optinal: Action-Funktion "IFTTT" für WetterWarnung aktivieren
+/*
+$unwetterConfig["ActionConfig"]["SendToITFFF"] = [
+    "apiKey"              => "",
+    "eventName"           => "",
+    "MessagePrefix"       => "",
+    "MessagePostfix"      => ""
+];
+*/
+
+// Optinal: Action-Funktion "Twitter" für WetterWarnung aktivieren
+/*
+$unwetterConfig["ActionConfig"]["SendToTwitter"] = [
+    "consumerKey"         => "",
+    "consumerSecret"      => "",
+    "oauthToken"          => "",
+    "oauthTokenSecret"    => "",
+    "TweetPlace"          => "",
+    "MessagePrefix"       => "",
+    "MessagePostfix"      => ""
+];
+*/

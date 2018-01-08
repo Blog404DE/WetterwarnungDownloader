@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+	<title>WetterwarnungDownloader</title>
+	<template name="responsive"/>
+	<parser>
+		<target>tmp/cache</target>
+		<extensions>
+			<extension>module</extension>
+			<extension>inc</extension>
+			<extension>php</extension>
+		</extensions>
+	</parser>
+	<transformer>
+		<target>docs/api</target>
+	</transformer>
+	<files>
+		<ignore>tests/*</ignore>
+		<ignore>Tests/*</ignore>
+		<ignore>Temp/*</ignore>
+		<ignore>temp/*</ignore>
+		<ignore>vendor/*</ignore>
+		<ignore>config.local.php</ignore>
+	</files>
+</phpdoc>

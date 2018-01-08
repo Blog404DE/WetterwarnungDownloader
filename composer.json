@@ -1,10 +1,11 @@
 {
   "name": "Blog404DE/wetterwarnungdownloader",
-  "description": "Registration info to admin",
+  "description": "Script zum herunterladen und auswerten der vom DWD bereitgestellten Warnungen vor Wettergefahren",
   "keywords": [
     "DWD",
-    "Regenradar",
-    "Satellitenbild"
+    "Wettergefahren",
+    "Wetterwarnung",
+    "Unwetterwarnung"
   ],
   "type": "project",
   "homepage": "https://github.com/Blog404DE/WetterwarnungDownloader",
@@ -19,6 +20,9 @@
   ],
   "support": {
     "issues": "https://github.com/Blog404DE/WetterwarnungDownloader/issues"
+  },
+  "require": {
+    "abraham/twitteroauth":    "@stable"
   },
   "require-dev": {
     "squizlabs/PHP_CodeSniffer":    "@stable",

@@ -1,0 +1,18 @@
+language: php
+php:
+  - '7.0'
+  - '7.1'
+branches:
+  only:
+  - master
+  - develop
+before_script:
+  - composer self-update
+  - composer update
+script:
+  - "find . -name \\*.php -not -path ./.idea/\\* -not -path ./vendor/\\* -exec php -lf {} \\;"
+  - "./vendor/bin/phpcs getWetterWarnung.php botLib/* --extensions=php --standard=PSR2"
+  - "./vendor/bin/phpmd getWetterWarnung.php,botLib/ text ./phpmd.xml"
+cache:
+  directories:
+    - $HOME/.composer/cache/files
