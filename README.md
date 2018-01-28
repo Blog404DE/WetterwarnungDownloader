@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Blog404DE/WetterwarnungDownloader.svg?branch=develop)](https://travis-ci.org/Blog404DE/WetterwarnungDownloader)
+
 # Wetterwarnung Downloader Script
 
 > **Wichtiger Hinweis:**
