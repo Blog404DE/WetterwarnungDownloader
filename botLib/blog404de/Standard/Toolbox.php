@@ -1,12 +1,12 @@
 <?php
 /**
- * Standard-Klasse für neuthardwetter.de by Jens Dutzi - Toolbox.php
+ * Standard-Klassen für neuthardwetter.de by Jens Dutzi - Toolbox.php
  *
  * @package    blog404de\WetterWarnung
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    3.0.0-dev
+ * @version    v3.0.0
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 

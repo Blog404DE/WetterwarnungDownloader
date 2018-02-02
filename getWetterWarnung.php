@@ -1,13 +1,13 @@
 #!/usr/bin/env php
 <?php
 /**
- * WarnParser für neuthardwetter.de by Jens Dutzi - WetterBot.php
+ * WetterwarnungDownloader für neuthardwetter.de by Jens Dutzi - getWetterWarnung.php
  *
  * @package    blog404de\WetterWarnung
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    2.7.0-dev
+ * @version    v3.0.1
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 

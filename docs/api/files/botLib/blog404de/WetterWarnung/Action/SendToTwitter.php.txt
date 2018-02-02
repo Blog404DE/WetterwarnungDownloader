@@ -1,12 +1,12 @@
 <?php
 /**
- * WetterWarnung für neuthardwetter.de by Jens Dutzi - SendToTwitter.php
+ * WarnParser für neuthardwetter.de by Jens Dutzi - SendToTwitter.php
  *
  * @package    blog404de\WetterWarnung
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    3.0.0-dev
+ * @version    v3.0.1
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -314,9 +314,8 @@ class SendToTwitter implements SendToInterface
             $tweet = $tweet . " für " . $parsedWarnInfo["area"];
 
             // Uhrzeit einfügen
-            $startZeit = unserialize($parsedWarnInfo["startzeit"]);
             $endzeit = unserialize($parsedWarnInfo["endzeit"]);
-            $tweet = $tweet . " (" . $startZeit->format("H:i") . " bis " . $endzeit->format("H:i") . "):";
+            $tweet = $tweet . " (gültig bis " . $endzeit->format("H:i") . " / Stand: " . date("d.m.Y H:i") . "):";
 
             // Haedline hinzufügen
             $tweet = $tweet . " " . $parsedWarnInfo["headline"] . ".";
@@ -359,42 +358,22 @@ class SendToTwitter implements SendToInterface
     public function setConfig(array $config)
     {
         try {
+            $configParameter = [
+                "consumerKey", "consumerSecret",
+                "oauthToken", "oauthTokenSecret",
+                "MessagePrefix", "MessagePostfix",
+                "TweetPlace"
+            ];
+
             // Alle Paramter verfügbar?
-            if (!array_key_exists("consumerKey", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"consumerKey\"] wurde nicht gesetzt."
-                );
+            foreach ($configParameter as $parameter) {
+                if (!array_key_exists($parameter, $config)) {
+                    throw new Exception(
+                        "Der Konfigurationsparamter [\"ActionConfig\"][\"" . $parameter . "\"] wurde nicht gesetzt."
+                    );
+                }
             }
-            if (!array_key_exists("consumerSecret", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"consumerSecret\"] wurde nicht gesetzt."
-                );
-            }
-            if (!array_key_exists("oauthToken", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"oauthToken\"] wurde nicht gesetzt."
-                );
-            }
-            if (!array_key_exists("oauthTokenSecret", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"oauthTokenSecret\"] wurde nicht gesetzt."
-                );
-            }
-            if (!array_key_exists("TweetPlace", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"TweetPlace\"] wurde nicht gesetzt."
-                );
-            }
-            if (!array_key_exists("MessagePrefix", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"MessagePrefix\"] wurde nicht gesetzt."
-                );
-            }
-            if (!array_key_exists("MessagePostfix", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"MessagePostfix\"] wurde nicht gesetzt."
-                );
-            }
+
             // Werte setzen
             $this->config = $config;
         } catch (Exception $e) {

@@ -1,12 +1,12 @@
 <?php
 /**
- * WetterWarnung für neuthardwetter.de by Jens Dutzi - SendToITFFF.php
+ * WarnParser für neuthardwetter.de by Jens Dutzi - SendToITFFF.php
  *
  * @package    blog404de\WetterWarnung
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    3.0.0-dev
+ * @version    v3.0.1
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -189,41 +189,18 @@ class SendToITFFF implements SendToInterface
     public function setConfig(array $config)
     {
         try {
+            $configParameter = [
+                "apiKey", "eventName",
+                "MessagePrefix", "MessagePostfix"
+            ];
+
             // Alle Paramter verfügbar?
-            if (!array_key_exists("apiKey", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"apiKey\"] wurde nicht gesetzt."
-                );
-            }
-            if (!preg_match('/^[\dA-Za-z]+$/m', $config["apiKey"])) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"apiKey\"] darf " .
-                    "nur aus Buchstaben oder Zahlen bestehen."
-                );
-            }
-
-            if (!array_key_exists("eventName", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"eventName\"] wurde nicht gesetzt."
-                );
-            }
-            if (!preg_match('/^[\dA-Za-z_]+$/m', $config["eventName"])) {
-                var_dump($config["eventName"]);
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"eventName\"] sollte nur aus " .
-                    "Buchstaben, Zahlen oder einem '_' bestehen."
-                );
-            }
-
-            if (!array_key_exists("MessagePrefix", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"MessagePrefix\"] wurde nicht gesetzt."
-                );
-            }
-            if (!array_key_exists("MessagePostfix", $config)) {
-                throw new Exception(
-                    "Der Konfigurationsparamter [\"ActionConfig\"][\"MessagePostfix\"] wurde nicht gesetzt."
-                );
+            foreach ($configParameter as $parameter) {
+                if (!array_key_exists($parameter, $config)) {
+                    throw new Exception(
+                        "Der Konfigurationsparamter [\"ActionConfig\"][\"" . $parameter . "\"] wurde nicht gesetzt."
+                    );
+                }
             }
 
             // Werte setzen

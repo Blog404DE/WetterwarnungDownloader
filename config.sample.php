@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    3.0.0-dev
+ * @version    v3.0.1
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -70,7 +70,8 @@ $unwetterConfig["ActionConfig"]["SendToITFFF"] = [
     "apiKey"              => "",
     "eventName"           => "",
     "MessagePrefix"       => "",
-    "MessagePostfix"      => ""
+    "MessagePostfix"      => "",
+    "ignoreForceUpdate"    => true
 ];
 */
 
@@ -83,6 +84,7 @@ $unwetterConfig["ActionConfig"]["SendToTwitter"] = [
     "oauthTokenSecret"    => "",
     "TweetPlace"          => "",
     "MessagePrefix"       => "",
-    "MessagePostfix"      => ""
+    "MessagePostfix"      => "",
+    "ignoreForceUpdate"    => false
 ];
 */

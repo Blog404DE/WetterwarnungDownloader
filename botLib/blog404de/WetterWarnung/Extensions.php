@@ -1,12 +1,12 @@
 <?php
 /**
- * WetterWarnung für neuthardwetter.de by Jens Dutzi - Extensions.php
+ * WarnParser für neuthardwetter.de by Jens Dutzi - Extensions.php
  *
  * @package    blog404de\WetterWarnung
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    3.0.0-dev
+ * @version    v3.0.1
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -81,10 +81,16 @@ trait Extensions
             // Durchlaufe alle definiertne Action-Klassen
             foreach ($this->actionConfig as $actionClassName => $actionConfig) {
                 echo(PHP_EOL . "*** Starte Action-Funktion '" . $actionClassName . "' der Wetterdaten ");
-                if ($this->forceAction === true) {
+
+                if ($this->forceAction === true && $actionConfig["ignoreForceUpdate"] === false) {
                     echo("(alle Meldungen):" . PHP_EOL);
+                    $warnExists = true;
+                } elseif ($this->forceAction === true && $actionConfig["ignoreForceUpdate"] === true) {
+                    echo("(neue Meldungen / forceUpdate ignoriert):" . PHP_EOL);
+                    $warnExists = null;
                 } else {
                     echo("(neue Meldungen):" . PHP_EOL);
+                    $warnExists = null;
                 }
 
                 // Instanziere Klasse
@@ -97,12 +103,9 @@ trait Extensions
                 // Verarbeite jede Wetterwarnung
                 foreach ($this->wetterWarnungen as $parsedWarnInfo) {
                     // Wetterwarnung an Action übergeben, sofern sich etwas geändert hatte
-                    if ($this->forceAction === false) {
+                    if (is_null($warnExists)) {
                         // Prüfe ob Action ausgeführt werden muss
                         $warnExists = $this->didWetterWarnungExist($parsedWarnInfo);
-                    } else {
-                        // Action auf jeden Fall ausführen
-                        $warnExists = false;
                     }
 
                     // Warnmeldung existiert nicht und führe Action aus
@@ -150,11 +153,35 @@ trait Extensions
      *
      * @param array $actionConfig
      * @param bool $forceAction
+     * @throws Exception
      */
     public function setActionConfig(array $actionConfig, bool $forceAction)
     {
-        $this->actionConfig = $actionConfig;
-        $this->forceAction = $forceAction;
+        try {
+            var_dump(current($actionConfig));
+
+            // Prüfe ob zwingend benötigte Konfigurationsparameter existieren
+            $configParameter = [
+                "MessagePrefix",
+                "MessagePostfix",
+                "ignoreForceUpdate"
+            ];
+
+            // Alle Paramter verfügbar?
+            foreach ($configParameter as $parameter) {
+                if (!array_key_exists($parameter, current($actionConfig))) {
+                    throw new Exception(
+                        "Der Konfigurationsparamter [\"ActionConfig\"][\"" . $parameter . "\"] wurde nicht gesetzt."
+                    );
+                }
+            }
+
+            $this->actionConfig = $actionConfig;
+            $this->forceAction = $forceAction;
+        } catch (Exception $e) {
+            // Fehler an Hauptklasse weitergeben
+            throw $e;
+        }
     }
 
     /**
