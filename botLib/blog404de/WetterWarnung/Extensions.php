@@ -158,8 +158,6 @@ trait Extensions
     public function setActionConfig(array $actionConfig, bool $forceAction)
     {
         try {
-            var_dump(current($actionConfig));
-
             // Prüfe ob zwingend benötigte Konfigurationsparameter existieren
             $configParameter = [
                 "MessagePrefix",

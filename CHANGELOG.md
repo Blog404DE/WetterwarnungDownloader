@@ -1,20 +1,14 @@
 # Changelog
 
-2018-02-02, 3.0.1
-----------
-
-* (NEU) Für einzelne Action-Module kann nun festgelegt werden, dass die erzwungene Ausführung ignoriert wird (interessant, sobald mehrere Action-Module aktiv sind (siehe README.md)
-
-* (NEU) Weiterer Konfigurationsparameter *ignoreForceUpdate* für die Action-Module eingeführt.
-
-* (BUGFIX) *SendToTwitter*-Klasse dahingehend korrigiert, dass sich der gemeldete Text bei jedem Tweet leicht ändert, da Twitter für 12h identische Tweets blockiert. Dies würde ein erzwungenes ausführen von *SendToTwitter* verhindern.
-
-
-2018-01-25, 3.0.1
+2018-02-02, 3.0.1 stable
 ----------
 
 **Durch ein kompletter Rewrite des Programmcodes und der Implementierung vieler neuen Funktionen wurde es notwendig die Konfigurationsdateien zu überarbeiten bzw. zu erweitern.**
 
+* (NEU) Anleitung auf das Github-Wiki für dieses Projekt umgestellt
+* (NEU) Für einzelne Action-Module kann nun festgelegt werden, dass die erzwungene Ausführung ignoriert wird (interessant, sobald mehrere Action-Module aktiv sind (siehe README.md)
+* (NEU) Weiterer Konfigurationsparameter *ignoreForceUpdate* für die Action-Module eingeführt.
+* (BUGFIX) *SendToTwitter*-Klasse dahingehend korrigiert, dass sich der gemeldete Text bei jedem Tweet leicht ändert, da Twitter für 12h identische Tweets blockiert. Dies würde ein erzwungenes ausführen von *SendToTwitter* verhindern.
 * (NEU) Kompletter Re-Write für eine deutlich größere Erweiterbarkeit des Scripts
 * (NEU) Archiv-Erweiterung: Unterstützung der Archivierung vorhandener Wettergefahren in eine MySQL Datenbank
 * (NEU) Action-Erweiterung 1: Bei einer Änderung der Warnwetter-Lage automatisch ein Tweet absetzen
