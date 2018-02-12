@@ -1,0 +1,31 @@
+{
+  "name": "Blog404DE/wetterwarnungdownloader",
+  "description": "Script zum herunterladen und auswerten der vom DWD bereitgestellten Warnungen vor Wettergefahren",
+  "keywords": [
+    "DWD",
+    "Wettergefahren",
+    "Wetterwarnung",
+    "Unwetterwarnung"
+  ],
+  "type": "project",
+  "homepage": "https://github.com/Blog404DE/WetterwarnungDownloader",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Jens Dutzi",
+      "email": "info@tf-network.de",
+      "homepage": "https://www.tf-network.de",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/Blog404DE/WetterwarnungDownloader/issues"
+  },
+  "require": {
+    "abraham/twitteroauth":    "@stable"
+  },
+  "require-dev": {
+    "squizlabs/PHP_CodeSniffer":    "@stable",
+    "phpmd/phpmd" : "@stable"
+  }
+}

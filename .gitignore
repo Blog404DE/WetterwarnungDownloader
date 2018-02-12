@@ -5,11 +5,10 @@ WetterwarnungDownloader/config.inc.php
 codetest.sh
 vendor/
 composer.lock
-composer.json
-phpmd.xml
 
 # Temporär-Ordner für Tests
 tmp/
+test/
 
 # Dokumentation ausklammern
 docs/cap_warncellids_csv.csv
