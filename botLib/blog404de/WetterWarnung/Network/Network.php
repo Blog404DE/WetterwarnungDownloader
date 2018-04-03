@@ -6,13 +6,14 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2-dev
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
 namespace blog404de\WetterWarnung\Network;
 
 use Exception;
+use blog404de\Standard\Toolbox;
 
 /**
  * Netzwerk-Funktionen des WarnParser für den Download
@@ -169,7 +170,7 @@ class Network
     /**
      * Ermittle die aktuellste Wetterwarnung-Datei durch parsen der Dateiliste (FallBack-Modus)
      *
-     * @param $arrFTPContent
+     * @param array $arrFTPContent Inhalt des Verzeichnisses auf dem DWD FTP Server
      * @return array
      * @throws Exception
      */
@@ -237,7 +238,7 @@ class Network
     /**
      * Lade die ermittelte Wetterwarnung-Datei(en) herunter
      *
-     * @param $arrDownloadList
+     * @param array $arrDownloadList Array mit zu herunterladenden Dateien
      * @throws Exception
      */
     private function downloadFromFTP(array $arrDownloadList)
@@ -361,7 +362,7 @@ class Network
 
     /**
      * Setter-Methode um FTP-Passiv Modus zu aktivieren
-     * @param bool $ftpPassiv
+     * @param bool $ftpPassiv Konfigurationsparameter für passive FTP Nutzung
      */
     public function setFtpPassiv(bool $ftpPassiv)
     {
@@ -369,17 +370,8 @@ class Network
     }
 
     /**
-     * Getter für $remoteFolder
-     * @return string
-     */
-    public function getRemoteFolder(): string
-    {
-        return $this->remoteFolder;
-    }
-
-    /**
      * Setter für $remoteFolder
-     * @param string $remoteFolder
+     * @param string $remoteFolder Ordner auf dem DWD FTP Server in dem sich die Warnungen befinden
      */
     public function setRemoteFolder(string $remoteFolder)
     {
@@ -397,7 +389,7 @@ class Network
 
     /**
      * Setter für $localFolder
-     * @param string $localFolder
+     * @param string $localFolder Ordner in denen die Dateien vom DWD-FTP Server gespeichert werden
      */
     public function setLocalFolder(string $localFolder)
     {

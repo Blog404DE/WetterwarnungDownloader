@@ -6,12 +6,13 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2-dev
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
 namespace blog404de\WetterWarnung\Reader;
 
+use blog404de\Standard\Toolbox;
 use Exception;
 use DateTime;
 use DateTimeZone;
@@ -23,6 +24,9 @@ use DateTimeZone;
  */
 trait ParserAlert
 {
+    /** @var string $localIconFolder Ordner in denen sich die Warnlagen-Icons befinden */
+    private $localIconFolder = "";
+
     /**
      * Startzeitpunkt der Wetterwarnung ermitteln
      *
@@ -365,6 +369,149 @@ trait ParserAlert
             }
 
             return (string)$currentWarnAlert->{"web"};
+        } catch (Exception $e) {
+            // Fehler an Hauptklasse weitergeben
+            throw $e;
+        }
+    }
+
+    /**
+     * Event-Code ermitteln für die spätere Icon-Auflösung
+     *
+     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @return Int
+     * @throws Exception
+     */
+    final private function getEventCode(\SimpleXMLElement $currentWarnAlert): Int
+    {
+        try {
+            $eventcode = -1;
+            foreach ($currentWarnAlert->children() as $child) {
+                if ($child->getName() == "eventCode") {
+                    if (property_exists($child, "valueName") && property_exists($child, "value")) {
+                        if ($child->{"valueName"}[0] == "II") {
+                            $eventcode = (int)$child->{"value"};
+                        }
+                    }
+                }
+            }
+
+            return $eventcode;
+        } catch (Exception $e) {
+            // Fehler an Hauptklasse weitergeben
+            throw $e;
+        }
+    }
+
+    /**
+     * Icon passend zum WarnEvent ermitteln
+     *
+     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @return String
+     * @throws Exception
+     */
+    final protected function getAlertIcon(\SimpleXMLElement $currentWarnAlert): String
+    {
+        try {
+            // Zuordnungs-Tabelle öffnen
+            $jsonZuordnung = file_get_contents(
+                $this->getLocalIconFolder() . DIRECTORY_SEPARATOR . "zuordnung.json"
+            );
+            if ($jsonZuordnung === false) {
+                throw new Exception(
+                    "Die Datei zuordnung.json innerhalb des Icon-Ordners konnte nicht geöffnet werden."
+                );
+            }
+
+            // JSON Daten in Array umwandeln
+            $warnIcons = json_decode($jsonZuordnung, true);
+            if (json_last_error()) {
+                $toolbox = new Toolbox();
+                throw new Exception(
+                    "Fehler beim interpretieren Icon-Zuordnung Datei (" .
+                    $toolbox->getJsonErrorMessage(json_last_error()) . ")"
+                );
+            }
+
+            // Eventcode ermitteln
+            $eventcode = $this->getEventCode($currentWarnAlert);
+
+            $warnIconFilename = "";
+            foreach ($warnIcons as $warnIconPart => $warnCodes) {
+                if (in_array($eventcode, $warnCodes)) {
+                    if ((int)$this->getAlertWarnstufe($currentWarnAlert) < 0) {
+                        $warnIconFilename =  "warn_icons_" .
+                            sprintf($warnIconPart, 0) . ".png";
+                    } else {
+                        $warnIconFilename =  "warn_icons_" .
+                            sprintf($warnIconPart, (int)$this->getAlertWarnstufe($currentWarnAlert)) . ".png";
+                    }
+                }
+            }
+
+            // Prüfe ob WarnFile existiert
+            if (empty($warnIconFilename)) {
+                echo(
+                    "\t\t* Warnung: Für den Warn-Event Code  " . $eventcode .
+                    " wurde in der zuordnung.json noch kein Warn-Icon zugeordnet (ggf. neuer Warn-Code?)". PHP_EOL
+                );
+            } elseif (!is_readable($this->getLocalIconFolder() . DIRECTORY_SEPARATOR . $warnIconFilename)) {
+                echo(
+                    "\t\t* Warnung: Zugeordnetes Wetter-Icon " .
+                    $warnIconFilename . " steht nicht zur Verfügung. Verwende daher kein Warn-Icon". PHP_EOL
+                );
+                $warnIconFilename = "";
+            }
+
+            return $warnIconFilename;
+        } catch (Exception $e) {
+            // Fehler an Hauptklasse weitergeben
+            throw $e;
+        }
+    }
+
+
+    /**
+     * Setter für den Ordner in dem sich die Warnlagen-Icons befinden
+     *
+     * @param string $localIconFolder Pfad zum Ordner mit den Warnlagen-Icons
+     * @throws Exception
+     */
+    public function setLocalIconFolder(string $localIconFolder)
+    {
+        try {
+            if (!empty($localIconFolder) && $localIconFolder !== false) {
+                if (!is_readable(
+                    realpath($localIconFolder . DIRECTORY_SEPARATOR . "zuordnung.json")
+                )) {
+                    // Kein Zugriff auf Datei möglich
+                    throw new Exception(
+                        "JSON Datei mit der Zuordnung der Warnlagen-Icons kann nicht in " .
+                        realpath($localIconFolder) . DIRECTORY_SEPARATOR .
+                        "zuordnung.json geöffnet werden"
+                    );
+                }
+            } else {
+                $localIconFolder = "";
+            }
+
+            $this->localIconFolder = $localIconFolder;
+        } catch (Exception $e) {
+            // Fehler an Hauptklasse weitergeben
+            throw $e;
+        }
+    }
+
+    /**
+     * Getter für den Ordner in dem sich die Warnlagen-Icons befinden
+     *
+     * @return string
+     * @throws Exception
+     */
+    public function getLocalIconFolder() : string
+    {
+        try {
+            return  $this->localIconFolder;
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;

@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2-dev
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 

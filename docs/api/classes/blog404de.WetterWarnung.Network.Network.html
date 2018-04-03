@@ -3,803 +3,964 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
     <meta charset="utf-8"/>
-    <title>    WetterwarnungDownloader &raquo; \blog404de\WetterWarnung\Network\Network
-</title>
+    <title>WetterwarnungDownloader</title>
     <meta name="author" content=""/>
     <meta name="description" content=""/>
 
-            <link href="../css/template.css" rel="stylesheet" media="all"/>
+    <link href="../css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+    <link href="../css/font-awesome.min.css" rel="stylesheet">
+    <link href="../css/prism.css" rel="stylesheet" media="all"/>
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
     
-            <!--[if lt IE 9]>
-        <script src="https://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
-        <![endif]-->
-        <script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script>
-        <script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
-        <script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script>
-        <script src="../js/bootstrap.js" type="text/javascript"></script>
-        <script src="../js/template.js" type="text/javascript"></script>
-        <script src="../js/prettify/prettify.min.js" type="text/javascript"></script>
-    
-            <link rel="shortcut icon" href="../img/favicon.ico"/>
-        <link rel="apple-touch-icon" href="../img/apple-touch-icon.png"/>
-        <link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png"/>
-        <link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png"/>
-    </head>
+    <!--[if lt IE 9]>
+    <script src="../js/html5.js"></script>
+    <![endif]-->
+    <script src="../js/jquery-1.11.0.min.js"></script>
+    <script src="../js/ui/1.10.4/jquery-ui.min.js"></script>
+    <script src="../js/bootstrap.min.js"></script>
+    <script src="../js/jquery.smooth-scroll.js"></script>
+    <script src="../js/prism.min.js"></script>
+    <!-- TODO: Add http://jscrollpane.kelvinluck.com/ to style the scrollbars for browsers not using webkit-->
+    <script type="text/javascript">
+    function loadExternalCodeSnippets() {
+        Array.prototype.slice.call(document.querySelectorAll('pre[data-src]')).forEach(function (pre) {
+            var src = pre.getAttribute('data-src');
+            var extension = (src.match(/\.(\w+)$/) || [, ''])[1];
+            var language = 'php';
+
+            var code = document.createElement('code');
+            code.className = 'language-' + language;
+
+            pre.textContent = '';
+
+            code.textContent = 'Loading…';
+
+            pre.appendChild(code);
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open('GET', src, true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState == 4) {
+
+                    if (xhr.status < 400 && xhr.responseText) {
+                        code.textContent = xhr.responseText;
+
+                        Prism.highlightElement(code);
+                    }
+                    else if (xhr.status >= 400) {
+                        code.textContent = '✖ Error ' + xhr.status + ' while fetching file: ' + xhr.statusText;
+                    }
+                    else {
+                        code.textContent = '✖ Error: File does not exist or is empty';
+                    }
+                }
+            };
+
+            xhr.send(null);
+        });
+    }
+
+    $(document).ready(function(){
+        loadExternalCodeSnippets();
+    });
+    $('#source-view').on('shown', function () {
+        loadExternalCodeSnippets();
+    })
+</script>
+
+    <link rel="shortcut icon" href="../images/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../images/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../images/apple-touch-icon-114x114.png"/>
+</head>
 <body>
 
-        <div class="navbar navbar-fixed-top">
-        <div class="navbar-inner">
-            <div class="container">
-                <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                    <span class="icon-bar"></span> <span class="icon-bar"></span>
-                    <span class="icon-bar"></span> </a>
-                <a class="brand" href="../index.html">WetterwarnungDownloader</a>
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <i class="icon-ellipsis-vertical"></i>
+            </a>
+            <a class="brand" href="../index.html">WetterwarnungDownloader</a>
 
-                <div class="nav-collapse">
-                    <ul class="nav">
-                        <li class="dropdown">
-                            <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
-                                API Documentation <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                                                    <li><a>Namespaces</a></li>
-                                                                        <li><a href="../namespaces/blog404de.html">blog404de</a></li>
-                                                                                                                                </ul>
-                        </li>
-                        <li class="dropdown" id="charts-menu">
-                            <a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
-                                Charts <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="../graph_class.html">
-                                        <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="dropdown" id="reports-menu">
-                            <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
-                                Reports <b class="caret"></b>
-                            </a>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a href="../errors.html">
-                                        <i class="icon-list-alt"></i>&#160;Errors
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="../markers.html">
-                                        <i class="icon-list-alt"></i>&#160;Markers
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="../deprecated.html">
-                                        <i class="icon-list-alt"></i>&#160;Deprecated
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
+            <div class="nav-collapse">
+                <ul class="nav pull-right">
+                                        <li class="dropdown">
+                        <a href="../index.html" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                        <li><a href="../namespaces/blog404de.html">\blog404de</a></li>
+                                                    </ul>
+                    </li>
+                                        <li class="dropdown" id="charts-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graphs/class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../reports/errors.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Errors <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/markers.html">
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <i class="icon-list-alt"></i>&#160;Markers <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="../reports/deprecated.html">
+                                                                                                            <i class="icon-list-alt"></i>&#160;Deprecated <span class="label label-info pull-right">0</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!--<div class="go_to_top">-->
+    <!--<a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>-->
+    <!--</div>-->
+</div>
+
+<div id="___" class="container-fluid">
+        <section class="row-fluid">
+        <div class="span2 sidebar">
+                                <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle " data-toggle="collapse" data-target="#namespace-766901733"></a>
+                                <a href="../namespaces/default.html" style="margin-left: 30px; padding-left: 0">\</a>
+            </div>
+            <div id="namespace-766901733" class="accordion-body collapse in">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-910530099"></a>
+                                <a href="../namespaces/blog404de.html" style="margin-left: 30px; padding-left: 0">blog404de</a>
+            </div>
+            <div id="namespace-910530099" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-661420502"></a>
+                                <a href="../namespaces/blog404de.Standard.html" style="margin-left: 30px; padding-left: 0">Standard</a>
+            </div>
+            <div id="namespace-661420502" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/blog404de.Standard.ErrorLogging.html">ErrorLogging</a></li>
+                                                    <li class="class"><a href="../classes/blog404de.Standard.Toolbox.html">Toolbox</a></li>
+                                            </ul>
                 </div>
             </div>
         </div>
-        <div class="go_to_top">
-            <a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>
-        </div>
     </div>
-    
-    <div id="___" class="container">
-        <noscript>
-            <div class="alert alert-warning">
-                Javascript is disabled; several features are only available if Javascript is enabled.
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-462745142"></a>
+                                <a href="../namespaces/blog404de.WetterWarnung.html" style="margin-left: 30px; padding-left: 0">WetterWarnung</a>
             </div>
-        </noscript>
+            <div id="namespace-462745142" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-        
-            <style>
-        .deprecated h2 {
-            text-decoration: line-through;
-        }
-    </style>
-    <div class="row">
-        <div class="span4">
-                    <div class="btn-group view pull-right" data-toggle="buttons-radio">
-        <button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button>
-        <button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-1402192742"></a>
+                                <a href="../namespaces/blog404de.WetterWarnung.Action.html" style="margin-left: 30px; padding-left: 0">Action</a>
+            </div>
+            <div id="namespace-1402192742" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/blog404de.WetterWarnung.Action.SendToInterface.html">SendToInterface</a></li>
+                                                                                                    <li class="class"><a href="../classes/blog404de.WetterWarnung.Action.SendToITFFF.html">SendToITFFF</a></li>
+                                                    <li class="class"><a href="../classes/blog404de.WetterWarnung.Action.SendToPushover.html">SendToPushover</a></li>
+                                                    <li class="class"><a href="../classes/blog404de.WetterWarnung.Action.SendToTwitter.html">SendToTwitter</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="btn-group visibility" data-toggle="buttons-checkbox">
-        <button class="btn public active" title="Show public elements">Public</button>
-        <button class="btn protected" title="Show protected elements">Protected</button>
-        <button class="btn private" title="Show private elements">Private</button>
-        <button class="btn inherited active" title="Show inherited elements">Inherited</button>
+
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-727995111"></a>
+                                <a href="../namespaces/blog404de.WetterWarnung.Archive.html" style="margin-left: 30px; padding-left: 0">Archive</a>
+            </div>
+            <div id="namespace-727995111" class="accordion-body collapse ">
+                <div class="accordion-inner">
+
+                    
+                    <ul>
+                                                    <li class="interface"><a href="../classes/blog404de.WetterWarnung.Archive.ArchiveToInterface.html">ArchiveToInterface</a></li>
+                                                                                                    <li class="class"><a href="../classes/blog404de.WetterWarnung.Archive.ArchiveToMySQL.html">ArchiveToMySQL</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
     </div>
 
-        <ul class="side-nav nav nav-list">
-        <li class="nav-header">
-            <i class="icon-custom icon-method"></i> Methods
-            <ul>
-                                                                                                    <li class="method public">
-        <a href="#method_cleanLocalDownloadFolder" title="cleanLocalDownloadFolder :: Lösche nicht mehr benötigte Dateien">
-            <span class="description">Lösche nicht mehr benötigte Dateien</span><pre>cleanLocalDownloadFolder</pre>
-        </a>
-    </li>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-209408099"></a>
+                                <a href="../namespaces/blog404de.WetterWarnung.Network.html" style="margin-left: 30px; padding-left: 0">Network</a>
+            </div>
+            <div id="namespace-209408099" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-                                                                                                        <li class="method public">
-        <a href="#method_connectToFTP" title="connectToFTP :: Verbindung zum DWD FTP Server aufbauen">
-            <span class="description">Verbindung zum DWD FTP Server aufbauen</span><pre>connectToFTP</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/blog404de.WetterWarnung.Network.Network.html">Network</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public">
-        <a href="#method_disconnectFromFTP" title="disconnectFromFTP :: Verbindung vom FTP Server trennen">
-            <span class="description">Verbindung vom FTP Server trennen</span><pre>disconnectFromFTP</pre>
-        </a>
-    </li>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-660842288"></a>
+                                <a href="../namespaces/blog404de.WetterWarnung.Reader.html" style="margin-left: 30px; padding-left: 0">Reader</a>
+            </div>
+            <div id="namespace-660842288" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-                                                                                                                                                                                                                        <li class="method public">
-        <a href="#method_getLocalFolder" title="getLocalFolder :: Getter für $localFolder">
-            <span class="description">Getter für $localFolder</span><pre>getLocalFolder</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                            <li class="trait"><a href="../classes/blog404de.WetterWarnung.Reader.ParserAlert.html">ParserAlert</a></li>
+                                                    <li class="trait"><a href="../classes/blog404de.WetterWarnung.Reader.ParserGeo.html">ParserGeo</a></li>
+                                                    <li class="trait"><a href="../classes/blog404de.WetterWarnung.Reader.ParserHeader.html">ParserHeader</a></li>
+                                                                            <li class="class"><a href="../classes/blog404de.WetterWarnung.Reader.Parser.html">Parser</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public">
-        <a href="#method_getRemoteFolder" title="getRemoteFolder :: Getter für $remoteFolder">
-            <span class="description">Getter für $remoteFolder</span><pre>getRemoteFolder</pre>
-        </a>
-    </li>
+                                                    <div class="accordion" style="margin-bottom: 0">
+        <div class="accordion-group">
+            <div class="accordion-heading">
+                                    <a class="accordion-toggle collapsed" data-toggle="collapse" data-target="#namespace-508896153"></a>
+                                <a href="../namespaces/blog404de.WetterWarnung.Save.html" style="margin-left: 30px; padding-left: 0">Save</a>
+            </div>
+            <div id="namespace-508896153" class="accordion-body collapse ">
+                <div class="accordion-inner">
 
-                                                                                                        <li class="method public">
-        <a href="#method_isFtpPassiv" title="isFtpPassiv :: Getter-Methode um zu prüfen ob FTP-Passiv Modus aktiviert ist">
-            <span class="description">Getter-Methode um zu prüfen ob FTP-Passiv Modus aktiviert ist</span><pre>isFtpPassiv</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                                    <li class="class"><a href="../classes/blog404de.WetterWarnung.Save.SaveToFile.html">SaveToFile</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public">
-        <a href="#method_setFtpPassiv" title="setFtpPassiv :: Setter-Methode um FTP-Passiv Modus zu aktivieren">
-            <span class="description">Setter-Methode um FTP-Passiv Modus zu aktivieren</span><pre>setFtpPassiv</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                            <li class="trait"><a href="../classes/blog404de.WetterWarnung.Extensions.html">Extensions</a></li>
+                                                                            <li class="class"><a href="../classes/blog404de.WetterWarnung.WetterWarnung.html">WetterWarnung</a></li>
+                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public">
-        <a href="#method_setLocalFolder" title="setLocalFolder :: Setter für $localFolder">
-            <span class="description">Setter für $localFolder</span><pre>setLocalFolder</pre>
-        </a>
-    </li>
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                                                                                                        <li class="method public">
-        <a href="#method_setRemoteFolder" title="setRemoteFolder :: Setter für $remoteFolder">
-            <span class="description">Setter für $remoteFolder</span><pre>setRemoteFolder</pre>
-        </a>
-    </li>
-
-                                                                                                        <li class="method public">
-        <a href="#method_updateFromFTP" title="updateFromFTP :: Lade aktuelle Wetterwarnungen vom DWD FTP Server">
-            <span class="description">Lade aktuelle Wetterwarnungen vom DWD FTP Server</span><pre>updateFromFTP</pre>
-        </a>
-    </li>
-
-                                                </ul>
-        </li>
-        <li class="nav-header protected">» Protected
-            <ul>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </ul>
-        </li>
-        <li class="nav-header private">» Private
-            <ul>
-                                                                                                                                                                                        <li class="method private">
-                            <a href="#method_downloadFromFTP" title="downloadFromFTP :: Lade die ermittelte Wetterwarnung-Datei(en) herunter">
-                                <span class="description">Lade die ermittelte Wetterwarnung-Datei(en) herunter</span><pre>downloadFromFTP</pre>
-                            </a>
-                        </li>
-                                                                                <li class="method private">
-                            <a href="#method_getCurrentWetterwarnungViaFallback" title="getCurrentWetterwarnungViaFallback :: Ermittle die aktuellste Wetterwarnung-Datei durch parsen der Dateiliste (FallBack-Modus)">
-                                <span class="description">Ermittle die aktuellste Wetterwarnung-Datei durch parsen der Dateiliste (FallBack-Modus)</span><pre>getCurrentWetterwarnungViaFallback</pre>
-                            </a>
-                        </li>
-                                                                                                                                                                                                                                                                                                            </ul>
-        </li>
-        <li class="nav-header">
-            <i class="icon-custom icon-constant"></i> Constants
-            <ul>
-                            </ul>
-        </li>
-    </ul>
-
+                    
+                    <ul>
+                                                                                            </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
         </div>
+    </section>
+    <section class="row-fluid">
+        <div class="span10 offset2">
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <nav>
+                                                <a href="../namespaces/blog404de.WetterWarnung.Network.html">\blog404de\WetterWarnung\Network</a> <i class="icon-level-up"></i>
+                                            </nav>
+                    <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal"><i class="icon-code"></i></a>
 
-        <div class="span8">
-            <div class="element class">
-                <h1>Network</h1>
-                <small style="display: block; text-align: right">
-                                                        </small>
-                <p class="short_description">Netzwerk-Funktionen des WarnParser für den Download
+                    <h1><small>\blog404de\WetterWarnung\Network</small>Network</h1>
+                    <p><em>Netzwerk-Funktionen des WarnParser für den Download
 und aufbereiten der Wetterwarnungen vom DWD Open Data
-FTP Server</p>
-                <div class="details">
-                    <div class="long_description">
+FTP Server</em></p>
+                    
+                    
+                                        
+                    <section id="summary">
+                        <h2>Summary</h2>
+                        <section class="row-fluid heading">
+                            <section class="span4">
+                                <a href="#methods">Methods</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#properties">Properties</a>
+                            </section>
+                            <section class="span4">
+                                <a href="#constants">Constants</a>
+                            </section>
+                        </section>
+                        <section class="row-fluid public">
+                            <section class="span4">
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_disconnectFromFTP" class="">disconnectFromFTP()</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_connectToFTP" class="">connectToFTP()</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_updateFromFTP" class="">updateFromFTP()</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_cleanLocalDownloadFolder" class="">cleanLocalDownloadFolder()</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_isFtpPassiv" class="">isFtpPassiv()</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_setFtpPassiv" class="">setFtpPassiv()</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_setRemoteFolder" class="">setRemoteFolder()</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_getLocalFolder" class="">getLocalFolder()</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_setLocalFolder" class="">setLocalFolder()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No public properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No constants found</em>
+                                                            </section>
+                        </section>
+                        <section class="row-fluid protected">
+                            <section class="span4">
+                                                                    <em>No protected methods found</em>
+                                                            </section>
+                            <section class="span4">
+                                                                    <em>No protected properties found</em>
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                        <section class="row-fluid private">
+                            <section class="span4">
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_getCurrentWetterwarnungViaFallback" class="">getCurrentWetterwarnungViaFallback()</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#method_downloadFromFTP" class="">downloadFromFTP()</a><br />
+                                                            </section>
+                            <section class="span4">
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#property_ftpConnectionId" class="">$ftpConnectionId</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#property_ftpPassiv" class="">$ftpPassiv</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#property_remoteFolder" class="">$remoteFolder</a><br />
+                                                                    <a href="../classes/blog404de.WetterWarnung.Network.Network.html#property_localFolder" class="">$localFolder</a><br />
+                                                            </section>
+                            <section class="span4">
+                                <em>N/A</em>
+                            </section>
+                        </section>
+                    </section>
+                </div>
+                <aside class="span4 detailsbar">
+                                        
+                    
+                    <dl>
+                        <dt>File</dt>
+                            <dd><a href="../files/botLib.blog404de.WetterWarnung.Network.Network.html"><div class="path-wrapper">botLib/blog404de/WetterWarnung/Network/Network.php</div></a></dd>
+                                                <dt>Package</dt>
+                            <dd><div class="namespace-wrapper">WetterScripts\WarnParser</div></dd>
+                                                <dt>Class hierarchy</dt>
+                            <dd class="hierarchy">
+                                                                                                                                                                    <div class="namespace-wrapper">\blog404de\WetterWarnung\Network\Network</div>
+                            </dd>
+
                         
-                    </div>
-                    <table class="table table-bordered">
-                                                                                    <tr>
-                                    <th>
-                                        package
-                                                                            </th>
-                                    <td>
-                                                                                    
-                                                                                <p>blog404de\WetterScripts\WarnParser</p>
-                                    </td>
-                                </tr>
-                                                                                                                                                                                                                                                                                                                                            </table>
-
-                    <h3><i class="icon-custom icon-method"></i> Methods</h3>
-                                                                <a id="method_cleanLocalDownloadFolder"></a>
-                        <div class="element clickable method public  method_cleanLocalDownloadFolder" data-toggle="collapse" data-target=".method_cleanLocalDownloadFolder .collapse">
-                            <h2>Lösche nicht mehr benötigte Dateien</h2>
-                            <pre>cleanLocalDownloadFolder() </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_connectToFTP"></a>
-                        <div class="element clickable method public  method_connectToFTP" data-toggle="collapse" data-target=".method_connectToFTP .collapse">
-                            <h2>Verbindung zum DWD FTP Server aufbauen</h2>
-                            <pre>connectToFTP(string $host, string $username, string $password) </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$host</h4>
-                                                <code>string</code><p><p>FTP Host des DWD</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$username</h4>
-                                                <code>string</code><p><p>FTP Username des DWD</p></p>
-                                            </div>
-                                                                                    <div class="subelement argument">
-                                                <h4>$password</h4>
-                                                <code>string</code><p><p>FTP Passwort des DWD</p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_disconnectFromFTP"></a>
-                        <div class="element clickable method public  method_disconnectFromFTP" data-toggle="collapse" data-target=".method_disconnectFromFTP .collapse">
-                            <h2>Verbindung vom FTP Server trennen</h2>
-                            <pre>disconnectFromFTP() </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_downloadFromFTP"></a>
-                        <div class="element clickable method private  method_downloadFromFTP" data-toggle="collapse" data-target=".method_downloadFromFTP .collapse">
-                            <h2>Lade die ermittelte Wetterwarnung-Datei(en) herunter</h2>
-                            <pre>downloadFromFTP( $arrDownloadList) </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$arrDownloadList</h4>
-                                                <code></code><p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getCurrentWetterwarnungViaFallback"></a>
-                        <div class="element clickable method private  method_getCurrentWetterwarnungViaFallback" data-toggle="collapse" data-target=".method_getCurrentWetterwarnungViaFallback .collapse">
-                            <h2>Ermittle die aktuellste Wetterwarnung-Datei durch parsen der Dateiliste (FallBack-Modus)</h2>
-                            <pre>getCurrentWetterwarnungViaFallback( $arrFTPContent) : array</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$arrFTPContent</h4>
-                                                <code></code><p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>array</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getLocalFolder"></a>
-                        <div class="element clickable method public  method_getLocalFolder" data-toggle="collapse" data-target=".method_getLocalFolder .collapse">
-                            <h2>Getter für $localFolder</h2>
-                            <pre>getLocalFolder() : string</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getRemoteFolder"></a>
-                        <div class="element clickable method public  method_getRemoteFolder" data-toggle="collapse" data-target=".method_getRemoteFolder .collapse">
-                            <h2>Getter für $remoteFolder</h2>
-                            <pre>getRemoteFolder() : string</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_isFtpPassiv"></a>
-                        <div class="element clickable method public  method_isFtpPassiv" data-toggle="collapse" data-target=".method_isFtpPassiv .collapse">
-                            <h2>Getter-Methode um zu prüfen ob FTP-Passiv Modus aktiviert ist</h2>
-                            <pre>isFtpPassiv() : boolean</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                    
-                                                                            <h3>Response</h3>
-                                        <code>boolean</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_setFtpPassiv"></a>
-                        <div class="element clickable method public  method_setFtpPassiv" data-toggle="collapse" data-target=".method_setFtpPassiv .collapse">
-                            <h2>Setter-Methode um FTP-Passiv Modus zu aktivieren</h2>
-                            <pre>setFtpPassiv(boolean $ftpPassiv) </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$ftpPassiv</h4>
-                                                <code>boolean</code><p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_setLocalFolder"></a>
-                        <div class="element clickable method public  method_setLocalFolder" data-toggle="collapse" data-target=".method_setLocalFolder .collapse">
-                            <h2>Setter für $localFolder</h2>
-                            <pre>setLocalFolder(string $localFolder) </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$localFolder</h4>
-                                                <code>string</code><p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_setRemoteFolder"></a>
-                        <div class="element clickable method public  method_setRemoteFolder" data-toggle="collapse" data-target=".method_setRemoteFolder .collapse">
-                            <h2>Setter für $remoteFolder</h2>
-                            <pre>setRemoteFolder(string $remoteFolder) </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                    </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$remoteFolder</h4>
-                                                <code>string</code><p></p>
-                                            </div>
-                                                                            
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_updateFromFTP"></a>
-                        <div class="element clickable method public  method_updateFromFTP" data-toggle="collapse" data-target=".method_updateFromFTP .collapse">
-                            <h2>Lade aktuelle Wetterwarnungen vom DWD FTP Server</h2>
-                            <pre>updateFromFTP() </pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                    <tr>
-                                                <th>
-                                                    
-                                                </th>
-                                                <td>
-                                                                                                    </td>
-                                            </tr>
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                    
-                                                                    </div>
-                            </div>
-
-                        </div>
-                    
-                    
-                                                                <h3><i class="icon-custom icon-property"></i> Properties</h3>
-                                                    <a id="property_ftpConnectionId"> </a>
-                            <div class="element clickable property  private property_ftpConnectionId" data-toggle="collapse" data-target=".property_ftpConnectionId .collapse">
-                                <h2>Link identifier der FTP Verbindung</h2>
-                                <pre>ftpConnectionId : resource</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    <p>Link identifier der FTP Verbindung</p>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>resource</code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_ftpPassiv"> </a>
-                            <div class="element clickable property  private property_ftpPassiv" data-toggle="collapse" data-target=".property_ftpPassiv .collapse">
-                                <h2>Verwende eine passive Verbindung zum FTP Server</h2>
-                                <pre>ftpPassiv : boolean</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    <p>Verwende eine passive Verbindung zum FTP Server</p>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>boolean</code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_remoteFolder"> </a>
-                            <div class="element clickable property  private property_remoteFolder" data-toggle="collapse" data-target=".property_remoteFolder .collapse">
-                                <h2>Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen</h2>
-                                <pre>remoteFolder : string</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    <p>Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen</p>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>string</code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                    <a id="property_localFolder"> </a>
-                            <div class="element clickable property  private property_localFolder" data-toggle="collapse" data-target=".property_localFolder .collapse">
-                                <h2>Lokaler Ordner in dem die Wetterwarnungen gespeichert werden</h2>
-                                <pre>localFolder : string</pre>
-                                <div class="labels">
-                                                                                                        </div>
-                                <div class="row collapse">
-                                    <div class="detail-description">
-                                        <div class="long_description"></div>
-
-                                        <table class="table">
-                                                                                            <tr>
-                                                    <th>
-                                                        var
-                                                    </th>
-                                                    <td>
-                                                                                                                    <p>Lokaler Ordner in dem die Wetterwarnungen gespeichert werden</p>
-                                                                                                            </td>
-                                                </tr>
-                                                                                    </table>
-
-                                                                                    <h3>Type(s)</h3>
-                                            <code>string</code>
-                                                                            </div>
-                                </div>
-                            </div>
-                                                            </div>
+                        
+                        
+                        
+                                                                        </dl>
+                    <h2>Tags</h2>
+                    <table class="table table-condensed">
+                                            <tr><td colspan="2"><em>None found</em></td></tr>
+                                        </table>
+                </aside>
             </div>
-            <a id="\blog404de\WetterWarnung\Network\Network"></a>
-            <ul class="breadcrumb">
-                <li><a href="../index.html"><i class="icon-custom icon-class"></i></a></li>
-                    
-    
-    <li><span class="divider">\</span><a href="../namespaces/blog404de.WetterWarnung.Network.html">Network</a></li>
 
-                <li class="active"><span class="divider">\</span><a href="../classes/blog404de.WetterWarnung.Network.Network.html">Network</a></li>
-            </ul>
+                        
+                                    <a id="properties" name="properties"></a>
+            <div class="row-fluid">
+                <div class="span8 content class">
+                    <h2>Properties</h2>
+                </div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_ftpConnectionId" name="property_ftpConnectionId" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$ftpConnectionId</h3>
+                <pre class="signature">$ftpConnectionId : resource</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                resource
+                &mdash; Link identifier der FTP Verbindung                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_ftpPassiv" name="property_ftpPassiv" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$ftpPassiv</h3>
+                <pre class="signature">$ftpPassiv : boolean</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                boolean
+                &mdash; Verwende eine passive Verbindung zum FTP Server                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_remoteFolder" name="property_remoteFolder" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$remoteFolder</h3>
+                <pre class="signature">$remoteFolder : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="property_localFolder" name="property_localFolder" class="anchor"></a>
+            <article class="property">
+                <h3 class="private ">$localFolder</h3>
+                <pre class="signature">$localFolder : string</pre>
+                <p><em></em></p>
+                
+
+                                <h4>Type</h4>
+                string
+                &mdash; Lokaler Ordner in dem die Wetterwarnungen gespeichert werden                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                        <dl>
+                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                            
+                                    <a id="methods" name="methods"></a>
+            <div class="row-fluid">
+                <div class="span8 content class"><h2>Methods</h2></div>
+                <aside class="span4 detailsbar"></aside>
+            </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_disconnectFromFTP" name="method_disconnectFromFTP" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">disconnectFromFTP()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">disconnectFromFTP() </pre>
+                <p><em>Verbindung vom FTP Server trennen</em></p>
+                
+
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_connectToFTP" name="method_connectToFTP" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">connectToFTP()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">connectToFTP(string  <span class="argument">$host</span>, string  <span class="argument">$username</span>, string  <span class="argument">$password</span>) </pre>
+                <p><em>Verbindung zum DWD FTP Server aufbauen</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$host </td>
+                                <td><p>FTP Host des DWD</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$username </td>
+                                <td><p>FTP Username des DWD</p></td>
+                            </tr>
+                                                    <tr>
+                                <td>string</td>
+                                <td>$password </td>
+                                <td><p>FTP Passwort des DWD</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_updateFromFTP" name="method_updateFromFTP" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">updateFromFTP()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">updateFromFTP() </pre>
+                <p><em>Lade aktuelle Wetterwarnungen vom DWD FTP Server</em></p>
+                
+
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_cleanLocalDownloadFolder" name="method_cleanLocalDownloadFolder" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">cleanLocalDownloadFolder()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">cleanLocalDownloadFolder() </pre>
+                <p><em>Lösche nicht mehr benötigte Dateien</em></p>
+                
+
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_isFtpPassiv" name="method_isFtpPassiv" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">isFtpPassiv()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">isFtpPassiv() : boolean</pre>
+                <p><em>Getter-Methode um zu prüfen ob FTP-Passiv Modus aktiviert ist</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    boolean
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setFtpPassiv" name="method_setFtpPassiv" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setFtpPassiv()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setFtpPassiv(boolean  <span class="argument">$ftpPassiv</span>) </pre>
+                <p><em>Setter-Methode um FTP-Passiv Modus zu aktivieren</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>boolean</td>
+                                <td>$ftpPassiv </td>
+                                <td><p>Konfigurationsparameter für passive FTP Nutzung</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setRemoteFolder" name="method_setRemoteFolder" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setRemoteFolder()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setRemoteFolder(string  <span class="argument">$remoteFolder</span>) </pre>
+                <p><em>Setter für $remoteFolder</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$remoteFolder </td>
+                                <td><p>Ordner auf dem DWD FTP Server in dem sich die Warnungen befinden</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getLocalFolder" name="method_getLocalFolder" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">getLocalFolder()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getLocalFolder() : string</pre>
+                <p><em>Getter für $localFolder</em></p>
+                
+
+                
+                
+                                    <h4>Returns</h4>
+                    string
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_setLocalFolder" name="method_setLocalFolder" class="anchor"></a>
+            <article class="method">
+                <h3 class="public ">setLocalFolder()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">setLocalFolder(string  <span class="argument">$localFolder</span>) </pre>
+                <p><em>Setter für $localFolder</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>string</td>
+                                <td>$localFolder </td>
+                                <td><p>Ordner in denen die Dateien vom DWD-FTP Server gespeichert werden</p></td>
+                            </tr>
+                                            </table>
+                
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_getCurrentWetterwarnungViaFallback" name="method_getCurrentWetterwarnungViaFallback" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">getCurrentWetterwarnungViaFallback()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">getCurrentWetterwarnungViaFallback(array  <span class="argument">$arrFTPContent</span>) : array</pre>
+                <p><em>Ermittle die aktuellste Wetterwarnung-Datei durch parsen der Dateiliste (FallBack-Modus)</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$arrFTPContent </td>
+                                <td><p>Inhalt des Verzeichnisses auf dem DWD FTP Server</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                                    <h4>Returns</h4>
+                    array
+                                    				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    <div class="row-fluid">
+        <div class="span8 content class">
+            <a id="method_downloadFromFTP" name="method_downloadFromFTP" class="anchor"></a>
+            <article class="method">
+                <h3 class="private ">downloadFromFTP()</h3>
+                <a href="#source-view" role="button" class="pull-right btn" data-toggle="modal" style="font-size: 1.1em; padding: 9px 14px"><i class="icon-code"></i></a>
+                <pre class="signature" style="margin-right: 54px;">downloadFromFTP(array  <span class="argument">$arrDownloadList</span>) </pre>
+                <p><em>Lade die ermittelte Wetterwarnung-Datei(en) herunter</em></p>
+                
+
+                                    <h4>Parameters</h4>
+                    <table class="table table-condensed table-hover">
+                                                    <tr>
+                                <td>array</td>
+                                <td>$arrDownloadList </td>
+                                <td><p>Array mit zu herunterladenden Dateien</p></td>
+                            </tr>
+                                            </table>
+                
+                                    <h4>Throws</h4>
+                    <dl>
+                                                    <dt>\Exception</dt>
+                            <dd></dd>
+                                                                    </dl>
+                
+                				
+                            </article>
+        </div>
+        <aside class="span4 detailsbar">
+            <h1><i class="icon-arrow-down"></i></h1>
+                                                            <dl>
+                                                                            </dl>
+            <h2>Tags</h2>
+            <table class="table table-condensed">
+                                    <tr><td colspan="2"><em>None found</em></td></tr>
+                            </table>
+        </aside>
+    </div>
+
+                                    </div>
+    </section>
+
+    <div id="source-view" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="source-view-label" aria-hidden="true">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+            <h3 id="source-view-label">Network.php</h3>
+        </div>
+        <div class="modal-body">
+            <pre data-src="../files/botLib/blog404de/WetterWarnung/Network/Network.php.txt" class="language-php line-numbers"></pre>
         </div>
     </div>
 
-    </div>
-
-        <footer class="span12">
-            Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
-            <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
-            Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Sun, 11 Feb 2018 18:52:43 +0100.<br/>
+    <footer class="row-fluid">
+        <section class="span10 offset2">
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <section class="row-fluid footer-sections">
+                        <section class="span4">
+                                                        <h1><i class="icon-code"></i></h1>
+                            <div>
+                                <ul>
+                                                                            <li><a href="../namespaces/blog404de.html">\blog404de</a></li>
+                                                                    </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-bar-chart"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../graphs/class.html">Class Hierarchy Diagram</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                        <section class="span4">
+                                                        <h1><i class="icon-pushpin"></i></h1>
+                            <div>
+                                <ul>
+                                    <li><a href="../reports/errors.html">Errors</a></li>
+                                    <li><a href="../reports/markers.html">Markers</a></li>
+                                </ul>
+                            </div>
+                        </section>
+                    </section>
+                </section>
+            </section>
+            <section class="row-fluid">
+                <section class="span10 offset1">
+                    <hr />
+                    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and authored
+                    on April 3rd, 2018 at 18:19.
+                </section>
+            </section>
+        </section>
     </footer>
-    </body>
+</div>
+
+</body>
 </html>

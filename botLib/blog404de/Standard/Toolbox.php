@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.0
+ * @version    v3.0.2-dev
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -142,7 +142,7 @@ class Toolbox
     /**
      * Methode zum generieren der Klartext-Fehlermeldung beim Zugriff auf ZIP-Dateien
      *
-     * @param $errCode
+     * @param $errCode ZIP-Archive Fehler-Konstante
      * @return string
      */
     public function getZipErrorMessage($errCode)
@@ -167,7 +167,7 @@ class Toolbox
     }
 
     /** Methode zum generieren von Klartext-Fehlermeldung während der JSON Kodierung
-     * @param $errCode
+     * @param $errCode JSON-Fehlerkonstante
      * @return string
      */
     public function getJsonErrorMessage($errCode)

@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2-dev
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -30,6 +30,10 @@ $unwetterConfig["localJsonWarnfile"]= "/pfad/zur/wetterwarnung.json";
 
 // Speicherordner für die Orginal Wetterwarnungen vom DWD
 $unwetterConfig["localFolder"] = "/pfad/zum/speicherordner/fuer/wetterWarnungen";
+
+// Ordner mit Icons für die Wetterwarnungen (auskommentieren, falls keine Icons verwendet werden sollen)
+// Standardmäßig ist es der Ordner "icons" Innerhalb des Projekt-Roots
+$unwetterConfig["localIconFolder"] = __DIR__ . DIRECTORY_SEPARATOR . "icons";
 
 /*
  * Optionale Konfigurationsparameter für Fehler-Behandlung / Logging
@@ -64,7 +68,19 @@ $unwetterConfig["ArchiveConfig"]["ArchiveToMySQL"] = [
 
 $unwetterConfig["Action"] = false;
 
-// Optinal: Action-Funktion "IFTTT" für WetterWarnung aktivieren
+// Optional: Action-Funktion "Pushover" für WetterWarnung aktivieren
+/*
+$unwetterConfig["ActionConfig"]["SendToPushover"] = [
+    "apiKey"              => "",
+    "userKey"             => "",
+    "MessagePrefix"       => "",
+    "MessagePostfix"      => "",
+    "MessageURL"          => "http://www.neuthardwetter.de",
+    "ignoreForceUpdate"   => true
+];
+ */
+
+// Optional: Action-Funktion "IFTTT" für WetterWarnung aktivieren
 /*
 $unwetterConfig["ActionConfig"]["SendToITFFF"] = [
     "apiKey"              => "",
@@ -75,7 +91,7 @@ $unwetterConfig["ActionConfig"]["SendToITFFF"] = [
 ];
 */
 
-// Optinal: Action-Funktion "Twitter" für WetterWarnung aktivieren
+// Optional: Action-Funktion "Twitter" für WetterWarnung aktivieren
 /*
 $unwetterConfig["ActionConfig"]["SendToTwitter"] = [
     "consumerKey"         => "",

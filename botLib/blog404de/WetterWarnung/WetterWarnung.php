@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2-dev
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -208,7 +208,7 @@ class WetterWarnung extends Save\SaveToFile
     /**
      * XML Datei einlesen und in XML Objekt einlesen
      *
-     * @param string $xmlFile
+     * @param string $xmlFile Pfad zur XML Datei mit den der WetterWarnung
      * @return \SimpleXMLElement
      * @throws Exception
      */
@@ -267,6 +267,7 @@ class WetterWarnung extends Save\SaveToFile
 
     /**
      * Setter für $localFolder an die Network-Klasse
+     *
      * @param string $localFolder
      * @throws
      */
@@ -286,7 +287,8 @@ class WetterWarnung extends Save\SaveToFile
 
     /**
      * Setter für $localJsonFile
-     * @param string $localJsonFile
+     *
+     * @param string $localJsonFile Pfad zur XML Datei mit den der WetterWarnung
      * @throws
      */
     public function setLocalJsonFile(string $localJsonFile)
@@ -323,6 +325,7 @@ class WetterWarnung extends Save\SaveToFile
 
     /**
      * Getter-Methode für WetterWarnungen
+     *
      * @return array Liste mit Wetterwarnungen
      */
     public function getWetterWarnungen(): array
@@ -332,6 +335,7 @@ class WetterWarnung extends Save\SaveToFile
 
     /**
      * Getter-Methode für Zugriff auf evntl. angelegten Temporär-Ordner
+     *
      * @return bool|string
      */
     public function getTmpFolder()

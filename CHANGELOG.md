@@ -1,5 +1,16 @@
 # Changelog
 
+2018-03-26, 3.0.3 stable
+----------
+
+* (NEU) Unterstützung von zur Warnlage passenden Icons innerhalb der Action-Extensions (soweit vom Dienst unterstützt)
+* (NEU) Direkte Unterstützung von PushOver via Action Extension ohne Umweg über IFFFT (inkl. Unterstützung der Warnlage-Icons als Attachments)
+* (NEU) Konfigurationsoption für den Pfad mit den Icons hinzugefügt
+* (BUGFIX) Kommandozeilen-Parameter für "force Update" wurde unter bestimmten Umständen nicht beachtet.
+* (NEU) API Dokumentation etwas überarbeitet
+
+Die Warnlage-Icons werden vom [Deutschen Wetterdienst](https://www.dwd.de/DE/wetter/warnungen_aktuell/objekt_einbindung/piktogramm_node.html) bereitgestellt. Bitte beachten Sie für die Verwendung die beigefügten Lizenzbedinungen des Deutschen Wetterdienstes (siehe /icons/Quelle.md). 
+
 2018-02-02, 3.0.1 stable
 ----------
 

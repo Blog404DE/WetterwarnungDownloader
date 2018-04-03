@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2-dev
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -26,7 +26,7 @@ trait ParserHeader
      *
      * @param \SimpleXMLElement $xml komplette XML-Wetterwarnung
      * @param int $warnCellId WarnCellID nach der gesucht werden soll
-     * @param $stateCode string Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
+     * @param string $stateCode Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
      * @return \SimpleXMLElement|bool
      * @throws
      */

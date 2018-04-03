@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2-dev
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -22,7 +22,7 @@ use Exception;
 interface SendToInterface
 {
     /**
-     * Action Ausführung starten (Tweet versenden)
+     * Action Ausführung starten
      *
      * @param array $parsedWarnInfo
      * @param bool $warnExists Wetterwarnung existiert bereits
@@ -32,9 +32,9 @@ interface SendToInterface
     public function startAction(array $parsedWarnInfo, bool $warnExists): int;
 
     /**
-     * Setter für Twitter OAuth Zugangsschlüssel
+     * Setter für die Konfiguration das Konfigurations-Array
      *
-     * @param array $config
+     * @param array $config Konfigurations-Array
      * @throws Exception
      */
     public function setConfig(array $config);
