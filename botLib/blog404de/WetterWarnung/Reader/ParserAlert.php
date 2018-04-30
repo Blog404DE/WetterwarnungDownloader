@@ -44,12 +44,10 @@ trait ParserAlert
                 );
             }
 
-            $strRawDate = str_replace("+00:00", "", (string)$currentWarnAlert->{"onset"});
             $objDateOnSet = new DateTime();
             $objDateOnset = $objDateOnSet->createFromFormat(
-                'Y-m-d*H:i:s',
-                $strRawDate,
-                new DateTimeZone("UTC")
+                'Y-m-d*H:i:sT',
+                $currentWarnAlert->{"onset"}->__toString()
             );
             if (!$objDateOnset) {
                 throw new Exception(
@@ -84,12 +82,10 @@ trait ParserAlert
                 $objDateExpire = $this->getAlertStartzeit($currentWarnAlert);
             } else {
                 // Expire-Element existiert
-                $strRawDate = str_replace("+00:00", "", (string)$currentWarnAlert->{"expires"});
                 $objDateExpire = new DateTime();
                 $objDateExpire = $objDateExpire->createFromFormat(
-                    'Y-m-d*H:i:s',
-                    $strRawDate,
-                    new DateTimeZone("UTC")
+                    'Y-m-d*H:i:sT',
+                    $currentWarnAlert->{"expires"}->__toString()
                 );
                 if (!$objDateExpire) {
                     throw new Exception(

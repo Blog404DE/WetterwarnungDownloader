@@ -7,6 +7,7 @@
 * (NEU) Direkte Unterstützung von PushOver via Action Extension ohne Umweg über IFFFT (inkl. Unterstützung der Warnlage-Icons als Attachments)
 * (NEU) Konfigurationsoption für den Pfad mit den Icons hinzugefügt
 * (BUGFIX) Kommandozeilen-Parameter für "force Update" wurde unter bestimmten Umständen nicht beachtet.
+* (BUGFIX) Parsen des Start-/Endzeitpunkts der Warnung verbessert und an das neue CAP Profil angepasst.
 * (NEU) API Dokumentation etwas überarbeitet
 
 Die Warnlage-Icons werden vom [Deutschen Wetterdienst](https://www.dwd.de/DE/wetter/warnungen_aktuell/objekt_einbindung/piktogramm_node.html) bereitgestellt. Bitte beachten Sie für die Verwendung die beigefügten Lizenzbedinungen des Deutschen Wetterdienstes (siehe /icons/Quelle.md). 
