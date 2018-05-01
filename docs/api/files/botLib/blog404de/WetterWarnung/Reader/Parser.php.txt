@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -32,9 +32,9 @@ class Parser extends Network
      * Prüfe Header der Warndatei auf Gültigkeit und übergebe ausschließlich
      * neue Nachrichten der angegebenen WarnCellID
      *
-     * @param $xml \SimpleXMLElement XML-Datei des DWD mit den Wetterwarnungen
-     * @param $warnCellId string WarnCellID für die eine Warnung ermittelt werden soll
-     * @param $stateCode string Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
+     * @param \SimpleXMLElement $xml XML-Datei des DWD mit den Wetterwarnungen
+     * @param string $warnCellId WarnCellID für die eine Warnung ermittelt werden soll
+     * @param string $stateCode Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
      * @return array
      * @throws Exception
      */
@@ -125,7 +125,7 @@ class Parser extends Network
     /**
      * Prüfe ob die Wetterwarnung verarbeitet werden muss
      *
-     * @param $xml \SimpleXMLElement XML-Datei des DWD mit den Wetterwarnungen
+     * @param \SimpleXMLElement $xml XML-Datei des DWD mit den Wetterwarnungen
      * @return boolean
      * @throws Exception
      */
@@ -178,6 +178,11 @@ class Parser extends Network
 
             // Art der Warnung ermitteln
             $parsedWarnInfo["event"] = $this->getAlertEvent($rawWarnung["warnung"]);
+
+            // Bei Bedarf das Event-Icon bestimmen
+            if (!empty($this->getLocalIconFolder())) {
+                $parsedWarnInfo["eventicon"] = $this->getAlertIcon($rawWarnung["warnung"]);
+            }
 
             // Ermittle Start-/Endzeitpunkt der Wetterwarnung
             $objStartzeit = $this->getAlertStartzeit($rawWarnung["warnung"]);
@@ -236,6 +241,7 @@ class Parser extends Network
                 $parsedWarnInfo["headline"] .
                 $parsedWarnInfo["description"] .
                 $parsedWarnInfo["instruction"]);
+
             return $parsedWarnInfo;
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben

@@ -7,7 +7,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -96,6 +96,12 @@ try {
     $warnBot->setLocalFolder($unwetterConfig["localFolder"]);
     $warnBot->setLocalJsonFile($unwetterConfig["localJsonWarnfile"]);
 
+    if (!array_key_exists("localIconFolder", $unwetterConfig) || $unwetterConfig["localIconFolder"] === false) {
+        $unwetterConfig["localIconFolder"] = "";
+    }
+    $warnBot->setLocalIconFolder($unwetterConfig["localIconFolder"]);
+
+    // Archiv-Support konfigurieren
     if ($unwetterConfig["Archive"]) {
         if (!array_key_exists("ArchiveConfig", $unwetterConfig)) {
             throw new Exception(
@@ -114,6 +120,7 @@ try {
         $warnBot->setArchiveConfig($unwetterConfig["ArchiveConfig"]);
     }
 
+    // Action-Support konfigurieren
     if ($unwetterConfig["Action"]) {
         if (!array_key_exists("ActionConfig", $unwetterConfig)) {
             throw new Exception(
@@ -129,7 +136,6 @@ try {
             );
         }
 
-        // Prüfen ob Action erzwungen werden soll
         if (in_array("--forceAction", $argv) || in_array("-f", $argv)) {
             $forceAction = true;
         } else {
@@ -137,6 +143,7 @@ try {
         }
 
         $warnBot->setActionConfig(
+            ["localIconFolder" => $unwetterConfig["localIconFolder"]],
             $unwetterConfig["ActionConfig"],
             $forceAction
         );

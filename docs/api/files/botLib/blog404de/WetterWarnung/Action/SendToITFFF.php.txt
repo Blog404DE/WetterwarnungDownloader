@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -47,7 +47,7 @@ class SendToITFFF implements SendToInterface
     /**
      * Action Ausführung starten (Tweet versenden)
      *
-     * @param array $parsedWarnInfo
+     * @param array $parsedWarnInfo Inhalt der Wetterwarnungen
      * @param bool $warnExists Wetterwarnung existiert bereits
      * @return int
      * @throws Exception
@@ -58,7 +58,7 @@ class SendToITFFF implements SendToInterface
             // Prüfe ob alles konfiguriert ist
             if ($this->getConfig()) {
                 if (!is_array($parsedWarnInfo)) {
-                    // Keine Warnwetter-Daten zum twittern vorhanden -> harter Fehler
+                    // Keine Warnwetter-Daten zum senden an IFTTT vorhanden -> harter Fehler
                     throw new Exception("Die im Archiv zu speicherenden Wetter-Informationen sind ungültig");
                 }
 
@@ -140,14 +140,14 @@ class SendToITFFF implements SendToInterface
     /**
      * Nachricht zusammenstellen
      *
-     * @param array $parsedWarnInfo
+     * @param array $parsedWarnInfo Inhalt der WetterWarnung
      * @return array
      * @throws Exception
      */
     private function composeMessage(array $parsedWarnInfo): array
     {
         try {
-            // Typ der Warnung ermitteln,Leerzeichen entfernen und daraus ein Hashtag erzeugen
+            // Typ der Warnung ermitteln ,Leerzeichen entfernen und daraus ein Hashtag erzeugen
             $message =  $parsedWarnInfo["severity"];
 
             // Gebiet einfügen
@@ -181,16 +181,16 @@ class SendToITFFF implements SendToInterface
     }
 
     /**
-     * Setter für Twitter OAuth Zugangsschlüssel
+     * Setter für Konfigurations-Array
      *
-     * @param array $config
+     * @param array $config Konfigurations-Array
      * @throws Exception
      */
     public function setConfig(array $config)
     {
         try {
             $configParameter = [
-                "apiKey", "eventName",
+                "apiKey", "eventName", "localIconFolder",
                 "MessagePrefix", "MessagePostfix"
             ];
 

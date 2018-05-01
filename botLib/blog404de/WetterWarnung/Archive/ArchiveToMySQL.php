@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -32,7 +32,7 @@ class ArchiveToMySQL implements ArchiveToInterface
     /**
      * Setter für MySQL Zugangsdaten
      *
-     * @param array $config
+     * @param array $config Konfigurations-Array
      * @throws Exception
      */
     public function setConfig(array $config)
@@ -79,7 +79,7 @@ class ArchiveToMySQL implements ArchiveToInterface
     /**
      * Getter-Methode für das Konfigurations-Array
      *
-     * @return array
+     * @return array Inhalt der WetterWarnung
      */
     public function getConfig(): array
     {

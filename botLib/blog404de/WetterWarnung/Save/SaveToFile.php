@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -141,7 +141,7 @@ class SaveToFile extends Parser
     /**
      * Methode zum laden der letzten Wetterwarnungen aus der Json Datei für späteren Vergleich
      *
-     * @param string $localJsonFile
+     * @param string $localJsonFile Pfad zur lokalen JSON Datei mit den aktuellen Wetterwarnungen
      * @throws Exception
      */
     final protected function loadLastWetterWarnungen(string $localJsonFile)

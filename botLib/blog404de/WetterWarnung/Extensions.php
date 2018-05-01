@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -32,6 +32,9 @@ trait Extensions
     /** @var array Array mit Konfiguration für die Action-Unterstützung */
     public $actionConfig;
 
+    /** @var array Array mit Konfiguration für das System */
+    public $systemConfig;
+
     /** @var array Array mit Konfiguration für die Action-Unterstützung */
     public $archiveConfig;
 
@@ -43,7 +46,7 @@ trait Extensions
      *
      * @throws Exception
      */
-    private function startExctensionArchive()
+    private function startExtensionArchive()
     {
         try {
             // Durchlaufe alle definiertne Archive-Klassen
@@ -84,7 +87,7 @@ trait Extensions
 
                 if ($this->forceAction === true && $actionConfig["ignoreForceUpdate"] === false) {
                     echo("(alle Meldungen):" . PHP_EOL);
-                    $warnExists = true;
+                    $warnExists = false;
                 } elseif ($this->forceAction === true && $actionConfig["ignoreForceUpdate"] === true) {
                     echo("(neue Meldungen / forceUpdate ignoriert):" . PHP_EOL);
                     $warnExists = null;
@@ -92,13 +95,13 @@ trait Extensions
                     echo("(neue Meldungen):" . PHP_EOL);
                     $warnExists = null;
                 }
-
                 // Instanziere Klasse
                 $actionClassPath = "\\blog404de\\WetterWarnung\\Action\\" . $actionClassName;
                 $this->actionClass = new $actionClassPath();
 
                 // Konfiguriere Action-Klasse
-                $this->actionClass->setConfig($actionConfig);
+                // -> füge System-Konfiguration und Konfiguration der Action-Klasse zusammen
+                $this->actionClass->setConfig(array_merge($this->systemConfig, $actionConfig));
 
                 // Verarbeite jede Wetterwarnung
                 foreach ($this->wetterWarnungen as $parsedWarnInfo) {
@@ -135,7 +138,7 @@ trait Extensions
             } else {
                 // Führe Action/Archiv aus.
                 if ($archive) {
-                    $this->startExctensionArchive();
+                    $this->startExtensionArchive();
                 }
 
                 if ($action) {
@@ -151,22 +154,22 @@ trait Extensions
     /**
      * Setzen der Konfiguration der Action-Funktion
      *
-     * @param array $actionConfig
-     * @param bool $forceAction
+     * @param array $systemConfig Konfigurationsparameter über das System
+     * @param array $actionConfig Konfigurationsparameter für ein spezifische Action
+     * @param bool $forceAction Action-Ausführung erzwingen
      * @throws Exception
      */
-    public function setActionConfig(array $actionConfig, bool $forceAction)
+    public function setActionConfig(array $systemConfig, array $actionConfig, bool $forceAction)
     {
         try {
-            // Prüfe ob zwingend benötigte Konfigurationsparameter existieren
-            $configParameter = [
+            // Prüfe ob actionConfig Parameter valid sind
+            $actionParameter = [
                 "MessagePrefix",
                 "MessagePostfix",
                 "ignoreForceUpdate"
             ];
 
-            // Alle Paramter verfügbar?
-            foreach ($configParameter as $parameter) {
+            foreach ($actionParameter as $parameter) {
                 if (!array_key_exists($parameter, current($actionConfig))) {
                     throw new Exception(
                         "Der Konfigurationsparamter [\"ActionConfig\"][\"" . $parameter . "\"] wurde nicht gesetzt."
@@ -174,7 +177,21 @@ trait Extensions
                 }
             }
 
+            // Prüfe ob systemConfig-Parameter valid sind
+            $systemParameter = [
+                "localIconFolder"
+            ];
+
+            foreach ($systemParameter as $parameter) {
+                if (!array_key_exists($parameter, $systemConfig)) {
+                    throw new Exception(
+                        "Der Konfigurationsparamter [\"localIconFolder\"] wurde nicht gesetzt."
+                    );
+                }
+            }
+
             $this->actionConfig = $actionConfig;
+            $this->systemConfig = $systemConfig;
             $this->forceAction = $forceAction;
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben

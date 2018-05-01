@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.0
+ * @version    v3.0.2
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -34,8 +34,8 @@ class ErrorLogging
     /**
      * Fehler innerhalb der Anwendung verarbeiten
      *
-     * @param Exception $exception
-     * @param string $tmpPath
+     * @param Exception $exception Inhalt der Exception
+     * @param string $tmpPath Temporär-Pfad
      */
     public function logError(Exception $exception, string $tmpPath = "")
     {
@@ -112,8 +112,8 @@ class ErrorLogging
     /**
      * Sende Log-Text per E-Mail
      *
-     * @param string $longText
-     * @param string $strDate
+     * @param string $longText Komplette Fehlermeldung
+     * @param string $strDate Zeitpunkt der Fehlermeldung
      * @return bool
      */
     private function logToMail(string $longText, string $strDate)
@@ -148,7 +148,7 @@ class ErrorLogging
     /**
      * Schreibe Log-Text in Datei
      *
-     * @param string $shortText
+     * @param string $shortText Kurzer Text zur Fehlermeldung
      * @return bool
      */
     private function logToFile(string $shortText)
@@ -175,7 +175,7 @@ class ErrorLogging
     /**
      * Entferne temporäre Dateien
      *
-     * @param $tmpPath
+     * @param $tmpPath Temporär-Pfad
      * @return boolean
      */
     private function cleanTempFiles($tmpPath)
@@ -202,7 +202,7 @@ class ErrorLogging
     /**
      * Setter-Methode für logToMail
      *
-     * @param array $logToMail
+     * @param array $logToMail Konfigurations-Array für die Log to E-Mail Funktion
      * @return ErrorLogging
      */
     public function setLogToMailSettings(array $logToMail): ErrorLogging
@@ -241,7 +241,7 @@ class ErrorLogging
     /**
      * Setter-Methode für LogToFile
      *
-     * @param array $logToFile
+     * @param array $logToFile Konfigurationsparameter für die Log-To-File Funktion
      * @return ErrorLogging
      * @throws \Exception
      */

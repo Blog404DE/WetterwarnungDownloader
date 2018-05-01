@@ -6,7 +6,7 @@
  * @author     Jens Dutzi <jens.dutzi@tf-network.de>
  * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
  * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.1
+ * @version    v3.0.2
  * @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -75,8 +75,8 @@ class SendToTwitter implements SendToInterface
     /**
      * Action Ausführung starten (Tweet versenden)
      *
-     * @param array $parsedWarnInfo
-     * @param bool $warnExists Wetterwarnung existiert bereits
+     * @param array $parsedWarnInfo Inhalt der WetterWarnung
+     * @param bool $warnExists WetterWarnung existiert bereits
      * @return int
      * @throws Exception
      */
@@ -169,7 +169,7 @@ class SendToTwitter implements SendToInterface
     /**
      * Tweet absenden an Twitter
      *
-     * @param array $tweetParameter
+     * @param array $tweetParameter Parameter für den Tweet
      * @throws Exception
      */
     private function sendTweet(array $tweetParameter)
@@ -263,7 +263,7 @@ class SendToTwitter implements SendToInterface
     /**
      * Länge des Tweet ermitteln
      *
-     * @param string $tweet
+     * @param string $tweet Inhalt des Tweets
      * @return int
      * @throws Exception
      */
@@ -287,9 +287,41 @@ class SendToTwitter implements SendToInterface
     }
 
     /**
+     * Attachment zusammenstellen
+     *
+     * @param array $parsedWarnInfo Inhalt der WetterWarnung
+     * @return string
+     * @throws Exception
+     */
+    private function composeAttachment(array $parsedWarnInfo): string
+    {
+        try {
+            $message = "";
+
+            //
+            // Attachment mit Icon hinzufügen sofern vorhanden
+            //
+            if (!empty($parsedWarnInfo["eventicon"])) {
+                // Stelle Pfad zusammen
+                $filename = $this->getConfig()["localIconFolder"] . DIRECTORY_SEPARATOR .
+                    $parsedWarnInfo["eventicon"];
+
+                // Lade Icon auf Twitter hoch
+                $attachment = $this->connectionId->upload("media/upload", ["media" => $filename]);
+                $message = $attachment->media_id_string;
+            }
+
+            return $message;
+        } catch (Exception $e) {
+            // Fehler an Hauptklasse weitergeben
+            throw $e;
+        }
+    }
+
+    /**
      * Tweet zusammenstellen
      *
-     * @param array $parsedWarnInfo
+     * @param array $parsedWarnInfo Inhalt der WetterWarnung
      * @return array
      * @throws Exception
      */
@@ -342,6 +374,13 @@ class SendToTwitter implements SendToInterface
             $tweet = $tweet . $postfix;
             $tweetParameter["status"] = $tweet;
 
+            // Attachment zusammenstellen
+            $attachment = $this->composeAttachment($parsedWarnInfo);
+            if (!empty($attachment)) {
+                // Attachment vorhanden -> füge es zu den Parameter hinzu
+                $tweetParameter["media_ids"] = $attachment;
+            }
+
             return $tweetParameter;
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
@@ -352,7 +391,7 @@ class SendToTwitter implements SendToInterface
     /**
      * Setter für Twitter OAuth Zugangsschlüssel
      *
-     * @param array $config
+     * @param array $config Konfigurations-Array
      * @throws Exception
      */
     public function setConfig(array $config)
@@ -362,7 +401,7 @@ class SendToTwitter implements SendToInterface
                 "consumerKey", "consumerSecret",
                 "oauthToken", "oauthTokenSecret",
                 "MessagePrefix", "MessagePostfix",
-                "TweetPlace"
+                "TweetPlace", "localIconFolder"
             ];
 
             // Alle Paramter verfügbar?
@@ -394,7 +433,7 @@ class SendToTwitter implements SendToInterface
     /**
      * Methode zum unwandeln der Error-Codes in Klartext-Fehlermeldungen von Twitter
      *
-     * @param $code
+     * @param $code Fehler-Codes von Twitter
      * @return string
      * @throws Exception
      */
