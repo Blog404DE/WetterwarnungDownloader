@@ -1,6 +1,6 @@
 # Changelog
 
-2018-03-26, 3.0.3 stable
+2018-05-01, 3.0.2 stable
 ----------
 
 * (NEU) Unterstützung von zur Warnlage passenden Icons innerhalb der Action-Extensions (soweit vom Dienst unterstützt)
