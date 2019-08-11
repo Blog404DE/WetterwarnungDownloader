@@ -28,8 +28,8 @@ try {
         );
     }
 
-    // Autoloader laden
-    require_once  dirname(__FILE__) . "/botLib/autoload.php";
+    // Autoloader initialisieren
+    require_once __DIR__ . '/vendor/autoload.php';
 
     // Error-Logger instanzieren
     $logger = new ErrorLogging();

@@ -15,8 +15,7 @@
     <rule ref="rulesets/codesize.xml/TooManyFields"/>
     <rule ref="rulesets/codesize.xml/TooManyMethods"/>
     <rule ref="rulesets/codesize.xml/TooManyPublicMethods"/>
-    <rule ref="rulesets/codesize.xml/ExcessiveClassComplexity">
-    </rule>
+    <rule ref="rulesets/codesize.xml/ExcessiveClassComplexity" />
     <rule ref="rulesets/controversial.xml"/>
     <rule ref="rulesets/design.xml"/>
     <rule ref="rulesets/naming.xml"/>

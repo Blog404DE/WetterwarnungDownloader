@@ -13,7 +13,6 @@
 namespace blog404de\WetterWarnung\Network;
 
 use Exception;
-use blog404de\Standard\Toolbox;
 
 /**
  * Netzwerk-Funktionen des WarnParser für den Download
@@ -195,11 +194,7 @@ class Network
                     );
                     if ($extractFileInfo) {
                         $dateTimeFormater = new \DateTime();
-                        $dateFileM = $dateTimeFormater->createFromFormat(
-                            "YmdHis",
-                            $regs['Datum'],
-                            new \DateTimeZone("UTC")
-                        );
+                        $dateFileM = $dateTimeFormater->createFromFormat("YmdHis", $regs['Datum'], new \DateTimeZone("UTC") );
                         if ($dateFileM === false) {
                             $fileDate = @ftp_mdtm($this->ftpConnectionId, $filename);
                             $detectMode = "via FTP / Lesen des Datums fehlgeschlagen";
@@ -217,8 +212,7 @@ class Network
 
                     // Bei deutscher Sprache -> verarbeiten
                     if (strtoupper($language) === "DE") {
-                        echo("\t" . $filename . " => " . date("d.m.Y H:i", $fileDate) .
-                            " (" . $language . " / " . $detectMode . ")" . PHP_EOL);
+                        echo("\t" . $filename . " => " . date("d.m.Y H:i", $fileDate) . " (" . $language . " / " . $detectMode . ")" . PHP_EOL);
                         $arrDownloadList[$filename] = $fileDate;
                     }
                 }

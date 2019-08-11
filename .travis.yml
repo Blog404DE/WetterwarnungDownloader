@@ -2,17 +2,15 @@ language: php
 php:
   - '7.0'
   - '7.1'
-branches:
-  only:
-  - master
-  - develop
+  - '7.2'
+  - '7.3'
 before_script:
   - composer self-update
   - composer update
 script:
-  - "find . -name \\*.php -not -path ./.idea/\\* -not -path ./vendor/\\* -exec php -lf {} \\;"
-  - "./vendor/bin/phpcs getWetterWarnung.php botLib/* --extensions=php --standard=PSR2"
-  - "./vendor/bin/phpmd getWetterWarnung.php,botLib/ text ./phpmd.xml"
+  - "./vendor/bin/phpcf -t ${TRAVIS_PHP_VERSION} getWetterWarnung.php config.sample.php ./botLib"
+  - "./vendor/bin/phpcpd --no-interaction getWetterWarnung.php config.sample.php ./botLib"
+  - "./vendor/bin/phpcs --colors --standard=PSR1 --extensions=php getWetterWarnung.php config.sample.php botLib/*"
 cache:
   directories:
     - $HOME/.composer/cache/files
