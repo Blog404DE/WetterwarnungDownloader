@@ -28,7 +28,8 @@
         "ext-ftp": "*",
         "ext-pdo": "*",
         "ext-zip": "*",
-        "ext-libxml": "*"
+        "ext-libxml": "*",
+        "ext-curl": "*"
     },
     "require-dev": {
         "phpmd/phpmd": "*",

@@ -75,11 +75,11 @@ trait ParserHeader
 
                 if (\array_key_exists($warnCellId, $cellinformation)) {
                     $result = new SimpleXMLElement('<geoInfo></geoInfo>');
-                    $result->addChild('warncellid', $warnCellId);
-                    $result->addChild('areaDesc', $cellinformation[$warnCellId]['areaDesc']);
-                    $result->addChild('altitude', $cellinformation[$warnCellId]['altitude']);
-                    $result->addChild('ceiling', $cellinformation[$warnCellId]['ceiling']);
-                    $result->addChild('state', $stateCode);
+                    $result->addChild('warncellid', (string) $warnCellId);
+                    $result->addChild('areaDesc', (string) $cellinformation[$warnCellId]['areaDesc']);
+                    $result->addChild('altitude', (string) $cellinformation[$warnCellId]['altitude']);
+                    $result->addChild('ceiling', (string) $cellinformation[$warnCellId]['ceiling']);
+                    $result->addChild('state', (string) $stateCode);
 
                     return $result;
                 }
@@ -195,7 +195,7 @@ trait ParserHeader
                 );
             }
 
-            if (('WARNCELLID' === $currentGeoCode->{'valueName'})) {
+            if (('WARNCELLID' === (string) $currentGeoCode->{'valueName'})) {
                 // Prüfe nach Höhenangaben-Nodes
                 if (!property_exists($area, 'altitude')) {
                     throw new Exception(

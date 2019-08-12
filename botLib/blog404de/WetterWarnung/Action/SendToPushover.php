@@ -80,24 +80,24 @@ class SendToPushover implements SendToInterface
                     // Stelle Parameter zusammen die an PushOver-API gesendet werden
                     $warnParameter = $this->composeMessage($parsedWarnInfo);
                     $attachment = $this->composeAttachment($parsedWarnInfo);
-                    $message = array_merge($warnParameter, $attachment);
+                    $jsonMessage = array_merge($warnParameter, $attachment);
 
                     // URL zusammensetzen
                     $url = 'https://api.pushover.net/1/messages.json';
 
                     // Sende Nachricht an PushOver-API ab
                     $curl = curl_init();
-                    curl_setopt($curl, CURLOPT_URL, $url);
-                    curl_setopt($curl, CURLOPT_FILETIME, true);
-                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($curl, CURLOPT_HEADER, false);
-                    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-                    curl_setopt($curl, CURLOPT_TIMEOUT, 5);
-                    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                    // POST Request
-                    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, $message);
+                    curl_setopt_array($curl, [
+                        CURLOPT_URL => $url,
+                        CURLOPT_FILETIME => true,
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_HEADER => false,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_TIMEOUT => 5,
+                        CURLOPT_CONNECTTIMEOUT => 5,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => $jsonMessage,
+                    ]);
 
                     // Nachricht absetzen
                     echo "\t\t -> Wetter-Warnung an Pushover API senden: ";
@@ -113,7 +113,7 @@ class SendToPushover implements SendToInterface
                     // Prüfe ob Befehl erfolgreich abgesetzt wurde
                     if (200 !== curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
                         throw new Exception(
-                            'IFFT Webhook API Liefert ein Fehler zurück (' .
+                            'Pushover Webhook API Liefert ein Fehler zurück (' .
                             curl_getinfo($curl, CURLINFO_HTTP_CODE) . ' / ' . $result . ')'
                         );
                     }

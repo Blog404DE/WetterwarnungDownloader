@@ -82,26 +82,22 @@ class SendToITFFF implements SendToInterface
 
                     // URL zusammensetzen
                     $url = 'https://maker.ifttt.com/trigger/' . $this->config['eventName'] .
-                           '/with/key/' . $this->config['apiKey'] . '/';
+                           '/with/key/' . $this->config['apiKey'];
 
                     // Sende Nachricht an IFTTT ab
                     $curl = curl_init();
-                    curl_setopt($curl, CURLOPT_URL, $url);
-                    curl_setopt($curl, CURLOPT_FILETIME, true);
-                    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-                    curl_setopt($curl, CURLOPT_HEADER, false);
-                    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-                    curl_setopt($curl, CURLOPT_TIMEOUT, 5);
-                    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
-
-                    // POST Request
-                    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-                    curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonMessage);
-                    curl_setopt(
-                        $curl,
-                        CURLOPT_HTTPHEADER,
-                        ['Content-Type: application/json',  'Content-Length: ' . \mb_strlen($jsonMessage)]
-                    );
+                    curl_setopt_array($curl, [
+                        CURLOPT_URL => $url,
+                        CURLOPT_FILETIME => true,
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_HEADER => false,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_TIMEOUT => 5,
+                        CURLOPT_CONNECTTIMEOUT => 5,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => $jsonMessage,
+                        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                    ]);
 
                     // NAchricht absetzen
                     echo "\t\t -> Wetter-Warnung an IFTTT Webhook API senden: ";
@@ -117,7 +113,7 @@ class SendToITFFF implements SendToInterface
                     // Prüfe ob Befehl erfolgreich abgesetzt wurde
                     if (200 !== curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
                         throw new Exception(
-                            'IFFT Webhook API Liefert ein Fehler zurück (' .
+                            'IFTTT  Webhook API Liefert ein Fehler zurück (' .
                             curl_getinfo($curl, CURLINFO_HTTP_CODE) . ' / ' . $result . ')'
                         );
                     }

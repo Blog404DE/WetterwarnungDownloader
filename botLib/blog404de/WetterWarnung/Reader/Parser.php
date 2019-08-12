@@ -35,14 +35,14 @@ class Parser extends Network
      * neue Nachrichten der angegebenen WarnCellID.
      *
      * @param SimpleXMLElement $xml        XML-Datei des DWD mit den Wetterwarnungen
-     * @param string           $warnCellId WarnCellID für die eine Warnung ermittelt werden soll
+     * @param int              $warnCellId WarnCellID für die eine Warnung ermittelt werden soll
      * @param string           $stateCode  Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
      *
      * @throws Exception
      *
      * @return array
      */
-    final protected function checkWarnFile(SimpleXMLElement $xml, string $warnCellId, string $stateCode): array
+    final protected function checkWarnFile(SimpleXMLElement $xml, int $warnCellId, string $stateCode): array
     {
         try {
             // Rohwarnung
@@ -240,7 +240,7 @@ class Parser extends Network
         $readWarnfile = false;
 
         // Prüfe um welche Art von Wetter-Warnung es sich handelt (Alert oder Cancel)
-        if ('alert' === mb_strtolower($xml->{'msgType'}) || 'update' === mb_strtolower($xml->{'msgType'})) {
+        if ('alert' === mb_strtolower((string) $xml->{'msgType'}) || 'update' === mb_strtolower((string) $xml->{'msgType'})) {
             // Verarbeite Inhalt der XML Datei (Typ: Alert)
             $wetterWarnung = $xml->{'info'};
             // Prüfe ob es sich um eine Testwarnung handelt
