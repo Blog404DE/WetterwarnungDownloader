@@ -22,8 +22,7 @@ use Exception;
 /**
  * Trait für die Extensions-Unterstützung im WetterWarnung Parser.
  */
-trait Extensions
-{
+trait Extensions {
     /** @var ArchiveToInterface Klasse für Archiv-Unterstützung via MySQL */
     public $archiveClass;
 
@@ -49,8 +48,7 @@ trait Extensions
      *
      * @throws
      */
-    public function startExtensions(bool $archive, bool $action)
-    {
+    public function startExtensions(bool $archive, bool $action) {
         try {
             if (0 === \count($this->wetterWarnungen)) {
                 // Keine Wetterwarnungen vorhanden
@@ -81,8 +79,7 @@ trait Extensions
      *
      * @throws Exception
      */
-    public function setActionConfig(array $systemConfig, array $actionConfig, bool $forceAction)
-    {
+    public function setActionConfig(array $systemConfig, array $actionConfig, bool $forceAction) {
         try {
             // Prüfe ob actionConfig Parameter valid sind
             $actionParameter = [
@@ -126,8 +123,7 @@ trait Extensions
      *
      * @param array $archiveConfig
      */
-    public function setArchiveConfig(array $archiveConfig)
-    {
+    public function setArchiveConfig(array $archiveConfig) {
         $this->archiveConfig = $archiveConfig;
     }
 
@@ -136,8 +132,7 @@ trait Extensions
      *
      * @throws Exception
      */
-    private function startExtensionArchive()
-    {
+    private function startExtensionArchive() {
         try {
             // Durchlaufe alle definiertne Archive-Klassen
             foreach ($this->archiveConfig as $archiveClassName => $archiveConfig) {
@@ -168,8 +163,7 @@ trait Extensions
      *
      * @throws Exception
      */
-    private function startExtensionAction()
-    {
+    private function startExtensionAction() {
         try {
             // Durchlaufe alle definiertne Action-Klassen
             foreach ($this->actionConfig as $actionClassName => $actionConfig) {

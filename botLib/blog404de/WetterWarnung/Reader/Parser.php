@@ -24,8 +24,7 @@ use SimpleXMLElement;
 /**
  * Haupt-Klasse des Parser - beinhaltet alle internen Methoden die zum parsen der Wetterwarnungen benötigt werden.
  */
-class Parser extends Network
-{
+class Parser extends Network {
     use ParserAlert;
     use ParserGeo;
     use ParserHeader;
@@ -42,8 +41,7 @@ class Parser extends Network
      *
      * @return array
      */
-    final protected function checkWarnFile(SimpleXMLElement $xml, int $warnCellId, string $stateCode): array
-    {
+    final protected function checkWarnFile(SimpleXMLElement $xml, int $warnCellId, string $stateCode): array {
         try {
             // Rohwarnung
             $arrRohWarnungen = [];
@@ -99,8 +97,7 @@ class Parser extends Network
      *
      * @return array
      */
-    final protected function collectWarnArray(array $rawWarnung): array
-    {
+    final protected function collectWarnArray(array $rawWarnung): array {
         try {
             $parsedWarnInfo = [];
             // Existieren alle benötigten Array-Elemente zum parsen?
@@ -143,13 +140,13 @@ class Parser extends Network
             }
 
             // Warnung ist nicht abgelaufen, setze ermitteln der Daten fort
-            $parsedWarnInfo['startzeit'] = (string) serialize($objStartzeit);
-            $parsedWarnInfo['endzeit'] = (string) serialize($objEndzeit);
+            $parsedWarnInfo['startzeit'] = (string)serialize($objStartzeit);
+            $parsedWarnInfo['endzeit'] = (string)serialize($objEndzeit);
 
             // Ermittle Daten aus Header
-            $parsedWarnInfo['identifier'] = (string) $rawWarnung['identifier'];
-            $parsedWarnInfo['reference'] = (string) $rawWarnung['reference'];
-            $parsedWarnInfo['msgType'] = (string) $rawWarnung['msgType'];
+            $parsedWarnInfo['identifier'] = (string)$rawWarnung['identifier'];
+            $parsedWarnInfo['reference'] = (string)$rawWarnung['reference'];
+            $parsedWarnInfo['msgType'] = (string)$rawWarnung['msgType'];
 
             // Ermittle Sonstige Informationen der Wetterwarnung
             $parsedWarnInfo['severity'] = $this->getAlertSeverity($rawWarnung['warnung']);
@@ -197,8 +194,7 @@ class Parser extends Network
      *
      * @return bool
      */
-    private function checkForTestWarnung(SimpleXMLElement $eventCodeElement): bool
-    {
+    private function checkForTestWarnung(SimpleXMLElement $eventCodeElement): bool {
         try {
             $testwarnung = false;
             foreach ($eventCodeElement as $eventCode) {
@@ -210,7 +206,7 @@ class Parser extends Network
                 }
 
                 // Schaue nach EventName = "II" und prüfe ob der Wert auf 98/99 steht (=Testwarnung)
-                if ('II' === (string) $eventCode->{'valueName'} && \in_array($eventCode->{'value'}, ['98', '99'], true)) {
+                if ('II' === (string)$eventCode->{'valueName'} && \in_array($eventCode->{'value'}, ['98', '99'], true)) {
                     // Da Test-Warnung, diese Warnung nicht zur weiteren Verarbeitung übernehmen
                     echo "\t\t-> Testwarnung (ignoriere Inhalt)" . PHP_EOL;
                     $testwarnung = false;
@@ -235,12 +231,11 @@ class Parser extends Network
      *
      * @return bool
      */
-    private function shouldParseWetterwarnung(SimpleXMLElement $xml)
-    {
+    private function shouldParseWetterwarnung(SimpleXMLElement $xml) {
         $readWarnfile = false;
 
         // Prüfe um welche Art von Wetter-Warnung es sich handelt (Alert oder Cancel)
-        if ('alert' === mb_strtolower((string) $xml->{'msgType'}) || 'update' === mb_strtolower((string) $xml->{'msgType'})) {
+        if ('alert' === mb_strtolower((string)$xml->{'msgType'}) || 'update' === mb_strtolower((string)$xml->{'msgType'})) {
             // Verarbeite Inhalt der XML Datei (Typ: Alert)
             $wetterWarnung = $xml->{'info'};
             // Prüfe ob es sich um eine Testwarnung handelt

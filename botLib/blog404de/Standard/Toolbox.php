@@ -21,8 +21,7 @@ use ZipArchive;
 /**
  * Generische Toolbox Klasse für NeuthardWetter.de-Scripte.
  */
-class Toolbox
-{
+class Toolbox {
     /**
      * Methode zum extrahieren aller ZIP-Dateien die sich in einem bestimmten Ordner befinden.
      *
@@ -31,8 +30,7 @@ class Toolbox
      *
      * @throws
      */
-    public function extractZipFile(string $source, string $destination)
-    {
+    public function extractZipFile(string $source, string $destination) {
         // Eigentlich darf aktuell nur eine ZIP Datei vorhanden sein (vorbereitet aber für >1 ZIP Datei)
         if (!is_readable($source)) {
             throw new Exception('Die ZIP-Datei (' . $source . ') kann nicht lesend geöffnet werden');
@@ -85,8 +83,7 @@ class Toolbox
      *
      * @return bool|string full path to newly-created dir, or false on failure
      */
-    public function tempdir(string $dir = null, string $prefix = 'tmp_', int $mode = 0700, int $maxAttempts = 1000)
-    {
+    public function tempdir(string $dir = null, string $prefix = 'tmp_', int $mode = 0700, int $maxAttempts = 1000) {
         // Use the system temp dir by default.
         if (null === $dir) {
             $dir = sys_get_temp_dir();
@@ -122,8 +119,7 @@ class Toolbox
      *
      * @return bool
      */
-    public function removeTempDir(string $dir)
-    {
+    public function removeTempDir(string $dir) {
         // TMP Ordner löschen (sofern möglich)
         if (false !== $dir && null !== $dir) {
             // Prüfe ob Verzeichnis existiert
@@ -150,8 +146,7 @@ class Toolbox
      *
      * @return string
      */
-    public function getZipErrorMessage($errCode)
-    {
+    public function getZipErrorMessage($errCode) {
         $errorCodeTable = [
             ZipArchive::ER_EXISTS => 'Datei existiert bereits',
             ZipArchive::ER_INCONS => 'Zip-Archiv ist nicht konsistent',
@@ -176,8 +171,7 @@ class Toolbox
      *
      * @return string
      */
-    public function getJsonErrorMessage($errCode)
-    {
+    public function getJsonErrorMessage($errCode) {
         $errorCodeTable = [
             JSON_ERROR_NONE => 'Keine Fehler',
             JSON_ERROR_DEPTH => 'Maximale Stacktiefe überschritten',

@@ -22,8 +22,7 @@ use Exception;
  *
  * @SuppressWarnings("ExitExpression")
  */
-class ErrorLogging
-{
+class ErrorLogging {
     /** @var array E-Mail Absender/Empfänger in ["empfaenger"] und ["absender"] */
     private $logToMailSettings = [];
 
@@ -39,8 +38,7 @@ class ErrorLogging
      * @param Exception $exception Inhalt der Exception
      * @param string    $tmpPath   Temporär-Pfad
      */
-    public function logError(Exception $exception, string $tmpPath = '')
-    {
+    public function logError(Exception $exception, string $tmpPath = '') {
         // Zeitpunkt
         $strDate = date('Y-m-d H:i:s');
 
@@ -120,8 +118,7 @@ class ErrorLogging
      *
      * @return ErrorLogging
      */
-    public function setLogToMailSettings(array $logToMail): self
-    {
+    public function setLogToMailSettings(array $logToMail): self {
         try {
             if (!\is_array($logToMail)) {
                 // Error Logging an E-Mail deaktivieren
@@ -167,8 +164,7 @@ class ErrorLogging
      *
      * @return ErrorLogging
      */
-    public function setLogToFileSettings(array $logToFile): self
-    {
+    public function setLogToFileSettings(array $logToFile): self {
         try {
             $filename = $logToFile['filename'];
 
@@ -203,8 +199,7 @@ class ErrorLogging
      *
      * @return array
      */
-    public function getLogToMailSettings(): array
-    {
+    public function getLogToMailSettings(): array {
         return $this->logToMailSettings;
     }
 
@@ -213,8 +208,7 @@ class ErrorLogging
      *
      * @return array
      */
-    public function getLogToFileSettings(): array
-    {
+    public function getLogToFileSettings(): array {
         return $this->logToFileSettings;
     }
 
@@ -223,8 +217,7 @@ class ErrorLogging
      *
      * @return bool
      */
-    public function isWithTrace(): bool
-    {
+    public function isWithTrace(): bool {
         return $this->withTrace;
     }
 
@@ -233,8 +226,7 @@ class ErrorLogging
      *
      * @param bool $withTrace
      */
-    public function setWithTrace(bool $withTrace)
-    {
+    public function setWithTrace(bool $withTrace) {
         $this->withTrace = $withTrace;
     }
 
@@ -246,8 +238,7 @@ class ErrorLogging
      *
      * @return bool
      */
-    private function logToMail(string $longText, string $strDate)
-    {
+    private function logToMail(string $longText, string $strDate) {
         try {
             $mailHeader = sprintf(
                 "From: Wetterwarn-Bot <%s>\r\n" .
@@ -282,8 +273,7 @@ class ErrorLogging
      *
      * @return bool
      */
-    private function logToFile(string $shortText)
-    {
+    private function logToFile(string $shortText) {
         try {
             $writeFile = file_put_contents(
                 $this->logToFileSettings['filename'],
@@ -311,8 +301,7 @@ class ErrorLogging
      *
      * @return bool
      */
-    private function cleanTempFiles($tmpPath)
-    {
+    private function cleanTempFiles($tmpPath) {
         try {
             // Lösche evntuell vorhandenes Temporäre Verzeichnis
             $tmpclean = true;

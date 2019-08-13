@@ -21,8 +21,7 @@ use SimpleXMLElement;
 /**
  * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.
  */
-trait ParserHeader
-{
+trait ParserHeader {
     /**
      * Info-Node der Wetterwarnungen des DWD nach einer bestimmten WarnCellID durchsuchen.
      *
@@ -75,11 +74,11 @@ trait ParserHeader
 
                 if (\array_key_exists($warnCellId, $cellinformation)) {
                     $result = new SimpleXMLElement('<geoInfo></geoInfo>');
-                    $result->addChild('warncellid', (string) $warnCellId);
-                    $result->addChild('areaDesc', (string) $cellinformation[$warnCellId]['areaDesc']);
-                    $result->addChild('altitude', (string) $cellinformation[$warnCellId]['altitude']);
-                    $result->addChild('ceiling', (string) $cellinformation[$warnCellId]['ceiling']);
-                    $result->addChild('state', (string) $stateCode);
+                    $result->addChild('warncellid', (string)$warnCellId);
+                    $result->addChild('areaDesc', (string)$cellinformation[$warnCellId]['areaDesc']);
+                    $result->addChild('altitude', (string)$cellinformation[$warnCellId]['altitude']);
+                    $result->addChild('ceiling', (string)$cellinformation[$warnCellId]['ceiling']);
+                    $result->addChild('state', (string)$stateCode);
 
                     return $result;
                 }
@@ -99,8 +98,7 @@ trait ParserHeader
      *
      * @return string
      */
-    final protected function getHeaderIdentifier(SimpleXMLElement $xml): string
-    {
+    final protected function getHeaderIdentifier(SimpleXMLElement $xml): string {
         try {
             if (!property_exists($xml, 'identifier')) {
                 throw new Exception(
@@ -108,7 +106,7 @@ trait ParserHeader
                 );
             }
 
-            return (string) $xml->{'identifier'};
+            return (string)$xml->{'identifier'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -124,8 +122,7 @@ trait ParserHeader
      *
      * @return string
      */
-    final protected function getHeaderMsgType(SimpleXMLElement $xml): string
-    {
+    final protected function getHeaderMsgType(SimpleXMLElement $xml): string {
         try {
             if (!property_exists($xml, 'msgType')) {
                 throw new Exception(
@@ -133,7 +130,7 @@ trait ParserHeader
                 );
             }
 
-            return mb_strtolower((string) $xml->{'msgType'});
+            return mb_strtolower((string)$xml->{'msgType'});
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -149,8 +146,7 @@ trait ParserHeader
      *
      * @return string
      */
-    final protected function getHeaderReference(SimpleXMLElement $xml): string
-    {
+    final protected function getHeaderReference(SimpleXMLElement $xml): string {
         try {
             if ('update' === $this->getHeaderMsgType($xml)) {
                 if (!property_exists($xml, 'references')) {
@@ -159,7 +155,7 @@ trait ParserHeader
                         "beinhaltet kein 'references'-Node."
                     );
                 }
-                $reference = (string) $xml->{'references'};
+                $reference = (string)$xml->{'references'};
             } else {
                 $reference = '';
             }
@@ -180,8 +176,7 @@ trait ParserHeader
      *
      * @return array
      */
-    private function extractInfosFromGeoField(SimpleXMLElement $area): array
-    {
+    private function extractInfosFromGeoField(SimpleXMLElement $area): array {
         $result = [];
         $geocodes = $area->{'geocode'};
 
@@ -195,7 +190,7 @@ trait ParserHeader
                 );
             }
 
-            if (('WARNCELLID' === (string) $currentGeoCode->{'valueName'})) {
+            if (('WARNCELLID' === (string)$currentGeoCode->{'valueName'})) {
                 // Prüfe nach Höhenangaben-Nodes
                 if (!property_exists($area, 'altitude')) {
                     throw new Exception(
@@ -209,11 +204,11 @@ trait ParserHeader
                 }
 
                 // Ergebnis zusammenstellen
-                $result[(string) $currentGeoCode->{'value'}] =
+                $result[(string)$currentGeoCode->{'value'}] =
                     [
-                        'altitude' => (float) $area->{'altitude'},
-                        'ceiling' => (float) $area->{'ceiling'},
-                        'areaDesc' => (string) $area->{'areaDesc'},
+                        'altitude' => (float)$area->{'altitude'},
+                        'ceiling' => (float)$area->{'ceiling'},
+                        'areaDesc' => (string)$area->{'areaDesc'},
                     ];
             }
         }

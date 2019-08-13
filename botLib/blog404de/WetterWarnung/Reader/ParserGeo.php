@@ -20,8 +20,7 @@ use Exception;
 /**
  * Traint zum auslesen diverser Geo-Elemente aus der Roh-XML Datei.
  */
-trait ParserGeo
-{
+trait ParserGeo {
     /** @var array Array mit Bundesländer in Deutschland */
     private $regionames = [
         'BB' => 'Brandenburg',
@@ -52,8 +51,7 @@ trait ParserGeo
      *
      * @return string
      */
-    final protected function getRegioWarncellid(\SimpleXMLElement $currentWarnGeo): string
-    {
+    final protected function getRegioWarncellid(\SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'warncellid')) {
@@ -62,7 +60,7 @@ trait ParserGeo
                 );
             }
 
-            return (string) $currentWarnGeo->{'warncellid'};
+            return (string)$currentWarnGeo->{'warncellid'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -78,8 +76,7 @@ trait ParserGeo
      *
      * @return string
      */
-    final protected function getRegionArea(\SimpleXMLElement $currentWarnGeo): string
-    {
+    final protected function getRegionArea(\SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'areaDesc')) {
@@ -88,7 +85,7 @@ trait ParserGeo
                 );
             }
 
-            return (string) $currentWarnGeo->{'areaDesc'};
+            return (string)$currentWarnGeo->{'areaDesc'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -104,8 +101,7 @@ trait ParserGeo
      *
      * @return string
      */
-    final protected function getRegionStateShort(\SimpleXMLElement $currentWarnGeo): string
-    {
+    final protected function getRegionStateShort(\SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'state')) {
@@ -114,7 +110,7 @@ trait ParserGeo
                 );
             }
 
-            return (string) $currentWarnGeo->{'state'};
+            return (string)$currentWarnGeo->{'state'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -130,8 +126,7 @@ trait ParserGeo
      *
      * @return string
      */
-    final protected function getRegionStateLong(\SimpleXMLElement $currentWarnGeo): string
-    {
+    final protected function getRegionStateLong(\SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'state')) {
@@ -141,14 +136,14 @@ trait ParserGeo
             }
 
             // Ermittle Event-Typ
-            if (!\array_key_exists((string) $currentWarnGeo->{'state'}, $this->regionames)) {
+            if (!\array_key_exists((string)$currentWarnGeo->{'state'}, $this->regionames)) {
                 throw new Exception(
                     'Die Abkürzung des Bundeslandes ' . $currentWarnGeo->{'state'} . ' kann keinem ' .
                     'deutschen Bundesland zugeordnet werden durch das Wetterwarnung-Script'
                 );
             }
 
-            return (string) $this->regionames[(string) $currentWarnGeo->{'state'}];
+            return (string)$this->regionames[(string)$currentWarnGeo->{'state'}];
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -165,8 +160,7 @@ trait ParserGeo
      *
      * @return float
      */
-    final protected function getRegionAltitude(\SimpleXMLElement $currentWarnGeo, bool $metric): float
-    {
+    final protected function getRegionAltitude(\SimpleXMLElement $currentWarnGeo, bool $metric): float {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'altitude')) {
@@ -176,9 +170,9 @@ trait ParserGeo
             }
 
             if ($metric) {
-                $altitude = floor((float) $currentWarnGeo->{'altitude'} * 0.3048);
+                $altitude = floor((float)$currentWarnGeo->{'altitude'} * 0.3048);
             } else {
-                $altitude = floor((float) $currentWarnGeo->{'altitude'});
+                $altitude = floor((float)$currentWarnGeo->{'altitude'});
             }
             if (false === $altitude) {
                 throw new Exception('Umwandlung des Altitude-Wertes von Feet in Meter fehlgeschlagen');
@@ -201,8 +195,7 @@ trait ParserGeo
      *
      * @return float
      */
-    final protected function getRegionCeiling(\SimpleXMLElement $currentWarnGeo, bool $metric): float
-    {
+    final protected function getRegionCeiling(\SimpleXMLElement $currentWarnGeo, bool $metric): float {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'ceiling')) {
@@ -212,9 +205,9 @@ trait ParserGeo
             }
 
             if ($metric) {
-                $ceiling = floor((float) $currentWarnGeo->{'ceiling'} * 0.3048);
+                $ceiling = floor((float)$currentWarnGeo->{'ceiling'} * 0.3048);
             } else {
-                $ceiling = floor((float) $currentWarnGeo->{'ceiling'});
+                $ceiling = floor((float)$currentWarnGeo->{'ceiling'});
             }
 
             if (false === $ceiling) {
@@ -237,8 +230,7 @@ trait ParserGeo
      *
      * @return string
      */
-    final protected function getRegionHoehenangabe(\SimpleXMLElement $currentWarnGeo): string
-    {
+    final protected function getRegionHoehenangabe(\SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe welche Höhenangabe verwendet werden muss für das Warngebiet (siehe Doku des DWD)
             if (0 === $this->getRegionAltitude($currentWarnGeo, false) &&
@@ -256,7 +248,7 @@ trait ParserGeo
                 $hoehenangabe = 'Alle Höhenlagen';
             }
 
-            return (string) $hoehenangabe;
+            return (string)$hoehenangabe;
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;

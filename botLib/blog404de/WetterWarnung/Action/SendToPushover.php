@@ -21,8 +21,7 @@ use Exception;
 /**
  * Action-Klasse für WetterWarnung Downloader zum senden eines Tweets bei einer neuen Nachricht.
  */
-class SendToPushover implements SendToInterface
-{
+class SendToPushover implements SendToInterface {
     /** @var array Konfigurationsdaten für die Action */
     private $config = [];
 
@@ -31,8 +30,7 @@ class SendToPushover implements SendToInterface
      *
      * @throws Exception
      */
-    public function __construct()
-    {
+    public function __construct() {
         try {
             // Prüfe ob libCurl vorhanden ist
             if (!\extension_loaded('curl')) {
@@ -62,8 +60,7 @@ class SendToPushover implements SendToInterface
      *
      * @return int
      */
-    public function startAction(array $parsedWarnInfo, bool $warnExists): int
-    {
+    public function startAction(array $parsedWarnInfo, bool $warnExists): int {
         try {
             // Prüfe ob alles konfiguriert ist
             if ($this->getConfig()) {
@@ -142,8 +139,7 @@ class SendToPushover implements SendToInterface
      *
      * @throws Exception
      */
-    public function setConfig(array $config)
-    {
+    public function setConfig(array $config) {
         try {
             $configParameter = [
                 'apiKey', 'userKey', 'localIconFolder',
@@ -172,8 +168,7 @@ class SendToPushover implements SendToInterface
      *
      * @return array
      */
-    public function getConfig(): array
-    {
+    public function getConfig(): array {
         return $this->config;
     }
 
@@ -186,8 +181,7 @@ class SendToPushover implements SendToInterface
      *
      * @return array
      */
-    private function composeAttachment(array $parsedWarnInfo): array
-    {
+    private function composeAttachment(array $parsedWarnInfo): array {
         try {
             $message = [];
 
@@ -223,8 +217,7 @@ class SendToPushover implements SendToInterface
      *
      * @return array
      */
-    private function composeMessage(array $parsedWarnInfo): array
-    {
+    private function composeMessage(array $parsedWarnInfo): array {
         try {
             //
             // Inhalt der Warnung zusammenstellen

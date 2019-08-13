@@ -20,8 +20,7 @@ use Exception;
 /**
  * Action-Klasse für WetterWarnung Downloader zum senden eines Tweets bei einer neuen Nachricht.
  */
-class SendToITFFF implements SendToInterface
-{
+class SendToITFFF implements SendToInterface {
     /** @var array Konfigurationsdaten für die Action */
     private $config = [];
 
@@ -30,8 +29,7 @@ class SendToITFFF implements SendToInterface
      *
      * @throws Exception
      */
-    public function __construct()
-    {
+    public function __construct() {
         try {
             // Prüfe ob libCurl vorhanden ist
             if (!\extension_loaded('curl')) {
@@ -55,8 +53,7 @@ class SendToITFFF implements SendToInterface
      *
      * @return int
      */
-    public function startAction(array $parsedWarnInfo, bool $warnExists): int
-    {
+    public function startAction(array $parsedWarnInfo, bool $warnExists): int {
         try {
             // Prüfe ob alles konfiguriert ist
             if ($this->getConfig()) {
@@ -142,8 +139,7 @@ class SendToITFFF implements SendToInterface
      *
      * @throws Exception
      */
-    public function setConfig(array $config)
-    {
+    public function setConfig(array $config) {
         try {
             $configParameter = [
                 'apiKey', 'eventName', 'localIconFolder',
@@ -172,8 +168,7 @@ class SendToITFFF implements SendToInterface
      *
      * @return array
      */
-    public function getConfig(): array
-    {
+    public function getConfig(): array {
         return $this->config;
     }
 
@@ -186,8 +181,7 @@ class SendToITFFF implements SendToInterface
      *
      * @return array
      */
-    private function composeMessage(array $parsedWarnInfo): array
-    {
+    private function composeMessage(array $parsedWarnInfo): array {
         try {
             // Typ der Warnung ermitteln ,Leerzeichen entfernen und daraus ein Hashtag erzeugen
             $message = $parsedWarnInfo['severity'];

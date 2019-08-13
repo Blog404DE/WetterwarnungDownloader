@@ -24,8 +24,7 @@ use Exception;
  * und aufbereiten der Wetterwarnungen vom DWD Open Data
  * FTP Server.
  */
-class Network
-{
+class Network {
     /** @var resource $ftpConnectionId Link identifier der FTP Verbindung */
     private $ftpConnectionId;
 
@@ -43,8 +42,7 @@ class Network
      *
      * @throws Exception
      */
-    public function disconnectFromFTP()
-    {
+    public function disconnectFromFTP() {
         try {
             // Schließe Verbindung sofern notwendig
             if (\is_resource($this->ftpConnectionId)) {
@@ -67,8 +65,7 @@ class Network
      *
      * @throws Exception
      */
-    public function connectToFTP(string $host, string $username, string $password)
-    {
+    public function connectToFTP(string $host, string $username, string $password) {
         try {
             echo '*** Baue Verbindung zum DWD-FTP Server auf.' . PHP_EOL;
 
@@ -107,8 +104,7 @@ class Network
      *
      * @throws Exception
      */
-    public function updateFromFTP()
-    {
+    public function updateFromFTP() {
         try {
             // Starte Verarbeitung der Dateien
             echo PHP_EOL . '*** Verarbeite alle Dateien auf dem DWD FTP Server' . PHP_EOL;
@@ -174,8 +170,7 @@ class Network
      *
      * @throws Exception
      */
-    public function cleanLocalDownloadFolder()
-    {
+    public function cleanLocalDownloadFolder() {
         try {
             // Starte Verarbeitung der Dateien
             echo PHP_EOL . '*** Lösche veraltete Wetterwarnungen aus Cache-Ordner.' . PHP_EOL;
@@ -230,8 +225,7 @@ class Network
      *
      * @return bool
      */
-    public function isFtpPassiv(): bool
-    {
+    public function isFtpPassiv(): bool {
         return $this->ftpPassiv;
     }
 
@@ -240,8 +234,7 @@ class Network
      *
      * @param bool $ftpPassiv Konfigurationsparameter für passive FTP Nutzung
      */
-    public function setFtpPassiv(bool $ftpPassiv)
-    {
+    public function setFtpPassiv(bool $ftpPassiv) {
         $this->ftpPassiv = $ftpPassiv;
     }
 
@@ -250,8 +243,7 @@ class Network
      *
      * @param string $remoteFolder Ordner auf dem DWD FTP Server in dem sich die Warnungen befinden
      */
-    public function setRemoteFolder(string $remoteFolder)
-    {
+    public function setRemoteFolder(string $remoteFolder) {
         $this->remoteFolder = $remoteFolder;
     }
 
@@ -260,8 +252,7 @@ class Network
      *
      * @return string
      */
-    public function getLocalFolder(): string
-    {
+    public function getLocalFolder(): string {
         return $this->localFolder;
     }
 
@@ -270,8 +261,7 @@ class Network
      *
      * @param string $localFolder Ordner in denen die Dateien vom DWD-FTP Server gespeichert werden
      */
-    public function setLocalFolder(string $localFolder)
-    {
+    public function setLocalFolder(string $localFolder) {
         $this->localFolder = $localFolder;
     }
 
@@ -284,8 +274,7 @@ class Network
      *
      * @return array
      */
-    private function getCurrentWetterwarnungViaFallback(array $arrFTPContent): array
-    {
+    private function getCurrentWetterwarnungViaFallback(array $arrFTPContent): array {
         try {
             // Filter erzeugen um die Dateien zu ermitteln die heute erzeugt wurden
             $searchTime = new DateTime('now', new DateTimeZone('GMT'));
@@ -347,8 +336,7 @@ class Network
      *
      * @throws Exception
      */
-    private function downloadFromFTP(array $arrDownloadList)
-    {
+    private function downloadFromFTP(array $arrDownloadList) {
         try {
             // Starte Download der aktuellsten Warn-Datei
             if (\count($arrDownloadList) > 0) {

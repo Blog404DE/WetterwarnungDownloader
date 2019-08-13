@@ -22,8 +22,7 @@ use PDO;
  * Klasse für die Archiv-Anbindung des WarnParser
  * unter Verwendung einer MySQL-Datenbank.
  */
-class ArchiveToMySQL implements ArchiveToInterface
-{
+class ArchiveToMySQL implements ArchiveToInterface {
     /** @var PDO MySQL Connection ResourceID */
     private $connectionId;
 
@@ -37,8 +36,7 @@ class ArchiveToMySQL implements ArchiveToInterface
      *
      * @throws Exception
      */
-    public function setConfig(array $config)
-    {
+    public function setConfig(array $config) {
         try {
             // MySQL Support vorhanden?
             if (!\extension_loaded('pdo_mysql')) {
@@ -83,8 +81,7 @@ class ArchiveToMySQL implements ArchiveToInterface
      *
      * @return array Inhalt der WetterWarnung
      */
-    public function getConfig(): array
-    {
+    public function getConfig(): array {
         return $this->config;
     }
 
@@ -95,8 +92,7 @@ class ArchiveToMySQL implements ArchiveToInterface
      *
      * @throws Exception
      */
-    public function saveToArchive(array $parsedWarnInfo)
-    {
+    public function saveToArchive(array $parsedWarnInfo) {
         try {
             if ($this->getConfig()) {
                 if (!\is_array($parsedWarnInfo)) {

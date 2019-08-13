@@ -23,8 +23,7 @@ use Exception;
 /**
  * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.
  */
-trait ParserAlert
-{
+trait ParserAlert {
     /** @var string $localIconFolder Ordner in denen sich die Warnlagen-Icons befinden */
     private $localIconFolder = '';
 
@@ -35,8 +34,7 @@ trait ParserAlert
      *
      * @throws Exception
      */
-    public function setLocalIconFolder(string $localIconFolder)
-    {
+    public function setLocalIconFolder(string $localIconFolder) {
         try {
             if (!empty($localIconFolder) && false !== $localIconFolder) {
                 if (!is_readable(
@@ -67,8 +65,7 @@ trait ParserAlert
      *
      * @return string
      */
-    public function getLocalIconFolder(): string
-    {
+    public function getLocalIconFolder(): string {
         try {
             return  $this->localIconFolder;
         } catch (Exception $e) {
@@ -86,8 +83,7 @@ trait ParserAlert
      *
      * @return DateTime
      */
-    final protected function getAlertStartzeit(\SimpleXMLElement $currentWarnAlert): DateTime
-    {
+    final protected function getAlertStartzeit(\SimpleXMLElement $currentWarnAlert): DateTime {
         try {
             // Startzeitpunkt ermitteln
             if (!property_exists($currentWarnAlert, 'onset')) {
@@ -126,8 +122,7 @@ trait ParserAlert
      *
      * @return DateTime
      */
-    final protected function getAlertEndzeit(\SimpleXMLElement $currentWarnAlert): DateTime
-    {
+    final protected function getAlertEndzeit(\SimpleXMLElement $currentWarnAlert): DateTime {
         try {
             // Endzeitpunkt ermitteln
             if (!property_exists($currentWarnAlert, 'expires')) {
@@ -166,8 +161,7 @@ trait ParserAlert
      *
      * @return string
      */
-    final protected function getAlertUrgency(\SimpleXMLElement $currentWarnAlert): string
-    {
+    final protected function getAlertUrgency(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'urgency')) {
@@ -176,7 +170,7 @@ trait ParserAlert
                 );
             }
 
-            return (string) $currentWarnAlert->{'urgency'};
+            return (string)$currentWarnAlert->{'urgency'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -192,8 +186,7 @@ trait ParserAlert
      *
      * @return string
      */
-    final protected function getAlertSeverity(\SimpleXMLElement $currentWarnAlert): string
-    {
+    final protected function getAlertSeverity(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'severity')) {
@@ -209,7 +202,7 @@ trait ParserAlert
                 $severity = 'Vorwarnung';
             } else {
                 // Warnung ist aktuell gültig -> daher Warnstufe ermitteln
-                switch ((string) $currentWarnAlert->{'severity'}) {
+                switch ((string)$currentWarnAlert->{'severity'}) {
                     case 'Minor':
                         $severity = 'Wetterwarnung';
 
@@ -231,7 +224,7 @@ trait ParserAlert
                 }
             }
 
-            return (string) $severity;
+            return (string)$severity;
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -247,8 +240,7 @@ trait ParserAlert
      *
      * @return int
      */
-    final protected function getAlertWarnstufe(\SimpleXMLElement $currentWarnAlert): int
-    {
+    final protected function getAlertWarnstufe(\SimpleXMLElement $currentWarnAlert): int {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'severity')) {
@@ -264,7 +256,7 @@ trait ParserAlert
                 $warnstufe = 0;
             } else {
                 // Warnung ist aktuell gültig -> daher Warnstufe ermitteln
-                switch ((string) $currentWarnAlert->{'severity'}) {
+                switch ((string)$currentWarnAlert->{'severity'}) {
                     case 'Minor':
                         $warnstufe = 1;
 
@@ -286,7 +278,7 @@ trait ParserAlert
                 }
             }
 
-            return (int) $warnstufe;
+            return (int)$warnstufe;
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -302,8 +294,7 @@ trait ParserAlert
      *
      * @return string
      */
-    final protected function getAlertEvent(\SimpleXMLElement $currentWarnAlert): string
-    {
+    final protected function getAlertEvent(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'event')) {
@@ -312,7 +303,7 @@ trait ParserAlert
                 );
             }
 
-            return (string) $currentWarnAlert->{'event'};
+            return (string)$currentWarnAlert->{'event'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -328,8 +319,7 @@ trait ParserAlert
      *
      * @return string
      */
-    final protected function getAlertHeadline(\SimpleXMLElement $currentWarnAlert): string
-    {
+    final protected function getAlertHeadline(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
@@ -338,7 +328,7 @@ trait ParserAlert
                 );
             }
 
-            return (string) $currentWarnAlert->{'headline'};
+            return (string)$currentWarnAlert->{'headline'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -354,8 +344,7 @@ trait ParserAlert
      *
      * @return string
      */
-    final protected function getAlertDescription(\SimpleXMLElement $currentWarnAlert): string
-    {
+    final protected function getAlertDescription(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
@@ -364,7 +353,7 @@ trait ParserAlert
                 );
             }
 
-            return (string) $currentWarnAlert->{'description'};
+            return (string)$currentWarnAlert->{'description'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -380,8 +369,7 @@ trait ParserAlert
      *
      * @return string
      */
-    final protected function getAlertInstruction(\SimpleXMLElement $currentWarnAlert): string
-    {
+    final protected function getAlertInstruction(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
@@ -390,7 +378,7 @@ trait ParserAlert
                 );
             }
 
-            return (string) $currentWarnAlert->{'instruction'};
+            return (string)$currentWarnAlert->{'instruction'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -406,8 +394,7 @@ trait ParserAlert
      *
      * @return string
      */
-    final protected function getAlertSender(\SimpleXMLElement $currentWarnAlert): string
-    {
+    final protected function getAlertSender(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
@@ -416,7 +403,7 @@ trait ParserAlert
                 );
             }
 
-            return (string) $currentWarnAlert->{'senderName'};
+            return (string)$currentWarnAlert->{'senderName'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -432,8 +419,7 @@ trait ParserAlert
      *
      * @return string
      */
-    final protected function getAlertWeb(\SimpleXMLElement $currentWarnAlert): string
-    {
+    final protected function getAlertWeb(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'web')) {
@@ -442,7 +428,7 @@ trait ParserAlert
                 );
             }
 
-            return (string) $currentWarnAlert->{'web'};
+            return (string)$currentWarnAlert->{'web'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -458,8 +444,7 @@ trait ParserAlert
      *
      * @return string
      */
-    final protected function getAlertIcon(\SimpleXMLElement $currentWarnAlert): string
-    {
+    final protected function getAlertIcon(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Zuordnungs-Tabelle öffnen
             $jsonZuordnung = file_get_contents(
@@ -488,12 +473,12 @@ trait ParserAlert
             $warnIconFilename = '';
             foreach ($warnIcons as $warnIconPart => $warnCodes) {
                 if (\in_array($eventcode, $warnCodes, true)) {
-                    if ((int) $this->getAlertWarnstufe($currentWarnAlert) < 0) {
+                    if ((int)$this->getAlertWarnstufe($currentWarnAlert) < 0) {
                         $warnIconFilename = 'warn_icons_' .
                             sprintf($warnIconPart, 0) . '.png';
                     } else {
                         $warnIconFilename = 'warn_icons_' .
-                            sprintf($warnIconPart, (int) $this->getAlertWarnstufe($currentWarnAlert)) . '.png';
+                            sprintf($warnIconPart, (int)$this->getAlertWarnstufe($currentWarnAlert)) . '.png';
                     }
                 }
             }
@@ -528,15 +513,14 @@ trait ParserAlert
      *
      * @return int
      */
-    final private function getEventCode(\SimpleXMLElement $currentWarnAlert): int
-    {
+    final private function getEventCode(\SimpleXMLElement $currentWarnAlert): int {
         try {
             $eventcode = -1;
             foreach ($currentWarnAlert->children() as $child) {
                 if ('eventCode' === $child->getName()) {
                     if (property_exists($child, 'valueName') && property_exists($child, 'value')) {
                         if ($child->{'valueName'}[0] === 'II') {
-                            $eventcode = (int) $child->{'value'};
+                            $eventcode = (int)$child->{'value'};
                         }
                     }
                 }

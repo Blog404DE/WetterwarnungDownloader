@@ -20,8 +20,7 @@ use Exception;
 /**
  * Definition der zwingend benötigten Methoden für eine Action-Klasse.
  */
-interface SendToInterface
-{
+interface SendToInterface {
     /**
      * Action Ausführung starten.
      *

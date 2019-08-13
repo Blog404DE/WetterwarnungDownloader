@@ -22,8 +22,7 @@ use SimpleXMLElement;
 /**
  * Parser-Hauptklasse für die Wetter-Warnungen des DWD.
  */
-class WetterWarnung extends Save\SaveToFile
-{
+class WetterWarnung extends Save\SaveToFile {
     use Extensions;
 
     /** @var Network\Network Instanz der Warnparser/Netzwerk Klasse */
@@ -46,8 +45,7 @@ class WetterWarnung extends Save\SaveToFile
      *
      * @throws Exception
      */
-    public function __construct()
-    {
+    public function __construct() {
         // Parent Constructor aufrufen
         parent::__construct();
 
@@ -95,8 +93,7 @@ class WetterWarnung extends Save\SaveToFile
      *
      * @throws
      */
-    public function prepareWetterWarnungen()
-    {
+    public function prepareWetterWarnungen() {
         try {
             // Starte verabeiten der Wetterwarnungen des DWD
             echo PHP_EOL . '*** Starte Vorbereitungen::' . PHP_EOL;
@@ -146,8 +143,7 @@ class WetterWarnung extends Save\SaveToFile
      *
      * @throws Exception
      */
-    public function parseWetterWarnungen(int $warnCellId, string $stateCode)
-    {
+    public function parseWetterWarnungen(int $warnCellId, string $stateCode) {
         try {
             // Lade zuletzt verarbeitete Wetterwarnungen
             $this->loadLastWetterWarnungen($this->localJsonFile);
@@ -174,7 +170,7 @@ class WetterWarnung extends Save\SaveToFile
                     // State noch hinzufügen
                     $currentWarnData['identifier'] = $this->getHeaderIdentifier($xml);
                     $currentWarnData['msgType'] = ucfirst($this->getHeaderMsgType($xml));
-                    $currentWarnData['reference'] = (string) $this->getHeaderReference($xml);
+                    $currentWarnData['reference'] = (string)$this->getHeaderReference($xml);
                     $arrRohWarnungen[basename($xmlFile)] = $currentWarnData;
                 }
             }
@@ -219,8 +215,7 @@ class WetterWarnung extends Save\SaveToFile
      *
      * @return bool
      */
-    public function saveToFile(bool $cleanCache): bool
-    {
+    public function saveToFile(bool $cleanCache): bool {
         // Speichere lokale JSON Datei
         echo PHP_EOL . '*** Speichere Wetter-Warnungen in eine Datei: ' . PHP_EOL;
         $status = $this->saveFile($this->wetterWarnungen, $this->localJsonFile);
@@ -251,8 +246,7 @@ class WetterWarnung extends Save\SaveToFile
      *
      * @throws
      */
-    public function setLocalFolder(string $localFolder)
-    {
+    public function setLocalFolder(string $localFolder) {
         if (is_dir($localFolder)) {
             if (is_writable($localFolder)) {
                 // Ordner an Parent-Klasse weitergeben
@@ -272,8 +266,7 @@ class WetterWarnung extends Save\SaveToFile
      *
      * @throws
      */
-    public function setLocalJsonFile(string $localJsonFile)
-    {
+    public function setLocalJsonFile(string $localJsonFile) {
         if (empty($localJsonFile)) {
             throw new Exception('Es wurde keine JSON-Datei zals Ziel für die Wetterwarnungen angegeben.');
         }
@@ -309,8 +302,7 @@ class WetterWarnung extends Save\SaveToFile
      *
      * @return array Liste mit Wetterwarnungen
      */
-    public function getWetterWarnungen(): array
-    {
+    public function getWetterWarnungen(): array {
         return $this->wetterWarnungen;
     }
 
@@ -319,8 +311,7 @@ class WetterWarnung extends Save\SaveToFile
      *
      * @return bool|string
      */
-    public function getTmpFolder()
-    {
+    public function getTmpFolder() {
         return $this->tmpFolder;
     }
 
@@ -333,8 +324,7 @@ class WetterWarnung extends Save\SaveToFile
      *
      * @return \SimpleXMLElement
      */
-    private function readXmlFile(string $xmlFile)
-    {
+    private function readXmlFile(string $xmlFile) {
         echo "\tPrüfe " . basename($xmlFile) .
             ' (' . number_format(round(filesize($xmlFile) / 1024, 2), 2) . ' kbyte): ';
 

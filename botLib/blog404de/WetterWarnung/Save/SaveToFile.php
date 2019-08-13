@@ -22,8 +22,7 @@ use Exception;
 /**
  * Klasse für das speichern der aktuell gültigen Wetterwarnungen in eine einzelne Datei.
  */
-class SaveToFile extends Parser
-{
+class SaveToFile extends Parser {
     /** @var Standard\Toolbox Instanz der generischen Toolbox-Klasse */
     private $toolbox;
 
@@ -35,8 +34,7 @@ class SaveToFile extends Parser
      *
      * @throws Exception
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->toolbox = new Standard\Toolbox();
     }
 
@@ -50,8 +48,7 @@ class SaveToFile extends Parser
      *
      * @return bool
      */
-    public function saveFile(array $wetterWarnungen, string $localJsonFile)
-    {
+    public function saveFile(array $wetterWarnungen, string $localJsonFile) {
         try {
             // Prüfe ob Zugriff auf json-Datei existiert
             if (empty($localJsonFile) || !is_writable($localJsonFile)) {
@@ -107,8 +104,7 @@ class SaveToFile extends Parser
      *
      * @return bool
      */
-    public function didWetterWarnungExist(array $parsedWarnInfo): bool
-    {
+    public function didWetterWarnungExist(array $parsedWarnInfo): bool {
         try {
             $hashExists = false;
 
@@ -153,8 +149,7 @@ class SaveToFile extends Parser
      *
      * @throws Exception
      */
-    final protected function loadLastWetterWarnungen(string $localJsonFile)
-    {
+    final protected function loadLastWetterWarnungen(string $localJsonFile) {
         try {
             // Nehme zuerst die bisherigen Wetterwarnungen in den Speicher
             echo PHP_EOL . '*** Lade zuerst den bisherigen Stand der WetterWarnungen:' . PHP_EOL;
@@ -207,8 +202,7 @@ class SaveToFile extends Parser
      *
      * @return bool
      */
-    private function shouldSaveFile(string $jsonWetterWarnung, string $localJsonFile): bool
-    {
+    private function shouldSaveFile(string $jsonWetterWarnung, string $localJsonFile): bool {
         try {
             // Ermittle MD5-Hashes der bisherigen und ehemaligen Wetterwarnungen
             echo "\t* Ermittle MD5-Hashs der bisherigen Wetterwarnung und " .

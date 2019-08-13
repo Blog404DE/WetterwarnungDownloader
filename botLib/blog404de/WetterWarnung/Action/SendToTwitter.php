@@ -21,8 +21,7 @@ use Exception;
 /**
  * Action-Klasse für WetterWarnung Downloader zum senden eines Tweets bei einer neuen Nachricht.
  */
-class SendToTwitter implements SendToInterface
-{
+class SendToTwitter implements SendToInterface {
     /** @var TwitterOAuth Twitter-Klasse */
     private $connectionId;
 
@@ -40,8 +39,7 @@ class SendToTwitter implements SendToInterface
      *
      * @throws Exception
      */
-    public function __construct()
-    {
+    public function __construct() {
         try {
             // TwitterOAuth-Klasse Pfad ermitteln
             $composerAutoloader = realpath(
@@ -82,8 +80,7 @@ class SendToTwitter implements SendToInterface
      *
      * @return int
      */
-    public function startAction(array $parsedWarnInfo, bool $warnExists): int
-    {
+    public function startAction(array $parsedWarnInfo, bool $warnExists): int {
         try {
             // Prüfe ob alles konfiguriert ist
             if ($this->getConfig()) {
@@ -174,8 +171,7 @@ class SendToTwitter implements SendToInterface
      *
      * @throws Exception
      */
-    public function setConfig(array $config)
-    {
+    public function setConfig(array $config) {
         try {
             $configParameter = [
                 'consumerKey', 'consumerSecret',
@@ -206,8 +202,7 @@ class SendToTwitter implements SendToInterface
      *
      * @return array
      */
-    public function getConfig(): array
-    {
+    public function getConfig(): array {
         return $this->config;
     }
 
@@ -218,8 +213,7 @@ class SendToTwitter implements SendToInterface
      *
      * @throws Exception
      */
-    private function sendTweet(array $tweetParameter)
-    {
+    private function sendTweet(array $tweetParameter) {
         try {
             // Sende Tweet
             echo "\t\t -> Sende Tweet " .
@@ -246,8 +240,7 @@ class SendToTwitter implements SendToInterface
      *
      * @throws Exception
      */
-    private function updatePlaceIdInfo()
-    {
+    private function updatePlaceIdInfo() {
         try {
             // Ort ermitteln?
             if (!empty($this->config['TweetPlace']) && false !== $this->config['TweetPlace']) {
@@ -314,8 +307,7 @@ class SendToTwitter implements SendToInterface
      *
      * @return int
      */
-    private function getTweetLength(string $tweet): int
-    {
+    private function getTweetLength(string $tweet): int {
         try {
             // Länge des Tweets ermitteln und ersetze URL durch Dummy-Text mit der Länge des URL Short
             // Service von Twitter
@@ -342,8 +334,7 @@ class SendToTwitter implements SendToInterface
      *
      * @return string
      */
-    private function composeAttachment(array $parsedWarnInfo): string
-    {
+    private function composeAttachment(array $parsedWarnInfo): string {
         try {
             $message = '';
 
@@ -376,8 +367,7 @@ class SendToTwitter implements SendToInterface
      *
      * @return array
      */
-    private function composeMessage(array $parsedWarnInfo): array
-    {
+    private function composeMessage(array $parsedWarnInfo): array {
         try {
             // Aktualisiere bei Bedarf die PlaceID Informationen
             $this->updatePlaceIdInfo();
@@ -448,8 +438,7 @@ class SendToTwitter implements SendToInterface
      *
      * @return string
      */
-    private function getErrorText($code): string
-    {
+    private function getErrorText($code): string {
         try {
             $error = [
                 200 => 'Success.',
