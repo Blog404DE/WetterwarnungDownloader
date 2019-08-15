@@ -23,7 +23,8 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 ### Vorraussetzungen:
 
 - Linux oder macOS (unter Debian und macOS 10.13.2 getestet)
-- PHP 7.0.0 (oder neuer) inklusive ftp-, mhash, mbstring *(neu)* und zip-Modul aktiv
+- PHP 7.0.0 (oder neuer) 
+- Folgende PHP Module werden benötigt: simplexml, json, ftp, pdo, zip, libxml, curl
 - (optional) MySQL-Datenbank
 - wget
 
@@ -41,4 +42,4 @@ Solltet Ihr Fragen oder Anregungen haben, so steht euch offen sich jederzeit an 
 --
 ##### Lizenz-Information:
 
-Copyright Jens Dutzi 2015-2018 / Stand: 01.05.2018 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
+Copyright Jens Dutzi 2015-2019 / Stand: 15.08.2019 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)

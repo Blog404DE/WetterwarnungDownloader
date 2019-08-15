@@ -1,5 +1,14 @@
 # Changelog
 
+2019-08-15, 3.1.0 stable
+----------
+
+* Vereinfachte Installation/Download des Scripts über composer
+* Kompatiblität verbessert mit künftigen PHP Versionen
+* (BUGFIX) ITFFF Unterstützung korrigiert (konnte zu Error 400 führen)
+* (NEU) Aktivierung von strict_types=1
+* Mehrere kleinere Korrekturen im zusammehang mit der strengen Typisierung
+
 2018-03-26, 3.0.3 stable
 ----------
 
