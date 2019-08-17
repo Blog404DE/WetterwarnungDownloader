@@ -1,6 +1,6 @@
 # Changelog
 
-2019-08-15, 3.1.0 stable
+2019-08-17, 3.1.0 stable
 ----------
 
 * Vereinfachte Installation/Download des Scripts über composer
