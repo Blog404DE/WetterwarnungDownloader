@@ -1,16 +1,24 @@
 language: php
 php:
-  - '7.0'
-  - '7.1'
-  - '7.2'
-  - '7.3'
+    - '7.0'
+    - '7.1'
+    - '7.2'
+    - '7.3'
+branches:
+    only:
+        - master
+        - develop
 before_script:
-  - composer self-update
-  - composer update
+    - composer self-update
+    - composer update
 script:
-  - "./vendor/bin/phpcf -t ${TRAVIS_PHP_VERSION} getWetterWarnung.php config.sample.php ./botLib"
-  - "./vendor/bin/phpcpd --no-interaction getWetterWarnung.php config.sample.php ./botLib"
-  - "./vendor/bin/phpcs --colors --standard=PSR1 --extensions=php getWetterWarnung.php config.sample.php botLib/*"
+    - "find . -name \\*.php -not -path ./.idea/\\* -not -path ./vendor/\\* -exec php -lf {} \\;"
+    - "./vendor/bin/phpcf -t ${TRAVIS_PHP_VERSION} getWetterWarnung.php config.sample.php ./botLib"
+    - "./vendor/bin/phpcpd --no-interaction getWetterWarnung.php config.sample.php ./botLib"
+    - "./vendor/bin/phpcs --colors --standard=PSR1 --extensions=php getWetterWarnung.php config.sample.php botLib/*"
+    - "./vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run --stop-on-violation"
+    - "./vendor/bin/phpmd getWetterWarnung.php text phpmd.xml"
+    - "./vendor/bin/phpmd botLib/ text phpmd.xml"
 cache:
-  directories:
-    - $HOME/.composer/cache/files
+    directories:
+        - $HOME/.composer/cache/files
