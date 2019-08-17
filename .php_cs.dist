@@ -1,0 +1,60 @@
+<?php
+$header = <<<EOF
+ WarnParser für neuthardwetter.de by Jens Dutzi
+
+ @package    blog404de\WetterWarnung
+ @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
+ @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ @version    v3.1.0
+ @link       https://github.com/Blog404DE/WetterwarnungDownloader
+EOF;
+
+$finder = PhpCsFixer\Finder::create()
+    ->exclude('Resources')
+    ->exclude('dev')
+    ->in([__DIR__, __DIR__.'/botLib'])
+;
+
+return PhpCsFixer\Config::create()
+    ->setRules([
+        '@Symfony' => true,
+        '@PSR1' => true,
+        '@Symfony:risky' => true,
+        '@PHP56Migration' => true,
+        '@PHP56Migration:risky' => true,
+        '@PHP70Migration' => true,
+        '@PHP70Migration:risky' => true,
+        '@PHPUnit60Migration:risky' => true,
+        '@PhpCsFixer' => true,
+        '@PhpCsFixer:risky' => true,
+        'array_syntax' => ['syntax' => 'short'],
+        'general_phpdoc_annotation_remove' => [
+            'expectedException',
+            'expectedExceptionMessage',
+        ],
+        'header_comment' => ['header' => $header],
+        'linebreak_after_opening_tag' => true,
+        'native_function_invocation' => [
+            'include' => ['@compiler_optimized'],
+        ],
+        'concat_space' => [
+            'spacing' => 'one'
+        ],
+		'cast_spaces' => [
+            'space' => 'none'
+        ],
+		'braces' => [
+			'position_after_control_structures' => 'same',
+			'position_after_functions_and_oop_constructs' => 'same',
+			'position_after_anonymous_constructs' => 'same'
+		],
+        'backtick_to_shell_exec' => true,
+        'mb_str_functions' => true,
+        'no_php4_constructor' => true,
+        'simplified_null_return' => true
+    ])
+    ->setFinder($finder)
+    ->setRiskyAllowed(true)
+    ->setUsingCache(false)
+;

@@ -1,44 +1,92 @@
 <?php
-/**
- * WarnParser für neuthardwetter.de by Jens Dutzi - ParserAlert.php
+
+declare(strict_types=1);
+
+/*
+ *  WarnParser für neuthardwetter.de by Jens Dutzi
  *
- * @package    blog404de\WetterWarnung
- * @author     Jens Dutzi <jens.dutzi@tf-network.de>
- * @copyright  Copyright (c) 2012-2018 Jens Dutzi (http://www.neuthardwetter.de)
- * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- * @version    v3.0.2
- * @link       https://github.com/Blog404DE/WetterwarnungDownloader
+ *  @package    blog404de\WetterWarnung
+ *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
+ *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *  @version    v3.1.0
+ *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
 namespace blog404de\WetterWarnung\Reader;
 
 use blog404de\Standard\Toolbox;
-use Exception;
 use DateTime;
 use DateTimeZone;
+use Exception;
 
 /**
- * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei
- *
- * @package blog404de\WetterWarnung\Reader
+ * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.
  */
-trait ParserAlert
-{
+trait ParserAlert {
     /** @var string $localIconFolder Ordner in denen sich die Warnlagen-Icons befinden */
-    private $localIconFolder = "";
+    private $localIconFolder = '';
 
     /**
-     * Startzeitpunkt der Wetterwarnung ermitteln
+     * Setter für den Ordner in dem sich die Warnlagen-Icons befinden.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return DateTime
+     * @param string $localIconFolder Pfad zum Ordner mit den Warnlagen-Icons
+     *
      * @throws Exception
      */
-    final protected function getAlertStartzeit(\SimpleXMLElement $currentWarnAlert): \DateTime
-    {
+    public function setLocalIconFolder(string $localIconFolder) {
+        try {
+            if (!empty($localIconFolder) && false !== $localIconFolder) {
+                if (!is_readable(
+                    realpath($localIconFolder . \DIRECTORY_SEPARATOR . 'zuordnung.json')
+                )) {
+                    // Kein Zugriff auf Datei möglich
+                    throw new Exception(
+                        'JSON Datei mit der Zuordnung der Warnlagen-Icons kann nicht in ' .
+                        realpath($localIconFolder) . \DIRECTORY_SEPARATOR .
+                        'zuordnung.json geöffnet werden'
+                    );
+                }
+            } else {
+                $localIconFolder = '';
+            }
+
+            $this->localIconFolder = $localIconFolder;
+        } catch (Exception $e) {
+            // Fehler an Hauptklasse weitergeben
+            throw $e;
+        }
+    }
+
+    /**
+     * Getter für den Ordner in dem sich die Warnlagen-Icons befinden.
+     *
+     * @throws Exception
+     *
+     * @return string
+     */
+    public function getLocalIconFolder(): string {
+        try {
+            return  $this->localIconFolder;
+        } catch (Exception $e) {
+            // Fehler an Hauptklasse weitergeben
+            throw $e;
+        }
+    }
+
+    /**
+     * Startzeitpunkt der Wetterwarnung ermitteln.
+     *
+     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     *
+     * @throws Exception
+     *
+     * @return DateTime
+     */
+    final protected function getAlertStartzeit(\SimpleXMLElement $currentWarnAlert): DateTime {
         try {
             // Startzeitpunkt ermitteln
-            if (!property_exists($currentWarnAlert, "onset")) {
+            if (!property_exists($currentWarnAlert, 'onset')) {
                 throw new Exception(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'onset'."
                 );
@@ -47,17 +95,16 @@ trait ParserAlert
             $objDateOnSet = new DateTime();
             $objDateOnset = $objDateOnSet->createFromFormat(
                 'Y-m-d*H:i:sT',
-                $currentWarnAlert->{"onset"}->__toString()
+                $currentWarnAlert->{'onset'}->__toString()
             );
             if (!$objDateOnset) {
                 throw new Exception(
-                    "Die aktuell verarbeitete Roh-Wetterwarnung beinhaltet ungültige Daten im " .
+                    'Die aktuell verarbeitete Roh-Wetterwarnung beinhaltet ungültige Daten im ' .
                     "XML-Node 'warnung'->'onset'."
                 );
-            } else {
-                // Zeitzone auf Deutschland umstellen
-                $objDateOnset->setTimezone(new DateTimeZone("Europe/Berlin"));
             }
+            // Zeitzone auf Deutschland umstellen
+            $objDateOnset->setTimezone(new DateTimeZone('Europe/Berlin'));
 
             return $objDateOnset;
         } catch (Exception $e) {
@@ -67,17 +114,18 @@ trait ParserAlert
     }
 
     /**
-     * Endzeitpunkt der Wetterwarnung ermitteln
+     * Endzeitpunkt der Wetterwarnung ermitteln.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return DateTime
+     *
      * @throws Exception
+     *
+     * @return DateTime
      */
-    final protected function getAlertEndzeit(\SimpleXMLElement $currentWarnAlert): \DateTime
-    {
+    final protected function getAlertEndzeit(\SimpleXMLElement $currentWarnAlert): DateTime {
         try {
             // Endzeitpunkt ermitteln
-            if (!property_exists($currentWarnAlert, "expires")) {
+            if (!property_exists($currentWarnAlert, 'expires')) {
                 // Falls Expire-Erzeitpunkt fehlt, nehme den normalen Start-Zeitpunkt
                 $objDateExpire = $this->getAlertStartzeit($currentWarnAlert);
             } else {
@@ -85,17 +133,16 @@ trait ParserAlert
                 $objDateExpire = new DateTime();
                 $objDateExpire = $objDateExpire->createFromFormat(
                     'Y-m-d*H:i:sT',
-                    $currentWarnAlert->{"expires"}->__toString()
+                    $currentWarnAlert->{'expires'}->__toString()
                 );
                 if (!$objDateExpire) {
                     throw new Exception(
-                        "Die aktuell verarbeitete Roh-Wetterwarnung beinhaltet ungültige Daten im " .
+                        'Die aktuell verarbeitete Roh-Wetterwarnung beinhaltet ungültige Daten im ' .
                         "XML-Node 'warnung'->'expires'."
                     );
-                } else {
-                    // Zeitzone auf Deutschland umstellen
-                    $objDateExpire->setTimezone(new DateTimeZone("Europe/Berlin"));
                 }
+                // Zeitzone auf Deutschland umstellen
+                $objDateExpire->setTimezone(new DateTimeZone('Europe/Berlin'));
             }
 
             return $objDateExpire;
@@ -106,23 +153,24 @@ trait ParserAlert
     }
 
     /**
-     * Urgency-Typ aus der Wetterwarnung auslesen
+     * Urgency-Typ aus der Wetterwarnung auslesen.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return String
+     *
      * @throws Exception
+     *
+     * @return string
      */
-    final protected function getAlertUrgency(\SimpleXMLElement $currentWarnAlert): String
-    {
+    final protected function getAlertUrgency(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
-            if (!property_exists($currentWarnAlert, "urgency")) {
+            if (!property_exists($currentWarnAlert, 'urgency')) {
                 throw new Exception(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'urgency'."
                 );
             }
 
-            return (string)$currentWarnAlert->{"urgency"};
+            return (string)$currentWarnAlert->{'urgency'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -130,44 +178,49 @@ trait ParserAlert
     }
 
     /**
-     * Warnstufe (Text) der Meldung der Wetterwarnung auslesen
+     * Warnstufe (Text) der Meldung der Wetterwarnung auslesen.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return string
+     *
      * @throws Exception
+     *
+     * @return string
      */
-    final protected function getAlertSeverity(\SimpleXMLElement $currentWarnAlert): string
-    {
+    final protected function getAlertSeverity(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
-            if (!property_exists($currentWarnAlert, "severity")) {
+            if (!property_exists($currentWarnAlert, 'severity')) {
                 throw new Exception(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'severity'."
                 );
             }
 
-            if ($this->getAlertUrgency($currentWarnAlert) == "Future"
+            if ('Future' === $this->getAlertUrgency($currentWarnAlert)
                 || $this->getAlertStartzeit($currentWarnAlert)->getTimestamp() > time()
             ) {
                 // Warnung liegt in der Zukunft -> daher Warnstufe auf 0 setzen
-                $severity = "Vorwarnung";
+                $severity = 'Vorwarnung';
             } else {
                 // Warnung ist aktuell gültig -> daher Warnstufe ermitteln
-                switch ((string)$currentWarnAlert->{"severity"}) {
-                    case "Minor":
-                        $severity = "Wetterwarnung";
+                switch ((string)$currentWarnAlert->{'severity'}) {
+                    case 'Minor':
+                        $severity = 'Wetterwarnung';
+
                         break;
-                    case "Moderate":
-                        $severity = "Markantes Wetter";
+                    case 'Moderate':
+                        $severity = 'Markantes Wetter';
+
                         break;
-                    case "Severe":
-                        $severity = "Unwetterwarnung";
+                    case 'Severe':
+                        $severity = 'Unwetterwarnung';
+
                         break;
-                    case "Extreme":
-                        $severity = "Extreme Unwetterwarnung";
+                    case 'Extreme':
+                        $severity = 'Extreme Unwetterwarnung';
+
                         break;
                     default:
-                        $severity = "Unbekannt";
+                        $severity = 'Unbekannt';
                 }
             }
 
@@ -179,41 +232,46 @@ trait ParserAlert
     }
 
     /**
-     * Warnstufe (Zahl) der Meldung der Wetterwarnung auslesen
+     * Warnstufe (Zahl) der Meldung der Wetterwarnung auslesen.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return int
+     *
      * @throws Exception
+     *
+     * @return int
      */
-    final protected function getAlertWarnstufe(\SimpleXMLElement $currentWarnAlert): int
-    {
+    final protected function getAlertWarnstufe(\SimpleXMLElement $currentWarnAlert): int {
         try {
             // Prüfe ob Feld in XML Datei existiert
-            if (!property_exists($currentWarnAlert, "severity")) {
+            if (!property_exists($currentWarnAlert, 'severity')) {
                 throw new Exception(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'severity'."
                 );
             }
 
-            if ($this->getAlertUrgency($currentWarnAlert) == "Future"
+            if ('Future' === $this->getAlertUrgency($currentWarnAlert)
                 || $this->getAlertStartzeit($currentWarnAlert)->getTimestamp() > time()
             ) {
                 // Warnung liegt in der Zukunft -> daher Warnstufe auf 0 setzen
                 $warnstufe = 0;
             } else {
                 // Warnung ist aktuell gültig -> daher Warnstufe ermitteln
-                switch ((string)$currentWarnAlert->{"severity"}) {
-                    case "Minor":
+                switch ((string)$currentWarnAlert->{'severity'}) {
+                    case 'Minor':
                         $warnstufe = 1;
+
                         break;
-                    case "Moderate":
+                    case 'Moderate':
                         $warnstufe = 2;
+
                         break;
-                    case "Severe":
+                    case 'Severe':
                         $warnstufe = 3;
+
                         break;
-                    case "Extreme":
+                    case 'Extreme':
                         $warnstufe = 4;
+
                         break;
                     default:
                         $warnstufe = -1;
@@ -228,23 +286,24 @@ trait ParserAlert
     }
 
     /**
-     * Event-Typ aus der Wetterwarnung auslesen
+     * Event-Typ aus der Wetterwarnung auslesen.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return String
+     *
      * @throws Exception
+     *
+     * @return string
      */
-    final protected function getAlertEvent(\SimpleXMLElement $currentWarnAlert): String
-    {
+    final protected function getAlertEvent(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
-            if (!property_exists($currentWarnAlert, "event")) {
+            if (!property_exists($currentWarnAlert, 'event')) {
                 throw new Exception(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'event'."
                 );
             }
 
-            return (string)$currentWarnAlert->{"event"};
+            return (string)$currentWarnAlert->{'event'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -252,23 +311,24 @@ trait ParserAlert
     }
 
     /**
-     * headline aus der Wetterwarnung auslesen
+     * headline aus der Wetterwarnung auslesen.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return String
+     *
      * @throws Exception
+     *
+     * @return string
      */
-    final protected function getAlertHeadline(\SimpleXMLElement $currentWarnAlert): String
-    {
+    final protected function getAlertHeadline(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
-            if (!property_exists($currentWarnAlert, "headline")) {
+            if (!property_exists($currentWarnAlert, 'headline')) {
                 throw new Exception(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'headline'."
                 );
             }
 
-            return (string)$currentWarnAlert->{"headline"};
+            return (string)$currentWarnAlert->{'headline'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -276,23 +336,24 @@ trait ParserAlert
     }
 
     /**
-     * description aus der Wetterwarnung auslesen
+     * description aus der Wetterwarnung auslesen.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return String
+     *
      * @throws Exception
+     *
+     * @return string
      */
-    final protected function getAlertDescription(\SimpleXMLElement $currentWarnAlert): String
-    {
+    final protected function getAlertDescription(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
-            if (!property_exists($currentWarnAlert, "headline")) {
+            if (!property_exists($currentWarnAlert, 'headline')) {
                 throw new Exception(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'description'."
                 );
             }
 
-            return (string)$currentWarnAlert->{"description"};
+            return (string)$currentWarnAlert->{'description'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -300,23 +361,24 @@ trait ParserAlert
     }
 
     /**
-     * instruction aus der Wetterwarnung auslesen
+     * instruction aus der Wetterwarnung auslesen.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return String
+     *
      * @throws Exception
+     *
+     * @return string
      */
-    final protected function getAlertInstruction(\SimpleXMLElement $currentWarnAlert): String
-    {
+    final protected function getAlertInstruction(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
-            if (!property_exists($currentWarnAlert, "headline")) {
+            if (!property_exists($currentWarnAlert, 'headline')) {
                 throw new Exception(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'instruction'."
                 );
             }
 
-            return (string)$currentWarnAlert->{"instruction"};
+            return (string)$currentWarnAlert->{'instruction'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -324,23 +386,24 @@ trait ParserAlert
     }
 
     /**
-     * senderName aus der Wetterwarnung auslesen
+     * senderName aus der Wetterwarnung auslesen.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return String
+     *
      * @throws Exception
+     *
+     * @return string
      */
-    final protected function getAlertSender(\SimpleXMLElement $currentWarnAlert): String
-    {
+    final protected function getAlertSender(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
-            if (!property_exists($currentWarnAlert, "headline")) {
+            if (!property_exists($currentWarnAlert, 'headline')) {
                 throw new Exception(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'senderName'."
                 );
             }
 
-            return (string)$currentWarnAlert->{"senderName"};
+            return (string)$currentWarnAlert->{'senderName'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -348,23 +411,24 @@ trait ParserAlert
     }
 
     /**
-     * web aus der Wetterwarnung auslesen
+     * web aus der Wetterwarnung auslesen.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return String
+     *
      * @throws Exception
+     *
+     * @return string
      */
-    final protected function getAlertWeb(\SimpleXMLElement $currentWarnAlert): String
-    {
+    final protected function getAlertWeb(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
-            if (!property_exists($currentWarnAlert, "web")) {
+            if (!property_exists($currentWarnAlert, 'web')) {
                 throw new Exception(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'web'."
                 );
             }
 
-            return (string)$currentWarnAlert->{"web"};
+            return (string)$currentWarnAlert->{'web'};
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -372,50 +436,23 @@ trait ParserAlert
     }
 
     /**
-     * Event-Code ermitteln für die spätere Icon-Auflösung
+     * Icon passend zum WarnEvent ermitteln.
      *
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return Int
-     * @throws Exception
-     */
-    final private function getEventCode(\SimpleXMLElement $currentWarnAlert): Int
-    {
-        try {
-            $eventcode = -1;
-            foreach ($currentWarnAlert->children() as $child) {
-                if ($child->getName() == "eventCode") {
-                    if (property_exists($child, "valueName") && property_exists($child, "value")) {
-                        if ($child->{"valueName"}[0] == "II") {
-                            $eventcode = (int)$child->{"value"};
-                        }
-                    }
-                }
-            }
-
-            return $eventcode;
-        } catch (Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
-        }
-    }
-
-    /**
-     * Icon passend zum WarnEvent ermitteln
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
-     * @return String
      * @throws Exception
+     *
+     * @return string
      */
-    final protected function getAlertIcon(\SimpleXMLElement $currentWarnAlert): String
-    {
+    final protected function getAlertIcon(\SimpleXMLElement $currentWarnAlert): string {
         try {
             // Zuordnungs-Tabelle öffnen
             $jsonZuordnung = file_get_contents(
-                $this->getLocalIconFolder() . DIRECTORY_SEPARATOR . "zuordnung.json"
+                $this->getLocalIconFolder() . \DIRECTORY_SEPARATOR . 'zuordnung.json'
             );
-            if ($jsonZuordnung === false) {
+            if (false === $jsonZuordnung) {
                 throw new Exception(
-                    "Die Datei zuordnung.json innerhalb des Icon-Ordners konnte nicht geöffnet werden."
+                    'Die Datei zuordnung.json innerhalb des Icon-Ordners konnte nicht geöffnet werden.'
                 );
             }
 
@@ -423,40 +460,41 @@ trait ParserAlert
             $warnIcons = json_decode($jsonZuordnung, true);
             if (json_last_error()) {
                 $toolbox = new Toolbox();
+
                 throw new Exception(
-                    "Fehler beim interpretieren Icon-Zuordnung Datei (" .
-                    $toolbox->getJsonErrorMessage(json_last_error()) . ")"
+                    'Fehler beim interpretieren Icon-Zuordnung Datei (' .
+                    $toolbox->getJsonErrorMessage(json_last_error()) . ')'
                 );
             }
 
             // Eventcode ermitteln
             $eventcode = $this->getEventCode($currentWarnAlert);
 
-            $warnIconFilename = "";
+            $warnIconFilename = '';
             foreach ($warnIcons as $warnIconPart => $warnCodes) {
-                if (in_array($eventcode, $warnCodes)) {
+                if (\in_array($eventcode, $warnCodes, true)) {
                     if ((int)$this->getAlertWarnstufe($currentWarnAlert) < 0) {
-                        $warnIconFilename =  "warn_icons_" .
-                            sprintf($warnIconPart, 0) . ".png";
+                        $warnIconFilename = 'warn_icons_' .
+                            sprintf($warnIconPart, 0) . '.png';
                     } else {
-                        $warnIconFilename =  "warn_icons_" .
-                            sprintf($warnIconPart, (int)$this->getAlertWarnstufe($currentWarnAlert)) . ".png";
+                        $warnIconFilename = 'warn_icons_' .
+                            sprintf($warnIconPart, (int)$this->getAlertWarnstufe($currentWarnAlert)) . '.png';
                     }
                 }
             }
 
             // Prüfe ob WarnFile existiert
             if (empty($warnIconFilename)) {
-                echo(
+                echo
                     "\t\t* Warnung: Für den Warn-Event Code  " . $eventcode .
-                    " wurde in der zuordnung.json noch kein Warn-Icon zugeordnet (ggf. neuer Warn-Code?)". PHP_EOL
-                );
-            } elseif (!is_readable($this->getLocalIconFolder() . DIRECTORY_SEPARATOR . $warnIconFilename)) {
-                echo(
+                    ' wurde in der zuordnung.json noch kein Warn-Icon zugeordnet (ggf. neuer Warn-Code?)' . PHP_EOL
+                ;
+            } elseif (!is_readable($this->getLocalIconFolder() . \DIRECTORY_SEPARATOR . $warnIconFilename)) {
+                echo
                     "\t\t* Warnung: Zugeordnetes Wetter-Icon " .
-                    $warnIconFilename . " steht nicht zur Verfügung. Verwende daher kein Warn-Icon". PHP_EOL
-                );
-                $warnIconFilename = "";
+                    $warnIconFilename . ' steht nicht zur Verfügung. Verwende daher kein Warn-Icon' . PHP_EOL
+                ;
+                $warnIconFilename = '';
             }
 
             return $warnIconFilename;
@@ -466,48 +504,29 @@ trait ParserAlert
         }
     }
 
-
     /**
-     * Setter für den Ordner in dem sich die Warnlagen-Icons befinden
+     * Event-Code ermitteln für die spätere Icon-Auflösung.
      *
-     * @param string $localIconFolder Pfad zum Ordner mit den Warnlagen-Icons
+     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     *
      * @throws Exception
+     *
+     * @return int
      */
-    public function setLocalIconFolder(string $localIconFolder)
-    {
+    final private function getEventCode(\SimpleXMLElement $currentWarnAlert): int {
         try {
-            if (!empty($localIconFolder) && $localIconFolder !== false) {
-                if (!is_readable(
-                    realpath($localIconFolder . DIRECTORY_SEPARATOR . "zuordnung.json")
-                )) {
-                    // Kein Zugriff auf Datei möglich
-                    throw new Exception(
-                        "JSON Datei mit der Zuordnung der Warnlagen-Icons kann nicht in " .
-                        realpath($localIconFolder) . DIRECTORY_SEPARATOR .
-                        "zuordnung.json geöffnet werden"
-                    );
+            $eventcode = -1;
+            foreach ($currentWarnAlert->children() as $child) {
+                if ('eventCode' === $child->getName()) {
+                    if (property_exists($child, 'valueName') && property_exists($child, 'value')) {
+                        if ($child->{'valueName'}[0] === 'II') {
+                            $eventcode = (int)$child->{'value'};
+                        }
+                    }
                 }
-            } else {
-                $localIconFolder = "";
             }
 
-            $this->localIconFolder = $localIconFolder;
-        } catch (Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
-        }
-    }
-
-    /**
-     * Getter für den Ordner in dem sich die Warnlagen-Icons befinden
-     *
-     * @return string
-     * @throws Exception
-     */
-    public function getLocalIconFolder() : string
-    {
-        try {
-            return  $this->localIconFolder;
+            return $eventcode;
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
