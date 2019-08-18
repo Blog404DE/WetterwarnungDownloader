@@ -22,14 +22,15 @@
         "issues": "https://github.com/Blog404DE/WetterwarnungDownloader/issues"
     },
     "require": {
-        "abraham/twitteroauth":    "@stable",
+        "php": "^7.0 <7.4",
         "ext-simplexml": "*",
         "ext-json": "*",
         "ext-ftp": "*",
         "ext-pdo": "*",
         "ext-zip": "*",
         "ext-libxml": "*",
-        "ext-curl": "*"
+        "ext-curl": "*",
+        "abraham/twitteroauth": "@stable"
     },
     "require-dev": {
         "phpmd/phpmd": "*",

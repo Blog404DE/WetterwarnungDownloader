@@ -1,5 +1,10 @@
 # Changelog
 
+2019-08-18, 3.1.1 stable
+----------
+
+* (BUGFIX) Fehler in der composer.json korrigiert (require für PHP hinzugefügt) 
+
 2019-08-17, 3.1.0 stable
 ----------
 
