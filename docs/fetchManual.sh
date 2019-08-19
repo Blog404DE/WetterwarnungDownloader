@@ -2,10 +2,10 @@
 
 echo "Lade Dbase-Datenbank mit WarnCellID und Bundesland"
 echo "-> cap_community_shape_dwd_zip"
-wget -q -O cap_community_shape_dwd_zip.zip "https://www.dwd.de/DE/leistungen/opendata/help/warnungen/cap_community_shape_dwd_zip.zip?__blob=publicationFile&v=2"
+wget -q -O cap_community_shape_dwd_zip.zip "https://www.dwd.de/DE/leistungen/opendata/help/warnungen/cap_community_shape_dwd_zip.zip?__blob=publicationFile"
 if [ -x "$(command -v unzip)" ]; then
     echo -e "-> Versuche Dbase-Datenbank mit WarnCellID aus ZIP Datei zu entpacken ... \c"
-    if unzip -p cap_community_shape_dwd_zip.zip Export/DWD-COMMUNITY.dbf > ./DWD-COMMUNITY.dbf; then
+    if unzip -p cap_community_shape_dwd_zip.zip COMMUNE_DWD_*.dbf > ./DWD-COMMUNITY.dbf; then
         rm cap_community_shape_dwd_zip.zip
         echo "Erfolgreich entpackt"
     else
