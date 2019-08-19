@@ -1,5 +1,10 @@
 # Changelog
 
+2019-08-19, 3.1.2 stable
+----------
+
+* (BUGFIX) fetchManual.sh überarbeitet und auf neue Dateinamen angepasst
+
 2019-08-18, 3.1.1 stable
 ----------
 
