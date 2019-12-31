@@ -95,8 +95,6 @@ trait ParserHeader {
      * @param \SimpleXMLElement $xml komplette XML-Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getHeaderIdentifier(SimpleXMLElement $xml): string {
         try {
@@ -119,8 +117,6 @@ trait ParserHeader {
      * @param \SimpleXMLElement $xml komplette XML-Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getHeaderMsgType(SimpleXMLElement $xml): string {
         try {
@@ -143,8 +139,6 @@ trait ParserHeader {
      * @param \SimpleXMLElement $xml komplette XML-Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getHeaderReference(SimpleXMLElement $xml): string {
         try {
@@ -173,8 +167,6 @@ trait ParserHeader {
      * @param \SimpleXMLElement $area Area-Node der XML-Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return array
      */
     private function extractInfosFromGeoField(SimpleXMLElement $area): array {
         $result = [];

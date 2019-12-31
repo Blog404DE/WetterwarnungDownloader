@@ -88,8 +88,6 @@ class ArchiveToMySQL implements ArchiveToInterface {
     /**
      * Speichere Wetterwarnung in Archiv.
      *
-     * @param array $parsedWarnInfo
-     *
      * @throws Exception
      */
     public function saveToArchive(array $parsedWarnInfo) {

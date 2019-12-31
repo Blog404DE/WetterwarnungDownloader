@@ -212,8 +212,6 @@ class WetterWarnung extends Save\SaveToFile {
      * @param bool $cleanCache Cache nach dem speichern aufräumen
      *
      * @throws Exception
-     *
-     * @return bool
      */
     public function saveToFile(bool $cleanCache): bool {
         // Speichere lokale JSON Datei
@@ -241,8 +239,6 @@ class WetterWarnung extends Save\SaveToFile {
 
     /**
      * Setter für $localFolder an die Network-Klasse.
-     *
-     * @param string $localFolder
      *
      * @throws
      */
@@ -275,7 +271,7 @@ class WetterWarnung extends Save\SaveToFile {
             throw new Exception(
                 'Auf die JSON Datei ' . $localJsonFile .
                     ' mit den geparsten Wetterwarnungen kann nicht schreibend zugegriffen werden'
-                );
+            );
         }
         if (is_writable(\dirname($localJsonFile))) {
             // Datei existiert nicht - Schreibrechte auf den Ordner existieren
@@ -283,14 +279,14 @@ class WetterWarnung extends Save\SaveToFile {
                 // Leere Datei anlegen ist nicht erfolgreich
                 throw new Exception(
                     'Leere JSON Datei für die geparsten Wetterwarnungen konnte nicht angelegt werden'
-                    );
+                );
             }
         } else {
             // Kein Zugriff auf Datei möglich
             throw new Exception(
                 'JSON Datei für die geparsten Wetterwarnungen kann nicht in ' .
                     \dirname($localJsonFile) . ' geschrieben werden'
-                );
+            );
         }
 
         // Variable setzen

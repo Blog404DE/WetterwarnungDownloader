@@ -38,8 +38,6 @@ class Parser extends Network {
      * @param string           $stateCode  Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
      *
      * @throws Exception
-     *
-     * @return array
      */
     final protected function checkWarnFile(SimpleXMLElement $xml, int $warnCellId, string $stateCode): array {
         try {
@@ -94,8 +92,6 @@ class Parser extends Network {
      * @param array $rawWarnung Array mit den relevanten Warn-Daten
      *
      * @throws Exception
-     *
-     * @return array
      */
     final protected function collectWarnArray(array $rawWarnung): array {
         try {
@@ -191,8 +187,6 @@ class Parser extends Network {
      * @param SimpleXMLElement $eventCodeElement Event-Code Element
      *
      * @throws Exception
-     *
-     * @return bool
      */
     private function checkForTestWarnung(SimpleXMLElement $eventCodeElement): bool {
         try {

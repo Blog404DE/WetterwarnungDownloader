@@ -101,8 +101,6 @@ class SaveToFile extends Parser {
      * @param array $parsedWarnInfo Aktuelle Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return bool
      */
     public function didWetterWarnungExist(array $parsedWarnInfo): bool {
         try {
@@ -199,8 +197,6 @@ class SaveToFile extends Parser {
      * @param string $localJsonFile     Pfad und Dateiname in welche die Wetterwarnungen gespeichert werden sollen
      *
      * @throws Exception
-     *
-     * @return bool
      */
     private function shouldSaveFile(string $jsonWetterWarnung, string $localJsonFile): bool {
         try {

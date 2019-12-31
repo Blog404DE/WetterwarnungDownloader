@@ -48,8 +48,6 @@ trait ParserGeo {
      * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getRegioWarncellid(\SimpleXMLElement $currentWarnGeo): string {
         try {
@@ -73,8 +71,6 @@ trait ParserGeo {
      * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getRegionArea(\SimpleXMLElement $currentWarnGeo): string {
         try {
@@ -98,8 +94,6 @@ trait ParserGeo {
      * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getRegionStateShort(\SimpleXMLElement $currentWarnGeo): string {
         try {
@@ -123,8 +117,6 @@ trait ParserGeo {
      * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getRegionStateLong(\SimpleXMLElement $currentWarnGeo): string {
         try {
@@ -157,8 +149,6 @@ trait ParserGeo {
      * @param bool              $metric         Wert in metrischen Metern zurückgeben
      *
      * @throws Exception
-     *
-     * @return float
      */
     final protected function getRegionAltitude(\SimpleXMLElement $currentWarnGeo, bool $metric): float {
         try {
@@ -192,8 +182,6 @@ trait ParserGeo {
      * @param bool              $metric         Wert in metrischen Metern zurückgeben
      *
      * @throws Exception
-     *
-     * @return float
      */
     final protected function getRegionCeiling(\SimpleXMLElement $currentWarnGeo, bool $metric): float {
         try {
@@ -227,8 +215,6 @@ trait ParserGeo {
      * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getRegionHoehenangabe(\SimpleXMLElement $currentWarnGeo): string {
         try {

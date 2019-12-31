@@ -176,6 +176,7 @@ class Network {
             echo PHP_EOL . '*** Lösche veraltete Wetterwarnungen aus Cache-Ordner.' . PHP_EOL;
 
             // Erzeuge Array mit allen bereits vorhandenen Dateien und bestimmte das alter der Datei
+            $localFiles = [];
             foreach (glob($this->localFolder . \DIRECTORY_SEPARATOR . '*.zip', GLOB_NOSORT) as $filename) {
                 $createtime = @filectime($filename);
                 if (false !== $createtime && is_file($filename)) {
@@ -222,8 +223,6 @@ class Network {
 
     /**
      * Getter-Methode um zu prüfen ob FTP-Passiv Modus aktiviert ist.
-     *
-     * @return bool
      */
     public function isFtpPassiv(): bool {
         return $this->ftpPassiv;
@@ -249,8 +248,6 @@ class Network {
 
     /**
      * Getter für $localFolder.
-     *
-     * @return string
      */
     public function getLocalFolder(): string {
         return $this->localFolder;
@@ -271,8 +268,6 @@ class Network {
      * @param array $arrFTPContent Inhalt des Verzeichnisses auf dem DWD FTP Server
      *
      * @throws Exception
-     *
-     * @return array
      */
     private function getCurrentWetterwarnungViaFallback(array $arrFTPContent): array {
         try {
@@ -281,10 +276,12 @@ class Network {
             $fileFilter = $searchTime->format('Ymd');
 
             // Ermittle das Datum für die Dateien
+            $arrDownloadList = [];
             foreach ($arrFTPContent as $filename) {
                 // Filtere nach den Wetterwarnungen vom heutigen Tag
                 if (false !== mb_strpos($filename, $fileFilter)) {
                     // Übernehme Datei in zu-bearbeiten Liste
+                    $regs = [];
                     $extractFileInfo = preg_match(
                         '/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})' .
                         '(?<Postfix>_\w{3}_STATUS_PREMIUMDWD_COMMUNEUNION_)' .

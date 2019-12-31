@@ -76,7 +76,7 @@ class Toolbox {
      * @see https://php.net/manual/en/function.tempnam.php
      * @see http://stackoverflow.com/questions/1707801/making-a-temporary-dir-for-unpacking-a-zipfile-into
      *
-     * @param null|string $dir         directory under which to create temp dir. If null, default system temp dir will be used
+     * @param string|null $dir         directory under which to create temp dir. If null, default system temp dir will be used
      * @param string      $prefix      string with which to prefix created dirs
      * @param int         $mode        Octal file permission mask for the newly-created dir. Should begin with a 0.
      * @param int         $maxAttempts maximum attempts before giving up (to prevent endless loops)
