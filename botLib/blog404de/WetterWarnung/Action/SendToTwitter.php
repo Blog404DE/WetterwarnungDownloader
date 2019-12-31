@@ -77,8 +77,6 @@ class SendToTwitter implements SendToInterface {
      * @param bool  $warnExists     WetterWarnung existiert bereits
      *
      * @throws Exception
-     *
-     * @return int
      */
     public function startAction(array $parsedWarnInfo, bool $warnExists): int {
         try {
@@ -157,7 +155,7 @@ class SendToTwitter implements SendToInterface {
             // Konfiguration ist nicht gsetzt
             throw new Exception(
                 'Die Action-Funktion wurde nicht erfolgreich konfiguriert'
-                );
+            );
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -199,8 +197,6 @@ class SendToTwitter implements SendToInterface {
 
     /**
      * Getter-Methode für das Konfigurations-Array.
-     *
-     * @return array
      */
     public function getConfig(): array {
         return $this->config;
@@ -304,8 +300,6 @@ class SendToTwitter implements SendToInterface {
      * @param string $tweet Inhalt des Tweets
      *
      * @throws Exception
-     *
-     * @return int
      */
     private function getTweetLength(string $tweet): int {
         try {
@@ -331,8 +325,6 @@ class SendToTwitter implements SendToInterface {
      * @param array $parsedWarnInfo Inhalt der WetterWarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     private function composeAttachment(array $parsedWarnInfo): string {
         try {
@@ -364,8 +356,6 @@ class SendToTwitter implements SendToInterface {
      * @param array $parsedWarnInfo Inhalt der WetterWarnung
      *
      * @throws Exception
-     *
-     * @return array
      */
     private function composeMessage(array $parsedWarnInfo): array {
         try {
@@ -435,8 +425,6 @@ class SendToTwitter implements SendToInterface {
      * @param $code Fehler-Codes von Twitter
      *
      * @throws Exception
-     *
-     * @return string
      */
     private function getErrorText($code): string {
         try {

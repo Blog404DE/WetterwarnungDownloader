@@ -32,8 +32,6 @@ interface ArchiveToInterface {
 
     /**
      * Getter-Methode für das Konfigurations-Array.
-     *
-     * @return array
      */
     public function getConfig(): array;
 

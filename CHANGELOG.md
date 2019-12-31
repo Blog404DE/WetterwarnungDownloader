@@ -1,5 +1,10 @@
 # Changelog
 
+2019-12-31, 3.1.3 stable
+----------
+
+* (BUGFIX) Potentielle Notices entfernt im "failsafe"-Mode bei der Erkennung der Warnmeldung-Dateinamen.
+
 2019-08-19, 3.1.2 stable
 ----------
 
@@ -8,7 +13,7 @@
 2019-08-18, 3.1.1 stable
 ----------
 
-* (BUGFIX) Fehler in der composer.json korrigiert (require für PHP hinzugefügt) 
+* (BUGFIX) Fehler in der composer.json korrigiert (require für PHP hinzugefügt)
 
 2019-08-17, 3.1.0 stable
 ----------
@@ -29,7 +34,7 @@
 * (BUGFIX) Parsen des Start-/Endzeitpunkts der Warnung verbessert und an das neue CAP Profil angepasst.
 * (NEU) API Dokumentation etwas überarbeitet
 
-Die Warnlage-Icons werden vom [Deutschen Wetterdienst](https://www.dwd.de/DE/wetter/warnungen_aktuell/objekt_einbindung/piktogramm_node.html) bereitgestellt. Bitte beachten Sie für die Verwendung die beigefügten Lizenzbedinungen des Deutschen Wetterdienstes (siehe /icons/Quelle.md). 
+Die Warnlage-Icons werden vom [Deutschen Wetterdienst](https://www.dwd.de/DE/wetter/warnungen_aktuell/objekt_einbindung/piktogramm_node.html) bereitgestellt. Bitte beachten Sie für die Verwendung die beigefügten Lizenzbedinungen des Deutschen Wetterdienstes (siehe /icons/Quelle.md).
 
 2018-02-02, 3.0.1 stable
 ----------

@@ -120,8 +120,6 @@ trait Extensions {
 
     /**
      * Setzen der Konfiguration der Archive-Funktion.
-     *
-     * @param array $archiveConfig
      */
     public function setArchiveConfig(array $archiveConfig) {
         $this->archiveConfig = $archiveConfig;

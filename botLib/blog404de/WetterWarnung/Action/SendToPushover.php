@@ -57,8 +57,6 @@ class SendToPushover implements SendToInterface {
      * @param bool  $warnExists     Wetterwarnung existiert bereits
      *
      * @throws Exception
-     *
-     * @return int
      */
     public function startAction(array $parsedWarnInfo, bool $warnExists): int {
         try {
@@ -125,7 +123,7 @@ class SendToPushover implements SendToInterface {
             // Konfiguration ist nicht gsetzt
             throw new Exception(
                 'Die Action-Funktion wurde nicht erfolgreich konfiguriert'
-                );
+            );
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -165,8 +163,6 @@ class SendToPushover implements SendToInterface {
 
     /**
      * Getter-Methode für das Konfigurations-Array.
-     *
-     * @return array
      */
     public function getConfig(): array {
         return $this->config;
@@ -178,8 +174,6 @@ class SendToPushover implements SendToInterface {
      * @param array $parsedWarnInfo Inhalt der WetterWarnung
      *
      * @throws Exception
-     *
-     * @return array
      */
     private function composeAttachment(array $parsedWarnInfo): array {
         try {
@@ -214,8 +208,6 @@ class SendToPushover implements SendToInterface {
      * @param array $parsedWarnInfo Inhalt der WetterWarnung
      *
      * @throws Exception
-     *
-     * @return array
      */
     private function composeMessage(array $parsedWarnInfo): array {
         try {

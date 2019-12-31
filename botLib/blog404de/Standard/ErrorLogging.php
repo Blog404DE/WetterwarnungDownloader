@@ -196,8 +196,6 @@ class ErrorLogging {
 
     /**
      * Getter-Methode für logToMail.
-     *
-     * @return array
      */
     public function getLogToMailSettings(): array {
         return $this->logToMailSettings;
@@ -205,8 +203,6 @@ class ErrorLogging {
 
     /**
      * Getter-Methode für LogToFile.
-     *
-     * @return array
      */
     public function getLogToFileSettings(): array {
         return $this->logToFileSettings;
@@ -214,8 +210,6 @@ class ErrorLogging {
 
     /**
      * Getter-Methode für Tracelog-Anzeige.
-     *
-     * @return bool
      */
     public function isWithTrace(): bool {
         return $this->withTrace;
@@ -223,8 +217,6 @@ class ErrorLogging {
 
     /**
      * Setter-Methode für Tracelog-Anzeige.
-     *
-     * @param bool $withTrace
      */
     public function setWithTrace(bool $withTrace) {
         $this->withTrace = $withTrace;

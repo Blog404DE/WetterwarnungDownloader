@@ -62,8 +62,6 @@ trait ParserAlert {
      * Getter für den Ordner in dem sich die Warnlagen-Icons befinden.
      *
      * @throws Exception
-     *
-     * @return string
      */
     public function getLocalIconFolder(): string {
         try {
@@ -80,8 +78,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return DateTime
      */
     final protected function getAlertStartzeit(\SimpleXMLElement $currentWarnAlert): DateTime {
         try {
@@ -119,8 +115,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return DateTime
      */
     final protected function getAlertEndzeit(\SimpleXMLElement $currentWarnAlert): DateTime {
         try {
@@ -158,8 +152,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getAlertUrgency(\SimpleXMLElement $currentWarnAlert): string {
         try {
@@ -183,8 +175,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getAlertSeverity(\SimpleXMLElement $currentWarnAlert): string {
         try {
@@ -237,8 +227,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return int
      */
     final protected function getAlertWarnstufe(\SimpleXMLElement $currentWarnAlert): int {
         try {
@@ -291,8 +279,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getAlertEvent(\SimpleXMLElement $currentWarnAlert): string {
         try {
@@ -316,8 +302,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getAlertHeadline(\SimpleXMLElement $currentWarnAlert): string {
         try {
@@ -341,8 +325,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getAlertDescription(\SimpleXMLElement $currentWarnAlert): string {
         try {
@@ -366,8 +348,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getAlertInstruction(\SimpleXMLElement $currentWarnAlert): string {
         try {
@@ -391,8 +371,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getAlertSender(\SimpleXMLElement $currentWarnAlert): string {
         try {
@@ -416,8 +394,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getAlertWeb(\SimpleXMLElement $currentWarnAlert): string {
         try {
@@ -441,8 +417,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return string
      */
     final protected function getAlertIcon(\SimpleXMLElement $currentWarnAlert): string {
         try {
@@ -510,8 +484,6 @@ trait ParserAlert {
      * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
-     *
-     * @return int
      */
     final private function getEventCode(\SimpleXMLElement $currentWarnAlert): int {
         try {

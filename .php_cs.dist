@@ -52,7 +52,13 @@ return PhpCsFixer\Config::create()
         'backtick_to_shell_exec' => true,
         'mb_str_functions' => true,
         'no_php4_constructor' => true,
-        'simplified_null_return' => true
+        'simplified_null_return' => true,
+        'phpdoc_add_missing_param_annotation' => true,
+        'phpdoc_order' => true,
+        'phpdoc_types_order' => [
+             'null_adjustment' => 'always_last',
+             'sort_algorithm' => 'none',
+        ],
     ])
     ->setFinder($finder)
     ->setRiskyAllowed(true)
