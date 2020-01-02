@@ -446,7 +446,7 @@ trait ParserAlert {
 
             $warnIconFilename = '';
             foreach ($warnIcons as $warnIconPart => $warnCodes) {
-                if (\in_array($eventcode, $warnCodes, true)) {
+                if (\in_array($eventcode, $warnCodes, false)) {
                     if ((int)$this->getAlertWarnstufe($currentWarnAlert) < 0) {
                         $warnIconFilename = 'warn_icons_' .
                             sprintf($warnIconPart, 0) . '.png';
@@ -491,7 +491,7 @@ trait ParserAlert {
             foreach ($currentWarnAlert->children() as $child) {
                 if ('eventCode' === $child->getName()) {
                     if (property_exists($child, 'valueName') && property_exists($child, 'value')) {
-                        if ($child->{'valueName'}[0] === 'II') {
+                        if ('II' === (string)$child->{'valueName'}[0]) {
                             $eventcode = (int)$child->{'value'};
                         }
                     }
