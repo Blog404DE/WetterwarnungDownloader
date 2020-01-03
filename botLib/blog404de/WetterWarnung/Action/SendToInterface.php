@@ -24,9 +24,10 @@ interface SendToInterface {
     /**
      * Action Ausführung starten.
      *
-     * @param bool $warnExists Wetterwarnung existiert bereits
+     * @param array $parsedWarnInfo Inhalt der WetterWarnung
+     * @param bool  $warnExists     Wetterwarnung existiert bereits
      *
-     * @throws Exception
+     * @return int
      */
     public function startAction(array $parsedWarnInfo, bool $warnExists): int;
 

@@ -81,6 +81,8 @@ class Toolbox {
      * @param int         $mode        Octal file permission mask for the newly-created dir. Should begin with a 0.
      * @param int         $maxAttempts maximum attempts before giving up (to prevent endless loops)
      *
+     * @throws Exception
+     *
      * @return bool|string full path to newly-created dir, or false on failure
      */
     public function tempdir(string $dir = null, string $prefix = 'tmp_', int $mode = 0700, int $maxAttempts = 1000) {

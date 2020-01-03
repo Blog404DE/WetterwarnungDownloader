@@ -240,7 +240,9 @@ class WetterWarnung extends Save\SaveToFile {
     /**
      * Setter für $localFolder an die Network-Klasse.
      *
-     * @throws
+     * @param string $localFolder Lokaler Ordner
+     *
+     * @throws Exception
      */
     public function setLocalFolder(string $localFolder) {
         if (is_dir($localFolder)) {

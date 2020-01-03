@@ -217,6 +217,8 @@ class ErrorLogging {
 
     /**
      * Setter-Methode für Tracelog-Anzeige.
+     *
+     * @param bool $withTrace
      */
     public function setWithTrace(bool $withTrace) {
         $this->withTrace = $withTrace;
