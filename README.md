@@ -23,7 +23,7 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 ### Vorraussetzungen:
 
 - Linux oder macOS (unter Debian und macOS 10.13.2 getestet)
-- PHP 7.0.0 (oder neuer)
+- PHP 7.1.0 (oder neuer)
 - Folgende PHP Module werden benötigt: simplexml, json, ftp, pdo, zip, libxml, curl
 - (optional) MySQL-Datenbank
 - wget
