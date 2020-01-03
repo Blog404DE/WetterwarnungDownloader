@@ -1,5 +1,10 @@
 # Changelog
 
+2019-12-31, 3.1.4 stable
+----------
+* Parser für die einzelnen Warnungen optimiert
+* (BUGFIX) Potentielle Notices entfernt im "failsafe"-Mode bei der Erkennung der Warnmeldung-Dateinamen.
+
 2019-12-31, 3.1.3 stable
 ----------
 

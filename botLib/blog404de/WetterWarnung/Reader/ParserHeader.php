@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.2
+ *  @version    v3.1.4
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -104,7 +104,7 @@ trait ParserHeader {
                 );
             }
 
-            return (string)$xml->{'identifier'};
+            return $xml->{'identifier'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -126,7 +126,7 @@ trait ParserHeader {
                 );
             }
 
-            return mb_strtolower((string)$xml->{'msgType'});
+            return mb_strtolower($xml->{'msgType'}->__toString());
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -149,7 +149,7 @@ trait ParserHeader {
                         "beinhaltet kein 'references'-Node."
                     );
                 }
-                $reference = (string)$xml->{'references'};
+                $reference = $xml->{'references'}->__toString();
             } else {
                 $reference = '';
             }
@@ -182,7 +182,7 @@ trait ParserHeader {
                 );
             }
 
-            if (('WARNCELLID' === (string)$currentGeoCode->{'valueName'})) {
+            if (('WARNCELLID' === $currentGeoCode->{'valueName'}->__toString())) {
                 // Prüfe nach Höhenangaben-Nodes
                 if (!property_exists($area, 'altitude')) {
                     throw new Exception(
@@ -198,9 +198,9 @@ trait ParserHeader {
                 // Ergebnis zusammenstellen
                 $result[(string)$currentGeoCode->{'value'}] =
                     [
-                        'altitude' => (float)$area->{'altitude'},
-                        'ceiling' => (float)$area->{'ceiling'},
-                        'areaDesc' => (string)$area->{'areaDesc'},
+                        'altitude' => (float)($area->{'altitude'}),
+                        'ceiling' => (float)($area->{'ceiling'}),
+                        'areaDesc' => $area->{'areaDesc'}->__toString(),
                     ];
             }
         }

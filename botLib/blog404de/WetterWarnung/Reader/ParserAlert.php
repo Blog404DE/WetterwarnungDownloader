@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.2
+ *  @version    v3.1.4
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -162,7 +162,7 @@ trait ParserAlert {
                 );
             }
 
-            return (string)$currentWarnAlert->{'urgency'};
+            return $currentWarnAlert->{'urgency'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -192,7 +192,7 @@ trait ParserAlert {
                 $severity = 'Vorwarnung';
             } else {
                 // Warnung ist aktuell gültig -> daher Warnstufe ermitteln
-                switch ((string)$currentWarnAlert->{'severity'}) {
+                switch ($currentWarnAlert->{'severity'}->__toString()) {
                     case 'Minor':
                         $severity = 'Wetterwarnung';
 
@@ -244,7 +244,7 @@ trait ParserAlert {
                 $warnstufe = 0;
             } else {
                 // Warnung ist aktuell gültig -> daher Warnstufe ermitteln
-                switch ((string)$currentWarnAlert->{'severity'}) {
+                switch ($currentWarnAlert->{'severity'}->__toString()) {
                     case 'Minor':
                         $warnstufe = 1;
 
@@ -289,7 +289,7 @@ trait ParserAlert {
                 );
             }
 
-            return (string)$currentWarnAlert->{'event'};
+            return $currentWarnAlert->{'event'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -312,7 +312,7 @@ trait ParserAlert {
                 );
             }
 
-            return (string)$currentWarnAlert->{'headline'};
+            return $currentWarnAlert->{'headline'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -335,7 +335,7 @@ trait ParserAlert {
                 );
             }
 
-            return (string)$currentWarnAlert->{'description'};
+            return $currentWarnAlert->{'description'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -358,7 +358,7 @@ trait ParserAlert {
                 );
             }
 
-            return (string)$currentWarnAlert->{'instruction'};
+            return $currentWarnAlert->{'instruction'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -381,7 +381,7 @@ trait ParserAlert {
                 );
             }
 
-            return (string)$currentWarnAlert->{'senderName'};
+            return $currentWarnAlert->{'senderName'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -404,7 +404,7 @@ trait ParserAlert {
                 );
             }
 
-            return (string)$currentWarnAlert->{'web'};
+            return $currentWarnAlert->{'web'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -446,7 +446,7 @@ trait ParserAlert {
 
             $warnIconFilename = '';
             foreach ($warnIcons as $warnIconPart => $warnCodes) {
-                if (\in_array($eventcode, $warnCodes, false)) {
+                if (\in_array((string)$eventcode, $warnCodes, true)) {
                     if ((int)$this->getAlertWarnstufe($currentWarnAlert) < 0) {
                         $warnIconFilename = 'warn_icons_' .
                             sprintf($warnIconPart, 0) . '.png';
@@ -491,8 +491,8 @@ trait ParserAlert {
             foreach ($currentWarnAlert->children() as $child) {
                 if ('eventCode' === $child->getName()) {
                     if (property_exists($child, 'valueName') && property_exists($child, 'value')) {
-                        if ('II' === (string)$child->{'valueName'}[0]) {
-                            $eventcode = (int)$child->{'value'};
+                        if ('II' === (string)$child->{'valueName'}[0]->__toString()) {
+                            $eventcode = (int)($child->{'value'}->__toString());
                         }
                     }
                 }
