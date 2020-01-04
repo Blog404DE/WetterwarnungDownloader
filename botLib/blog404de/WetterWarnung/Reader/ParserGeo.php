@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.2
+ *  @version    v3.1.4
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -58,7 +58,7 @@ trait ParserGeo {
                 );
             }
 
-            return (string)$currentWarnGeo->{'warncellid'};
+            return $currentWarnGeo->{'warncellid'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -81,7 +81,7 @@ trait ParserGeo {
                 );
             }
 
-            return (string)$currentWarnGeo->{'areaDesc'};
+            return $currentWarnGeo->{'areaDesc'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -104,7 +104,7 @@ trait ParserGeo {
                 );
             }
 
-            return (string)$currentWarnGeo->{'state'};
+            return $currentWarnGeo->{'state'}->__toString();
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -135,7 +135,7 @@ trait ParserGeo {
                 );
             }
 
-            return (string)$this->regionames[(string)$currentWarnGeo->{'state'}];
+            return (string)$this->regionames[$currentWarnGeo->{'state'}->__toString()];
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -160,9 +160,9 @@ trait ParserGeo {
             }
 
             if ($metric) {
-                $altitude = floor((float)$currentWarnGeo->{'altitude'} * 0.3048);
+                $altitude = floor((float)($currentWarnGeo->{'altitude'}->__toString()) * 0.3048);
             } else {
-                $altitude = floor((float)$currentWarnGeo->{'altitude'});
+                $altitude = floor((float)($currentWarnGeo->{'altitude'}->__toString()));
             }
             if (false === $altitude) {
                 throw new Exception('Umwandlung des Altitude-Wertes von Feet in Meter fehlgeschlagen');
@@ -192,10 +192,11 @@ trait ParserGeo {
                 );
             }
 
+            var_dump($currentWarnGeo->{'ceiling'});
             if ($metric) {
-                $ceiling = floor((float)$currentWarnGeo->{'ceiling'} * 0.3048);
+                $ceiling = floor(((float)($currentWarnGeo->{'ceiling'}->__toString()) * 0.3048));
             } else {
-                $ceiling = floor((float)$currentWarnGeo->{'ceiling'});
+                $ceiling = floor((float)($currentWarnGeo->{'ceiling'}->__toString()));
             }
 
             if (false === $ceiling) {
@@ -234,7 +235,7 @@ trait ParserGeo {
                 $hoehenangabe = 'Alle Höhenlagen';
             }
 
-            return (string)$hoehenangabe;
+            return $hoehenangabe;
         } catch (Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;

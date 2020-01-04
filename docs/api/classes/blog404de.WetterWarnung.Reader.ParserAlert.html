@@ -44,7 +44,9 @@
                             <ul class="dropdown-menu">
                                                                     <li><a>Namespaces</a></li>
                                                                         <li><a href="../namespaces/blog404de.html">blog404de</a></li>
-                                                                                                                                </ul>
+                                                                                                    
+Warning: count(): Parameter must be an array or an object that implements Countable in phar:///usr/local/bin/phpDocumentor.phar/vendor/twig/twig/lib/Twig/Extension/Core.php on line 1293
+                            </ul>
                         </li>
                         <li class="dropdown" id="charts-menu">
                             <a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
@@ -220,7 +222,9 @@
             <div class="element class">
                 <h1>ParserAlert</h1>
                 <small style="display: block; text-align: right">
-                                                        </small>
+                                        
+Warning: count(): Parameter must be an array or an object that implements Countable in phar:///usr/local/bin/phpDocumentor.phar/vendor/twig/twig/lib/Twig/Extension/Core.php on line 1293
+                </small>
                 <p class="short_description">Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.</p>
                 <div class="details">
                     <div class="long_description">
@@ -242,477 +246,9 @@
                                                                 <a id="method_getAlertDescription"></a>
                         <div class="element clickable method protected  method_getAlertDescription" data-toggle="collapse" data-target=".method_getAlertDescription .collapse">
                             <h2>description aus der Wetterwarnung auslesen.</h2>
-                            <pre>getAlertDescription(\SimpleXMLElement $currentWarnAlert) : string</pre>
+                            <pre>getAlertDescription(\SimpleXMLElement $currentWarnAlert) </pre>
                             <div class="labels">
                                                                                                 <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertEndzeit"></a>
-                        <div class="element clickable method protected  method_getAlertEndzeit" data-toggle="collapse" data-target=".method_getAlertEndzeit .collapse">
-                            <h2>Endzeitpunkt der Wetterwarnung ermitteln.</h2>
-                            <pre>getAlertEndzeit(\SimpleXMLElement $currentWarnAlert) : \DateTime</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>\DateTime</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertEvent"></a>
-                        <div class="element clickable method protected  method_getAlertEvent" data-toggle="collapse" data-target=".method_getAlertEvent .collapse">
-                            <h2>Event-Typ aus der Wetterwarnung auslesen.</h2>
-                            <pre>getAlertEvent(\SimpleXMLElement $currentWarnAlert) : string</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertHeadline"></a>
-                        <div class="element clickable method protected  method_getAlertHeadline" data-toggle="collapse" data-target=".method_getAlertHeadline .collapse">
-                            <h2>headline aus der Wetterwarnung auslesen.</h2>
-                            <pre>getAlertHeadline(\SimpleXMLElement $currentWarnAlert) : string</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertIcon"></a>
-                        <div class="element clickable method protected  method_getAlertIcon" data-toggle="collapse" data-target=".method_getAlertIcon .collapse">
-                            <h2>Icon passend zum WarnEvent ermitteln.</h2>
-                            <pre>getAlertIcon(\SimpleXMLElement $currentWarnAlert) : string</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertInstruction"></a>
-                        <div class="element clickable method protected  method_getAlertInstruction" data-toggle="collapse" data-target=".method_getAlertInstruction .collapse">
-                            <h2>instruction aus der Wetterwarnung auslesen.</h2>
-                            <pre>getAlertInstruction(\SimpleXMLElement $currentWarnAlert) : string</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertSender"></a>
-                        <div class="element clickable method protected  method_getAlertSender" data-toggle="collapse" data-target=".method_getAlertSender .collapse">
-                            <h2>senderName aus der Wetterwarnung auslesen.</h2>
-                            <pre>getAlertSender(\SimpleXMLElement $currentWarnAlert) : string</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertSeverity"></a>
-                        <div class="element clickable method protected  method_getAlertSeverity" data-toggle="collapse" data-target=".method_getAlertSeverity .collapse">
-                            <h2>Warnstufe (Text) der Meldung der Wetterwarnung auslesen.</h2>
-                            <pre>getAlertSeverity(\SimpleXMLElement $currentWarnAlert) : string</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertStartzeit"></a>
-                        <div class="element clickable method protected  method_getAlertStartzeit" data-toggle="collapse" data-target=".method_getAlertStartzeit .collapse">
-                            <h2>Startzeitpunkt der Wetterwarnung ermitteln.</h2>
-                            <pre>getAlertStartzeit(\SimpleXMLElement $currentWarnAlert) : \DateTime</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>\DateTime</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertUrgency"></a>
-                        <div class="element clickable method protected  method_getAlertUrgency" data-toggle="collapse" data-target=".method_getAlertUrgency .collapse">
-                            <h2>Urgency-Typ aus der Wetterwarnung auslesen.</h2>
-                            <pre>getAlertUrgency(\SimpleXMLElement $currentWarnAlert) : string</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertWarnstufe"></a>
-                        <div class="element clickable method protected  method_getAlertWarnstufe" data-toggle="collapse" data-target=".method_getAlertWarnstufe .collapse">
-                            <h2>Warnstufe (Zahl) der Meldung der Wetterwarnung auslesen.</h2>
-                            <pre>getAlertWarnstufe(\SimpleXMLElement $currentWarnAlert) : integer</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>integer</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getAlertWeb"></a>
-                        <div class="element clickable method protected  method_getAlertWeb" data-toggle="collapse" data-target=".method_getAlertWeb .collapse">
-                            <h2>web aus der Wetterwarnung auslesen.</h2>
-                            <pre>getAlertWeb(\SimpleXMLElement $currentWarnAlert) : string</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getEventCode"></a>
-                        <div class="element clickable method private  method_getEventCode" data-toggle="collapse" data-target=".method_getEventCode .collapse">
-                            <h2>Event-Code ermitteln für die spätere Icon-Auflösung.</h2>
-                            <pre>getEventCode(\SimpleXMLElement $currentWarnAlert) : integer</pre>
-                            <div class="labels">
-                                                                                                <span class="label">final</span>                                                                                            </div>
-
-                            
-                            <div class="row collapse">
-                                <div class="detail-description">
-                                    <div class="long_description"></div>
-
-                                    <table class="table">
-                                                                                                                            <tr>
-                                                <th>Throws</th>
-                                                <td>
-                                                    <dl>
-                                                                                                            <dt>\Exception</dt>
-                                                        <dd></dd>
-                                                                                                                                                            </dl>
-                                                </td>
-                                            </tr>
-                                                                            </table>
-
-                                                                            <h3>Arguments</h3>
-                                                                                    <div class="subelement argument">
-                                                <h4>$currentWarnAlert</h4>
-                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
-                                            </div>
-                                                                            
-                                                                            <h3>Response</h3>
-                                        <code>integer</code><p></p>
-                                                                    </div>
-                            </div>
-
-                        </div>
-                                            <a id="method_getLocalIconFolder"></a>
-                        <div class="element clickable method public  method_getLocalIconFolder" data-toggle="collapse" data-target=".method_getLocalIconFolder .collapse">
-                            <h2>Getter für den Ordner in dem sich die Warnlagen-Icons befinden.</h2>
-                            <pre>getLocalIconFolder() : string</pre>
-                            <div class="labels">
-                                                                                                                                                                                            </div>
 
                             
                             <div class="row collapse">
@@ -738,9 +274,547 @@
                                             </tr>
                                                                             </table>
 
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertEndzeit"></a>
+                        <div class="element clickable method protected  method_getAlertEndzeit" data-toggle="collapse" data-target=".method_getAlertEndzeit .collapse">
+                            <h2>Endzeitpunkt der Wetterwarnung ermitteln.</h2>
+                            <pre>getAlertEndzeit(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertEvent"></a>
+                        <div class="element clickable method protected  method_getAlertEvent" data-toggle="collapse" data-target=".method_getAlertEvent .collapse">
+                            <h2>Event-Typ aus der Wetterwarnung auslesen.</h2>
+                            <pre>getAlertEvent(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertHeadline"></a>
+                        <div class="element clickable method protected  method_getAlertHeadline" data-toggle="collapse" data-target=".method_getAlertHeadline .collapse">
+                            <h2>headline aus der Wetterwarnung auslesen.</h2>
+                            <pre>getAlertHeadline(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertIcon"></a>
+                        <div class="element clickable method protected  method_getAlertIcon" data-toggle="collapse" data-target=".method_getAlertIcon .collapse">
+                            <h2>Icon passend zum WarnEvent ermitteln.</h2>
+                            <pre>getAlertIcon(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertInstruction"></a>
+                        <div class="element clickable method protected  method_getAlertInstruction" data-toggle="collapse" data-target=".method_getAlertInstruction .collapse">
+                            <h2>instruction aus der Wetterwarnung auslesen.</h2>
+                            <pre>getAlertInstruction(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertSender"></a>
+                        <div class="element clickable method protected  method_getAlertSender" data-toggle="collapse" data-target=".method_getAlertSender .collapse">
+                            <h2>senderName aus der Wetterwarnung auslesen.</h2>
+                            <pre>getAlertSender(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertSeverity"></a>
+                        <div class="element clickable method protected  method_getAlertSeverity" data-toggle="collapse" data-target=".method_getAlertSeverity .collapse">
+                            <h2>Warnstufe (Text) der Meldung der Wetterwarnung auslesen.</h2>
+                            <pre>getAlertSeverity(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertStartzeit"></a>
+                        <div class="element clickable method protected  method_getAlertStartzeit" data-toggle="collapse" data-target=".method_getAlertStartzeit .collapse">
+                            <h2>Startzeitpunkt der Wetterwarnung ermitteln.</h2>
+                            <pre>getAlertStartzeit(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertUrgency"></a>
+                        <div class="element clickable method protected  method_getAlertUrgency" data-toggle="collapse" data-target=".method_getAlertUrgency .collapse">
+                            <h2>Urgency-Typ aus der Wetterwarnung auslesen.</h2>
+                            <pre>getAlertUrgency(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertWarnstufe"></a>
+                        <div class="element clickable method protected  method_getAlertWarnstufe" data-toggle="collapse" data-target=".method_getAlertWarnstufe .collapse">
+                            <h2>Warnstufe (Zahl) der Meldung der Wetterwarnung auslesen.</h2>
+                            <pre>getAlertWarnstufe(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getAlertWeb"></a>
+                        <div class="element clickable method protected  method_getAlertWeb" data-toggle="collapse" data-target=".method_getAlertWeb .collapse">
+                            <h2>web aus der Wetterwarnung auslesen.</h2>
+                            <pre>getAlertWeb(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getEventCode"></a>
+                        <div class="element clickable method private  method_getEventCode" data-toggle="collapse" data-target=".method_getEventCode .collapse">
+                            <h2>Event-Code ermitteln für die spätere Icon-Auflösung.</h2>
+                            <pre>getEventCode(\SimpleXMLElement $currentWarnAlert) </pre>
+                            <div class="labels">
+                                                                                                <span class="label">final</span>                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$currentWarnAlert</h4>
+                                                <code>\SimpleXMLElement</code><p><p>Alert-Teil der aktuellen Wetterwarnung</p></p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+
+                        </div>
+                                            <a id="method_getLocalIconFolder"></a>
+                        <div class="element clickable method public  method_getLocalIconFolder" data-toggle="collapse" data-target=".method_getLocalIconFolder .collapse">
+                            <h2>Getter für den Ordner in dem sich die Warnlagen-Icons befinden.</h2>
+                            <pre>getLocalIconFolder() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+
+                            
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"></div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                                                            <tr>
+                                                <th>Throws</th>
+                                                <td>
+                                                    <dl>
+                                                                                                            <dt>\Exception</dt>
+                                                        <dd></dd>
+                                                                                                                                                            </dl>
+                                                </td>
+                                            </tr>
+                                                                            </table>
+
                                     
-                                                                            <h3>Response</h3>
-                                        <code>string</code><p></p>
                                                                     </div>
                             </div>
 
@@ -788,6 +862,8 @@
                         </div>
                     
                     
+Warning: count(): Parameter must be an array or an object that implements Countable in phar:///usr/local/bin/phpDocumentor.phar/vendor/twig/twig/lib/Twig/Extension/Core.php on line 1293
+
                                                                 <h3><i class="icon-custom icon-property"></i> Properties</h3>
                                                     <a id="property_localIconFolder"> </a>
                             <div class="element clickable property  private property_localIconFolder" data-toggle="collapse" data-target=".property_localIconFolder .collapse">
@@ -835,7 +911,7 @@
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
             <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
-            generated on Tue, 13 Aug 2019 17:21:12 +0000.<br/>
+            generated on Fri, 03 Jan 2020 18:05:51 +0000.<br/>
     </footer>
     </body>
 </html>

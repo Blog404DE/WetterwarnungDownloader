@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.2
+ *  @version    v3.1.4
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -24,9 +24,10 @@ interface SendToInterface {
     /**
      * Action Ausführung starten.
      *
-     * @param bool $warnExists Wetterwarnung existiert bereits
+     * @param array $parsedWarnInfo Inhalt der WetterWarnung
+     * @param bool  $warnExists     Wetterwarnung existiert bereits
      *
-     * @throws Exception
+     * @return int
      */
     public function startAction(array $parsedWarnInfo, bool $warnExists): int;
 

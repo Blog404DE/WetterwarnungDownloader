@@ -22,7 +22,7 @@
         "issues": "https://github.com/Blog404DE/WetterwarnungDownloader/issues"
     },
     "require": {
-        "php": "^7.0 <7.4",
+        "php": "^7.1 <7.4",
         "ext-simplexml": "*",
         "ext-json": "*",
         "ext-ftp": "*",
@@ -33,11 +33,11 @@
         "abraham/twitteroauth": "@stable"
     },
     "require-dev": {
-        "phpmd/phpmd": "*",
-        "sebastian/phpcpd": "*",
-        "wapmorgan/php-code-fixer": "*",
-        "squizlabs/php_codesniffer": "*",
-        "friendsofphp/php-cs-fixer": "*"
+        "phpmd/phpmd": "^2.8",
+        "sebastian/phpcpd": "^4.1",
+        "wapmorgan/php-code-fixer": "^2.0",
+        "squizlabs/php_codesniffer": "^3.5",
+        "friendsofphp/php-cs-fixer": "^2.16"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.2
+ *  @version    v3.1.4
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -88,6 +88,8 @@ class ArchiveToMySQL implements ArchiveToInterface {
     /**
      * Speichere Wetterwarnung in Archiv.
      *
+     * @param array $parsedWarnInfo Inhalt der WetterWarnung
+     *
      * @throws Exception
      */
     public function saveToArchive(array $parsedWarnInfo) {
@@ -122,15 +124,15 @@ class ArchiveToMySQL implements ArchiveToInterface {
                     $endzeit = unserialize($parsedWarnInfo['endzeit'])->getTimestamp();
 
                     // Eingabe speichern
-                    $sql = 'INSERT INTO warnarchiv 
+                    $sql = 'INSERT INTO warnarchiv
                                (`datum`, `hash`, `identifier`,  `reference`, `event`, `msgType`, `startzeit`, `endzeit`,
-                                `severity`, `warnstufe`, `urgency`, `headline`, `description`, `instruction`, `sender`, 
-                                `web`, `warncellid`, `area`, `stateLong`, `stateShort`, `altitude`, `ceiling`, 
-                                `hoehenangabe`) 
+                                `severity`, `warnstufe`, `urgency`, `headline`, `description`, `instruction`, `sender`,
+                                `web`, `warncellid`, `area`, `stateLong`, `stateShort`, `altitude`, `ceiling`,
+                                `hoehenangabe`)
                                 VALUES (
-                                    NOW(), :hash, :identifier, :reference, :event, :msgType, FROM_UNIXTIME(:startzeit), 
-                                    FROM_UNIXTIME(:endzeit), :severity, :warnstufe, :urgency, :headline, :description, 
-                                    :instruction, :sender, :web, :warncellid, :area, :stateLong, :stateShort, 
+                                    NOW(), :hash, :identifier, :reference, :event, :msgType, FROM_UNIXTIME(:startzeit),
+                                    FROM_UNIXTIME(:endzeit), :severity, :warnstufe, :urgency, :headline, :description,
+                                    :instruction, :sender, :web, :warncellid, :area, :stateLong, :stateShort,
                                     :altitude, :ceiling, :hoehenangabe
                                 )';
                     $sth = $this->connectionId->prepare($sql, [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]);

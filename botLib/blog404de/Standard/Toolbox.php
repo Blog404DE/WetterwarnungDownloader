@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.2
+ *  @version    v3.1.4
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -80,6 +80,8 @@ class Toolbox {
      * @param string      $prefix      string with which to prefix created dirs
      * @param int         $mode        Octal file permission mask for the newly-created dir. Should begin with a 0.
      * @param int         $maxAttempts maximum attempts before giving up (to prevent endless loops)
+     *
+     * @throws Exception
      *
      * @return bool|string full path to newly-created dir, or false on failure
      */

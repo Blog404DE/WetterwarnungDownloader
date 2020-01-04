@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.2
+ *  @version    v3.1.4
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -217,6 +217,8 @@ class ErrorLogging {
 
     /**
      * Setter-Methode für Tracelog-Anzeige.
+     *
+     * @param bool $withTrace
      */
     public function setWithTrace(bool $withTrace) {
         $this->withTrace = $withTrace;
