@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - ArchiveToMySQL.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -17,6 +28,7 @@ namespace blog404de\WetterWarnung\Archive;
 
 use Exception;
 use PDO;
+use RuntimeException;
 
 /**
  * Klasse für die Archiv-Anbindung des WarnParser
@@ -36,31 +48,31 @@ class ArchiveToMySQL implements ArchiveToInterface {
      *
      * @throws Exception
      */
-    public function setConfig(array $config) {
+    public function setConfig(array $config): void {
         try {
             // MySQL Support vorhanden?
             if (!\extension_loaded('pdo_mysql')) {
-                throw new Exception('Für die Archiv-Funktion wird das mysqli-Modul in PHP benötigt');
+                throw new RuntimeException('Für die Archiv-Funktion wird das mysqli-Modul in PHP benötigt');
             }
 
             // Alle Paramter verfügbar?
             if (!\array_key_exists('host', $config)) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Der Konfigurationsparamter ["ArchiveConfig"]["host"] wurde nicht gesetzt.'
                 );
             }
             if (!\array_key_exists('username', $config)) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Der Konfigurationsparamter ["ArchiveConfig"]["username"] wurde nicht gesetzt.'
                 );
             }
             if (!\array_key_exists('password', $config)) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Der Konfigurationsparamter ["ArchiveConfig"]["username"] wurde nicht gesetzt.'
                 );
             }
             if (!\array_key_exists('database', $config)) {
-                throw new Exception('Der Konfigurationsparamter ["ArchiveConfig"]["host"] wurde nicht gesetzt.');
+                throw new RuntimeException('Der Konfigurationsparamter ["ArchiveConfig"]["host"] wurde nicht gesetzt.');
             }
 
             // Verbindung aufbauen zur MySQL Datenbank
@@ -70,7 +82,7 @@ class ArchiveToMySQL implements ArchiveToInterface {
 
             // Werte setzen
             $this->config = $config;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -92,11 +104,11 @@ class ArchiveToMySQL implements ArchiveToInterface {
      *
      * @throws Exception
      */
-    public function saveToArchive(array $parsedWarnInfo) {
+    public function saveToArchive(array $parsedWarnInfo): void {
         try {
             if ($this->getConfig()) {
                 if (!\is_array($parsedWarnInfo)) {
-                    throw new Exception('Die im Archiv zu speicherenden Wetter-Informationen sind ungültig');
+                    throw new RuntimeException('Die im Archiv zu speicherenden Wetter-Informationen sind ungültig');
                 }
 
                 // Status-Ausgabe der aktuellen Wetterwarnung
@@ -110,7 +122,7 @@ class ArchiveToMySQL implements ArchiveToInterface {
                 );
                 $sth->bindParam(':identifier', $parsedWarnInfo['identifier'], PDO::PARAM_STR, 32);
                 if (!$sth->execute()) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         'Fehler beim prüfen ob Warnung bereits im Archiv ist: ' . $this->connectionId->errorInfo()
                     );
                 }
@@ -120,8 +132,8 @@ class ArchiveToMySQL implements ArchiveToInterface {
                     // Wetterwarnung ist noch nicht im Archiv
 
                     // Start-/Enddatum verarbeiten
-                    $startZeit = unserialize($parsedWarnInfo['startzeit'])->getTimestamp();
-                    $endzeit = unserialize($parsedWarnInfo['endzeit'])->getTimestamp();
+                    $startZeit = unserialize($parsedWarnInfo['startzeit'], ['allowed_classes' => true])->getTimestamp();
+                    $endzeit = unserialize($parsedWarnInfo['endzeit'], ['allowed_classes' => true])->getTimestamp();
 
                     // Eingabe speichern
                     $sql = 'INSERT INTO warnarchiv
@@ -163,7 +175,7 @@ class ArchiveToMySQL implements ArchiveToInterface {
 
                     // In Datenbank eintragen
                     if (!$sth->execute()) {
-                        throw new Exception(
+                        throw new RuntimeException(
                             'Fehler beim prüfen ob Warnung bereits im Archiv ist: ' .
                             $this->connectionId->errorInfo()
                         );
@@ -176,11 +188,11 @@ class ArchiveToMySQL implements ArchiveToInterface {
                 }
             } else {
                 // Konfiguration ist nicht gsetzt
-                throw new Exception(
+                throw new RuntimeException(
                     'Die Archiv-Funktion wurde nicht erfolgreich konfiguriert'
                 );
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

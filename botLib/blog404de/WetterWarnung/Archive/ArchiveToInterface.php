@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - ArchiveToInterface.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -16,6 +27,7 @@ declare(strict_types=1);
 namespace blog404de\WetterWarnung\Archive;
 
 use Exception;
+use RuntimeException;
 
 /**
  * Interface für die Archiv-Unterstützung.
@@ -26,7 +38,7 @@ interface ArchiveToInterface {
      *
      * @param array $config Konfigurations-Array
      *
-     * @throws Exception
+     * @throws Exception | RuntimeException
      */
     public function setConfig(array $config);
 
@@ -40,7 +52,7 @@ interface ArchiveToInterface {
      *
      * @param array $parsedWarnInfo Inhalt der WetterWarnung
      *
-     * @throws Exception
+     * @throws Exception | RuntimeException
      */
     public function saveToArchive(array $parsedWarnInfo);
 }

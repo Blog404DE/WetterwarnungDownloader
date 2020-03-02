@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - Parser.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -18,7 +29,7 @@ namespace blog404de\WetterWarnung\Reader;
 use blog404de\WetterWarnung\Network\Network;
 use DateTime;
 use DateTimeZone;
-use Exception;
+use RuntimeException;
 use SimpleXMLElement;
 
 /**
@@ -37,7 +48,7 @@ class Parser extends Network {
      * @param int              $warnCellId WarnCellID für die eine Warnung ermittelt werden soll
      * @param string           $stateCode  Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
      *
-     * @throws Exception
+     * @throws RuntimeException(
      */
     final protected function checkWarnFile(SimpleXMLElement $xml, int $warnCellId, string $stateCode): array {
         try {
@@ -46,7 +57,7 @@ class Parser extends Network {
 
             // Prüfe ob Info-Node existiert
             if (!property_exists($xml, 'info')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'info'-Node."
                 );
             }
@@ -80,7 +91,7 @@ class Parser extends Network {
             }
 
             return $arrRohWarnungen;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -91,7 +102,7 @@ class Parser extends Network {
      *
      * @param array $rawWarnung Array mit den relevanten Warn-Daten
      *
-     * @throws Exception
+     * @throws RuntimeException(
      */
     final protected function collectWarnArray(array $rawWarnung): array {
         try {
@@ -102,7 +113,7 @@ class Parser extends Network {
                 !\array_key_exists('identifier', $rawWarnung) ||
                 !\array_key_exists('msgType', $rawWarnung)
             ) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Die aktuell verarbeitete Roh-Wetterwarnung ist nicht vollständig - ' .
                     "'warnung' oder 'geoinfo' fehlt."
                 );
@@ -122,6 +133,7 @@ class Parser extends Network {
             $dateCurrent = new DateTime('now', new DateTimeZone('Europe/Berlin'));
 
             // Prüfe ob Warnung bereits abgelaufen ist und übersprungen werden kann
+            /** @noinspection NotOptimalIfConditionsInspection */
             if ($objEndzeit->getTimestamp() <= $dateCurrent->getTimestamp() &&
                 $objEndzeit->getTimestamp() !== $objStartzeit->getTimestamp()
             ) {
@@ -175,7 +187,7 @@ class Parser extends Network {
                 $parsedWarnInfo['instruction']);
 
             return $parsedWarnInfo;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -186,14 +198,14 @@ class Parser extends Network {
      *
      * @param SimpleXMLElement $eventCodeElement Event-Code Element
      *
-     * @throws Exception
+     * @throws RuntimeException(
      */
     private function checkForTestWarnung(SimpleXMLElement $eventCodeElement): bool {
         try {
             $testwarnung = false;
             foreach ($eventCodeElement as $eventCode) {
-                if (!isset($eventCode->{'valueName'}) || !isset($eventCode->{'value'})) {
-                    throw new Exception(
+                if (!isset($eventCode->{'valueName'}, $eventCode->{'value'})) {
+                    throw new RuntimeException(
                         'Fehler beim parsen der Wetterwarnung: ' .
                         "Die XML Datei beinhaltet kein 'eventCode'->'valueName' bzw. 'value'-Node."
                     );
@@ -210,7 +222,7 @@ class Parser extends Network {
             }
 
             return $testwarnung;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -221,18 +233,19 @@ class Parser extends Network {
      *
      * @param SimpleXMLElement $xml XML-Datei des DWD mit den Wetterwarnungen
      *
-     * @throws Exception
+     * @throws RuntimeException(
      */
     private function shouldParseWetterwarnung(SimpleXMLElement $xml): bool {
         $readWarnfile = false;
 
         // Prüfe um welche Art von Wetter-Warnung es sich handelt (Alert oder Cancel)
+        /** @noinspection NotOptimalIfConditionsInspection */
         if ('alert' === mb_strtolower((string)$xml->{'msgType'}) || 'update' === mb_strtolower((string)$xml->{'msgType'})) {
             // Verarbeite Inhalt der XML Datei (Typ: Alert)
             $wetterWarnung = $xml->{'info'};
             // Prüfe ob es sich um eine Testwarnung handelt
             if (!property_exists($wetterWarnung, 'eventCode')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'eventCode'-Node."
                 );
             }

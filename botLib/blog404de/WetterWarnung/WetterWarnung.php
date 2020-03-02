@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - WetterWarnung.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -17,6 +28,7 @@ namespace blog404de\WetterWarnung;
 
 use blog404de\Standard;
 use Exception;
+use RuntimeException;
 use SimpleXMLElement;
 
 /**
@@ -55,33 +67,34 @@ class WetterWarnung extends Save\SaveToFile {
 
         // Via CLI gestartet?
         if (\PHP_SAPI !== 'cli') {
-            throw new Exception('Script darf ausschließlich über die Kommandozeile gestartet werden.');
+            throw new RuntimeException('Script darf ausschließlich über die Kommandozeile gestartet werden.');
         }
 
         // FTP Modul vorhanden?
         if (!\extension_loaded('ftp')) {
-            throw new Exception("PHP Modul 'ftp' steht nicht zur Verfügung");
+            throw new RuntimeException("PHP Modul 'ftp' steht nicht zur Verfügung");
         }
 
         // FTP Modul vorhanden?
         if (!\extension_loaded('zip')) {
-            throw new Exception("PHP Modul 'zip' steht nicht zur Verfügung");
+            throw new RuntimeException("PHP Modul 'zip' steht nicht zur Verfügung");
         }
 
         // FTP Modul vorhanden?
         if (!\extension_loaded('mbstring')) {
-            throw new Exception("PHP Modul 'mbstring' steht nicht zur Verfügung");
+            throw new RuntimeException("PHP Modul 'mbstring' steht nicht zur Verfügung");
         }
 
         // PHP Version prüfen
         if (version_compare(PHP_VERSION, '7.0.0') < 0) {
-            throw new Exception(
+            throw new RuntimeException(
                 'Für das Script wird mindestens PHP7 vorrausgesetzt ' .
                 '(PHP 5.6.x wird nur noch mit Sicherheitsupdates bis 31.12.2018 versorgt'
             );
         }
 
         // Array leeren
+        /** @noinspection PropertyInitializationFlawsInspection */
         $this->wetterWarnungen = [];
 
         // Toolbox instanzieren
@@ -93,7 +106,7 @@ class WetterWarnung extends Save\SaveToFile {
      *
      * @throws
      */
-    public function prepareWetterWarnungen() {
+    public function prepareWetterWarnungen(): void {
         try {
             // Starte verabeiten der Wetterwarnungen des DWD
             echo PHP_EOL . '*** Starte Vorbereitungen::' . PHP_EOL;
@@ -106,7 +119,7 @@ class WetterWarnung extends Save\SaveToFile {
                 // Temporär-Ordner kann nicht angelegt werden
                 echo 'fehlgeschlagen' . PHP_EOL;
 
-                throw new Exception(
+                throw new RuntimeException(
                     'Temporär-Ordner kann nicht angelegt werden. Bitte prüfen Sie ob in der php.ini ' .
                     "'sys_tmp_dir' oder die Umgebungsvariable 'TMPDIR' gesetzt ist."
                 );
@@ -117,11 +130,12 @@ class WetterWarnung extends Save\SaveToFile {
             // ZIP-Dateien in Temporär-Ordner entpacken
             echo '-> Entpacke die Wetterwarnungen des DWD' . PHP_EOL;
             $zipfiles = glob($this->getLocalFolder() . \DIRECTORY_SEPARATOR . '*.zip');
+            /** @noinspection NotOptimalIfConditionsInspection */
             if (0 === \count($zipfiles) || false === $zipfiles) {
-                throw new Exception('Es befindet sich keine ZIP Datei im Download-Ordner.');
+                throw new RuntimeException('Es befindet sich keine ZIP Datei im Download-Ordner.');
             }
             if (\count($zipfiles) > 10) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Mehr als 10 ZIP-Datei im Download-Cache vorhanden - ' .
                     'es sollten nie mehr als eine ZIP-Datei vorhanden sein.'
                 );
@@ -129,7 +143,7 @@ class WetterWarnung extends Save\SaveToFile {
             foreach ($zipfiles as $filename) {
                 $this->toolbox->extractZipFile($filename, $this->tmpFolder);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -141,9 +155,9 @@ class WetterWarnung extends Save\SaveToFile {
      * @param int    $warnCellId Warn-Region mittels WarnCellID festlegen
      * @param string $stateCode  Kürzel des Bundeslandes
      *
-     * @throws Exception
+     * @throws RuntimeException
      */
-    public function parseWetterWarnungen(int $warnCellId, string $stateCode) {
+    public function parseWetterWarnungen(int $warnCellId, string $stateCode): void {
         try {
             // Lade zuletzt verarbeitete Wetterwarnungen
             $this->loadLastWetterWarnungen($this->localJsonFile);
@@ -170,7 +184,7 @@ class WetterWarnung extends Save\SaveToFile {
                     // State noch hinzufügen
                     $currentWarnData['identifier'] = $this->getHeaderIdentifier($xml);
                     $currentWarnData['msgType'] = ucfirst($this->getHeaderMsgType($xml));
-                    $currentWarnData['reference'] = (string)$this->getHeaderReference($xml);
+                    $currentWarnData['reference'] = $this->getHeaderReference($xml);
                     $arrRohWarnungen[basename($xmlFile)] = $currentWarnData;
                 }
             }
@@ -200,7 +214,7 @@ class WetterWarnung extends Save\SaveToFile {
             } else {
                 echo "\tKeine Warnmeldungen zum verarbeiten vorhanden" . PHP_EOL;
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -211,7 +225,7 @@ class WetterWarnung extends Save\SaveToFile {
      *
      * @param bool $cleanCache Cache nach dem speichern aufräumen
      *
-     * @throws Exception
+     * @throws
      */
     public function saveToFile(bool $cleanCache): bool {
         // Speichere lokale JSON Datei
@@ -219,17 +233,15 @@ class WetterWarnung extends Save\SaveToFile {
         $status = $this->saveFile($this->wetterWarnungen, $this->localJsonFile);
 
         // Cache aufräumen?
-        if ($cleanCache) {
-            // Lösche Cache-Folder
-            if ('' !== $this->tmpFolder) {
-                echo PHP_EOL . '*** Lösche eventuell vorhandenen Cache und temporäre Daten:' . PHP_EOL;
-                if (!$this->toolbox->removeTempDir($this->tmpFolder)) {
-                    echo "\t* Löschen des Ordner " . $this->tmpFolder . ' fehlgeschlagen' . PHP_EOL;
+        // Lösche Cache-Folder
+        if ($cleanCache && '' !== $this->tmpFolder) {
+            echo PHP_EOL . '*** Lösche eventuell vorhandenen Cache und temporäre Daten:' . PHP_EOL;
+            if (!$this->toolbox->removeTempDir($this->tmpFolder)) {
+                echo "\t* Löschen des Ordner " . $this->tmpFolder . ' fehlgeschlagen' . PHP_EOL;
 
-                    throw new Exception('Löschen des Temporären Ordner (' . $this->tmpFolder . ') ist fehlgeschlagen.');
-                }
-                echo "\t* Löschen des Ordner " . $this->tmpFolder . ' erfolgreich' . PHP_EOL;
+                throw new RuntimeException('Löschen des Temporären Ordner (' . $this->tmpFolder . ') ist fehlgeschlagen.');
             }
+            echo "\t* Löschen des Ordner " . $this->tmpFolder . ' erfolgreich' . PHP_EOL;
         }
 
         return $status;
@@ -242,18 +254,18 @@ class WetterWarnung extends Save\SaveToFile {
      *
      * @param string $localFolder Lokaler Ordner
      *
-     * @throws Exception
+     * @throws RuntimeException
      */
-    public function setLocalFolder(string $localFolder) {
+    public function setLocalFolder(string $localFolder): void {
         if (is_dir($localFolder)) {
             if (is_writable($localFolder)) {
                 // Ordner an Parent-Klasse weitergeben
                 parent::setLocalFolder($localFolder);
             } else {
-                throw new Exception('In den lokale Ordner ' . $localFolder . ' kann nicht geschrieben werden.');
+                throw new RuntimeException('In den lokale Ordner ' . $localFolder . ' kann nicht geschrieben werden.');
             }
         } else {
-            throw new Exception('Der lokale Ordner ' . $localFolder . ' existiert nicht.');
+            throw new RuntimeException('Der lokale Ordner ' . $localFolder . ' existiert nicht.');
         }
     }
 
@@ -264,13 +276,13 @@ class WetterWarnung extends Save\SaveToFile {
      *
      * @throws
      */
-    public function setLocalJsonFile(string $localJsonFile) {
+    public function setLocalJsonFile(string $localJsonFile): void {
         if (empty($localJsonFile)) {
-            throw new Exception('Es wurde keine JSON-Datei zals Ziel für die Wetterwarnungen angegeben.');
+            throw new RuntimeException('Es wurde keine JSON-Datei zals Ziel für die Wetterwarnungen angegeben.');
         }
         if (file_exists($localJsonFile) && !is_writable($localJsonFile)) {
             // Datei existiert - aber die Schreibrechte fehlen
-            throw new Exception(
+            throw new RuntimeException(
                 'Auf die JSON Datei ' . $localJsonFile .
                     ' mit den geparsten Wetterwarnungen kann nicht schreibend zugegriffen werden'
             );
@@ -279,13 +291,13 @@ class WetterWarnung extends Save\SaveToFile {
             // Datei existiert nicht - Schreibrechte auf den Ordner existieren
             if (!@touch($localJsonFile)) {
                 // Leere Datei anlegen ist nicht erfolgreich
-                throw new Exception(
+                throw new RuntimeException(
                     'Leere JSON Datei für die geparsten Wetterwarnungen konnte nicht angelegt werden'
                 );
             }
         } else {
             // Kein Zugriff auf Datei möglich
-            throw new Exception(
+            throw new RuntimeException(
                 'JSON Datei für die geparsten Wetterwarnungen kann nicht in ' .
                     \dirname($localJsonFile) . ' geschrieben werden'
             );
@@ -318,24 +330,24 @@ class WetterWarnung extends Save\SaveToFile {
      *
      * @param string $xmlFile Pfad zur XML Datei mit den der WetterWarnung
      *
-     * @throws Exception
+     * @throws RuntimeException
      *
      * @return \SimpleXMLElement
      */
-    private function readXmlFile(string $xmlFile) {
+    private function readXmlFile(string $xmlFile): SimpleXMLElement {
         echo "\tPrüfe " . basename($xmlFile) .
             ' (' . number_format(round(filesize($xmlFile) / 1024, 2), 2) . ' kbyte): ';
 
         // Öffne XML Datei zum lesen
         $content = @file_get_contents($xmlFile);
         if (!$content) {
-            throw new Exception(PHP_EOL . 'Fehler beim lesen der XML Datei ' . $xmlFile);
+            throw new RuntimeException(PHP_EOL . 'Fehler beim lesen der XML Datei ' . $xmlFile);
         }
 
         // XML Datei in Parser laden
         $xml = new SimpleXMLElement($content, LIBXML_NOERROR | LIBXML_NOWARNING | LIBXML_NONET);
         if (!$xml) {
-            throw new Exception('Fehler in parseWetterWarnung: Die XML Datei konnte nicht verarbeitet werden.');
+            throw new RuntimeException('Fehler in parseWetterWarnung: Die XML Datei konnte nicht verarbeitet werden.');
         }
 
         return $xml;

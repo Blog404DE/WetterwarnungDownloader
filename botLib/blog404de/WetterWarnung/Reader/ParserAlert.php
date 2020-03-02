@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - ParserAlert.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -19,6 +30,7 @@ use blog404de\Standard\Toolbox;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use RuntimeException;
 
 /**
  * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.
@@ -34,14 +46,14 @@ trait ParserAlert {
      *
      * @throws Exception
      */
-    public function setLocalIconFolder(string $localIconFolder) {
+    public function setLocalIconFolder(string $localIconFolder): void {
         try {
             if (!empty($localIconFolder) && false !== $localIconFolder) {
                 if (!is_readable(
                     realpath($localIconFolder . \DIRECTORY_SEPARATOR . 'zuordnung.json')
                 )) {
                     // Kein Zugriff auf Datei möglich
-                    throw new Exception(
+                    throw new RuntimeException(
                         'JSON Datei mit der Zuordnung der Warnlagen-Icons kann nicht in ' .
                         realpath($localIconFolder) . \DIRECTORY_SEPARATOR .
                         'zuordnung.json geöffnet werden'
@@ -52,7 +64,7 @@ trait ParserAlert {
             }
 
             $this->localIconFolder = $localIconFolder;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -66,7 +78,7 @@ trait ParserAlert {
     public function getLocalIconFolder(): string {
         try {
             return  $this->localIconFolder;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -83,18 +95,18 @@ trait ParserAlert {
         try {
             // Startzeitpunkt ermitteln
             if (!property_exists($currentWarnAlert, 'onset')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'onset'."
                 );
             }
 
             $objDateOnSet = new DateTime();
-            $objDateOnset = $objDateOnSet->createFromFormat(
+            $objDateOnset = $objDateOnSet::createFromFormat(
                 'Y-m-d*H:i:sT',
                 $currentWarnAlert->{'onset'}->__toString()
             );
             if (!$objDateOnset) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Die aktuell verarbeitete Roh-Wetterwarnung beinhaltet ungültige Daten im ' .
                     "XML-Node 'warnung'->'onset'."
                 );
@@ -103,7 +115,7 @@ trait ParserAlert {
             $objDateOnset->setTimezone(new DateTimeZone('Europe/Berlin'));
 
             return $objDateOnset;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -125,12 +137,12 @@ trait ParserAlert {
             } else {
                 // Expire-Element existiert
                 $objDateExpire = new DateTime();
-                $objDateExpire = $objDateExpire->createFromFormat(
+                $objDateExpire = $objDateExpire::createFromFormat(
                     'Y-m-d*H:i:sT',
                     $currentWarnAlert->{'expires'}->__toString()
                 );
                 if (!$objDateExpire) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         'Die aktuell verarbeitete Roh-Wetterwarnung beinhaltet ungültige Daten im ' .
                         "XML-Node 'warnung'->'expires'."
                     );
@@ -140,7 +152,7 @@ trait ParserAlert {
             }
 
             return $objDateExpire;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -157,13 +169,13 @@ trait ParserAlert {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'urgency')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'urgency'."
                 );
             }
 
             return $currentWarnAlert->{'urgency'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -180,7 +192,7 @@ trait ParserAlert {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'severity')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'severity'."
                 );
             }
@@ -214,8 +226,8 @@ trait ParserAlert {
                 }
             }
 
-            return (string)$severity;
-        } catch (Exception $e) {
+            return $severity;
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -232,7 +244,7 @@ trait ParserAlert {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'severity')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'severity'."
                 );
             }
@@ -266,8 +278,8 @@ trait ParserAlert {
                 }
             }
 
-            return (int)$warnstufe;
-        } catch (Exception $e) {
+            return $warnstufe;
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -284,13 +296,13 @@ trait ParserAlert {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'event')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'event'."
                 );
             }
 
             return $currentWarnAlert->{'event'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -307,13 +319,13 @@ trait ParserAlert {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'headline'."
                 );
             }
 
             return $currentWarnAlert->{'headline'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -330,13 +342,13 @@ trait ParserAlert {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'description'."
                 );
             }
 
             return $currentWarnAlert->{'description'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -353,13 +365,13 @@ trait ParserAlert {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'instruction'."
                 );
             }
 
             return $currentWarnAlert->{'instruction'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -376,13 +388,13 @@ trait ParserAlert {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'senderName'."
                 );
             }
 
             return $currentWarnAlert->{'senderName'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -399,13 +411,13 @@ trait ParserAlert {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'web')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'web'."
                 );
             }
 
             return $currentWarnAlert->{'web'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -425,7 +437,7 @@ trait ParserAlert {
                 $this->getLocalIconFolder() . \DIRECTORY_SEPARATOR . 'zuordnung.json'
             );
             if (false === $jsonZuordnung) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Die Datei zuordnung.json innerhalb des Icon-Ordners konnte nicht geöffnet werden.'
                 );
             }
@@ -435,7 +447,7 @@ trait ParserAlert {
             if (json_last_error()) {
                 $toolbox = new Toolbox();
 
-                throw new Exception(
+                throw new RuntimeException(
                     'Fehler beim interpretieren Icon-Zuordnung Datei (' .
                     $toolbox->getJsonErrorMessage(json_last_error()) . ')'
                 );
@@ -447,12 +459,12 @@ trait ParserAlert {
             $warnIconFilename = '';
             foreach ($warnIcons as $warnIconPart => $warnCodes) {
                 if (\in_array((string)$eventcode, $warnCodes, true)) {
-                    if ((int)$this->getAlertWarnstufe($currentWarnAlert) < 0) {
+                    if ($this->getAlertWarnstufe($currentWarnAlert) < 0) {
                         $warnIconFilename = 'warn_icons_' .
                             sprintf($warnIconPart, 0) . '.png';
                     } else {
                         $warnIconFilename = 'warn_icons_' .
-                            sprintf($warnIconPart, (int)$this->getAlertWarnstufe($currentWarnAlert)) . '.png';
+                            sprintf($warnIconPart, $this->getAlertWarnstufe($currentWarnAlert)) . '.png';
                     }
                 }
             }
@@ -472,7 +484,7 @@ trait ParserAlert {
             }
 
             return $warnIconFilename;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -485,21 +497,22 @@ trait ParserAlert {
      *
      * @throws Exception
      */
-    final private function getEventCode(\SimpleXMLElement $currentWarnAlert): int {
+    private function getEventCode(\SimpleXMLElement $currentWarnAlert): int {
         try {
             $eventcode = -1;
             foreach ($currentWarnAlert->children() as $child) {
-                if ('eventCode' === $child->getName()) {
-                    if (property_exists($child, 'valueName') && property_exists($child, 'value')) {
-                        if ('II' === (string)$child->{'valueName'}[0]->__toString()) {
-                            $eventcode = (int)($child->{'value'}->__toString());
-                        }
-                    }
+                /** @noinspection NotOptimalIfConditionsInspection */
+                if (('eventCode' === $child->getName()) &&
+                    property_exists($child, 'valueName') && property_exists(
+                        $child,
+                        'value'
+                    ) && 'II' === (string)$child->{'valueName'}[0]->__toString()) {
+                    $eventcode = (int)($child->{'value'}->__toString());
                 }
             }
 
             return $eventcode;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

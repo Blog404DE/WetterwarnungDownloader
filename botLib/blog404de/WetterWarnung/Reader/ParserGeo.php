@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - ParserGeo.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -16,6 +27,7 @@ declare(strict_types=1);
 namespace blog404de\WetterWarnung\Reader;
 
 use Exception;
+use RuntimeException;
 
 /**
  * Traint zum auslesen diverser Geo-Elemente aus der Roh-XML Datei.
@@ -53,13 +65,13 @@ trait ParserGeo {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'warncellid')) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Die aktuell verarbeitete Roh-Wetterwarnung fehlt die WarnCellID in den Region-Angaben.'
                 );
             }
 
             return $currentWarnGeo->{'warncellid'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -76,13 +88,13 @@ trait ParserGeo {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'areaDesc')) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Die aktuell verarbeitete Roh-Wetterwarnung fehlt der Ortsname in den Region-Angaben.'
                 );
             }
 
             return $currentWarnGeo->{'areaDesc'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -99,13 +111,13 @@ trait ParserGeo {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'state')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt 'State' in den Region-Angaben."
                 );
             }
 
             return $currentWarnGeo->{'state'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -122,21 +134,21 @@ trait ParserGeo {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'state')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt 'State' in den Region-Angaben."
                 );
             }
 
             // Ermittle Event-Typ
             if (!\array_key_exists((string)$currentWarnGeo->{'state'}, $this->regionames)) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Die Abkürzung des Bundeslandes ' . $currentWarnGeo->{'state'} . ' kann keinem ' .
                     'deutschen Bundesland zugeordnet werden durch das Wetterwarnung-Script'
                 );
             }
 
             return (string)$this->regionames[$currentWarnGeo->{'state'}->__toString()];
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -154,7 +166,7 @@ trait ParserGeo {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'altitude')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt 'altitude' in den Region-Angaben."
                 );
             }
@@ -165,11 +177,11 @@ trait ParserGeo {
                 $altitude = floor((float)($currentWarnGeo->{'altitude'}->__toString()));
             }
             if (false === $altitude) {
-                throw new Exception('Umwandlung des Altitude-Wertes von Feet in Meter fehlgeschlagen');
+                throw new RuntimeException('Umwandlung des Altitude-Wertes von Feet in Meter fehlgeschlagen');
             }
 
             return $altitude;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -187,12 +199,11 @@ trait ParserGeo {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'ceiling')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt 'ceiling' in den Region-Angaben."
                 );
             }
 
-            var_dump($currentWarnGeo->{'ceiling'});
             if ($metric) {
                 $ceiling = floor(((float)($currentWarnGeo->{'ceiling'}->__toString()) * 0.3048));
             } else {
@@ -200,11 +211,11 @@ trait ParserGeo {
             }
 
             if (false === $ceiling) {
-                throw new Exception('Umwandlung des Ceiling-Wertes von Feet in Meter fehlgeschlagen');
+                throw new RuntimeException('Umwandlung des Ceiling-Wertes von Feet in Meter fehlgeschlagen');
             }
 
             return $ceiling;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -236,7 +247,7 @@ trait ParserGeo {
             }
 
             return $hoehenangabe;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
