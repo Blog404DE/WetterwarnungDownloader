@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - ParserHeader.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -16,6 +27,7 @@ declare(strict_types=1);
 namespace blog404de\WetterWarnung\Reader;
 
 use Exception;
+use RuntimeException;
 use SimpleXMLElement;
 
 /**
@@ -40,12 +52,12 @@ trait ParserHeader {
     ): SimpleXMLElement {
         // Prüfen ob die entsprechenden Felder in der XML Datei existieren
         if (!property_exists($xml, 'info')) {
-            throw new Exception(
+            throw new RuntimeException(
                 "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'info'-Node."
             );
         }
         if (!property_exists($xml->{'info'}, 'area')) {
-            throw new Exception(
+            throw new RuntimeException(
                 "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'info->area' Node."
             );
         }
@@ -56,7 +68,7 @@ trait ParserHeader {
             if (!property_exists($area, 'polygon')) {
                 // Speichere areaDesc
                 if (!property_exists($area, 'areaDesc')) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         "Fehler beim durchsuchen der Geo-Informationen: XML-GeoInfo-Node fehlt 'areaDesc'."
                     );
                 }
@@ -66,7 +78,7 @@ trait ParserHeader {
 
                 // Prüfe ob mindestens ein gültiger Eintrag existiert in dem geprüften Area-Node
                 if (0 === \count($cellinformation)) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         'Fehler beim durchsuchen der Geo-Informationen: ' .
                         "Der 'GeoCode'-Node beinhaltete keine WarncellID-Informationen innerhalb der WetterWarnung"
                     );
@@ -78,7 +90,7 @@ trait ParserHeader {
                     $result->addChild('areaDesc', (string)$cellinformation[$warnCellId]['areaDesc']);
                     $result->addChild('altitude', (string)$cellinformation[$warnCellId]['altitude']);
                     $result->addChild('ceiling', (string)$cellinformation[$warnCellId]['ceiling']);
-                    $result->addChild('state', (string)$stateCode);
+                    $result->addChild('state', $stateCode);
 
                     return $result;
                 }
@@ -99,13 +111,13 @@ trait ParserHeader {
     final protected function getHeaderIdentifier(SimpleXMLElement $xml): string {
         try {
             if (!property_exists($xml, 'identifier')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'identifier'-Node."
                 );
             }
 
             return $xml->{'identifier'}->__toString();
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -121,13 +133,13 @@ trait ParserHeader {
     final protected function getHeaderMsgType(SimpleXMLElement $xml): string {
         try {
             if (!property_exists($xml, 'msgType')) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'identifier'-Node."
                 );
             }
 
             return mb_strtolower($xml->{'msgType'}->__toString());
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -144,7 +156,7 @@ trait ParserHeader {
         try {
             if ('update' === $this->getHeaderMsgType($xml)) {
                 if (!property_exists($xml, 'references')) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         "Fehler beim parsen der Wetterwarnung: Die XML Datei mit Typ 'update' " .
                         "beinhaltet kein 'references'-Node."
                     );
@@ -155,7 +167,7 @@ trait ParserHeader {
             }
 
             return $reference;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -176,7 +188,7 @@ trait ParserHeader {
         foreach ($geocodes as $currentGeoCode) {
             // Prüfe ob Nodes vorhanden sind
             if (!property_exists($currentGeoCode, 'valueName') || !property_exists($currentGeoCode, 'value')) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Fehler beim durchsuchen der Geo-Informationen: XML-Nodes ' .
                     "'area'->'geocode'->'valueName' oder 'value' fehlen."
                 );
@@ -185,12 +197,12 @@ trait ParserHeader {
             if (('WARNCELLID' === $currentGeoCode->{'valueName'}->__toString())) {
                 // Prüfe nach Höhenangaben-Nodes
                 if (!property_exists($area, 'altitude')) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         "Fehler beim durchsuchen der Geo-Informationen: XML-Nodes 'altitude' fehlt"
                     );
                 }
                 if (!property_exists($area, 'ceiling')) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         "Fehler beim durchsuchen der Geo-Informationen: XML-Nodes 'ceiling' fehlt."
                     );
                 }

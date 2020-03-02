@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - Extensions.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -18,6 +29,7 @@ namespace blog404de\WetterWarnung;
 use blog404de\WetterWarnung\Action\SendToInterface;
 use blog404de\WetterWarnung\Archive\ArchiveToInterface;
 use Exception;
+use RuntimeException;
 
 /**
  * Trait für die Extensions-Unterstützung im WetterWarnung Parser.
@@ -48,7 +60,7 @@ trait Extensions {
      *
      * @throws
      */
-    public function startExtensions(bool $archive, bool $action) {
+    public function startExtensions(bool $archive, bool $action): void {
         try {
             if (0 === \count($this->wetterWarnungen)) {
                 // Keine Wetterwarnungen vorhanden
@@ -64,7 +76,7 @@ trait Extensions {
                     $this->startExtensionAction();
                 }
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -79,7 +91,7 @@ trait Extensions {
      *
      * @throws Exception
      */
-    public function setActionConfig(array $systemConfig, array $actionConfig, bool $forceAction) {
+    public function setActionConfig(array $systemConfig, array $actionConfig, bool $forceAction): void {
         try {
             // Prüfe ob actionConfig Parameter valid sind
             $actionParameter = [
@@ -90,7 +102,7 @@ trait Extensions {
 
             foreach ($actionParameter as $parameter) {
                 if (!\array_key_exists($parameter, current($actionConfig))) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         'Der Konfigurationsparamter ["ActionConfig"]["' . $parameter . '"] wurde nicht gesetzt.'
                     );
                 }
@@ -103,7 +115,7 @@ trait Extensions {
 
             foreach ($systemParameter as $parameter) {
                 if (!\array_key_exists($parameter, $systemConfig)) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         'Der Konfigurationsparamter ["localIconFolder"] wurde nicht gesetzt.'
                     );
                 }
@@ -112,7 +124,7 @@ trait Extensions {
             $this->actionConfig = $actionConfig;
             $this->systemConfig = $systemConfig;
             $this->forceAction = $forceAction;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -123,7 +135,7 @@ trait Extensions {
      *
      * @param array $archiveConfig Konfigurations-Array für die Archiv-Extension
      */
-    public function setArchiveConfig(array $archiveConfig) {
+    public function setArchiveConfig(array $archiveConfig): void {
         $this->archiveConfig = $archiveConfig;
     }
 
@@ -132,7 +144,7 @@ trait Extensions {
      *
      * @throws Exception
      */
-    private function startExtensionArchive() {
+    private function startExtensionArchive(): void {
         try {
             // Durchlaufe alle definiertne Archive-Klassen
             foreach ($this->archiveConfig as $archiveClassName => $archiveConfig) {
@@ -152,7 +164,7 @@ trait Extensions {
                     $this->archiveClass->saveToArchive($parsedWarnInfo);
                 }
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -163,7 +175,7 @@ trait Extensions {
      *
      * @throws Exception
      */
-    private function startExtensionAction() {
+    private function startExtensionAction(): void {
         try {
             // Durchlaufe alle definiertne Action-Klassen
             foreach ($this->actionConfig as $actionClassName => $actionConfig) {
@@ -199,7 +211,7 @@ trait Extensions {
                     $this->actionClass->startAction($parsedWarnInfo, $warnExists);
                 }
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

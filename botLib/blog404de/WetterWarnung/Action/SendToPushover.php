@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - SendToPushover.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -17,6 +28,7 @@ namespace blog404de\WetterWarnung\Action;
 
 use CURLFile;
 use Exception;
+use RuntimeException;
 
 /**
  * Action-Klasse für WetterWarnung Downloader zum senden eines Tweets bei einer neuen Nachricht.
@@ -34,17 +46,17 @@ class SendToPushover implements SendToInterface {
         try {
             // Prüfe ob libCurl vorhanden ist
             if (!\extension_loaded('curl')) {
-                throw new Exception(
+                throw new RuntimeException(
                     'libCurl bzw. die das libCurl-PHP Modul steht nicht zur Verfügung.'
                 );
             }
 
             if (!class_exists('CURLFile')) {
-                throw new Exception(
+                throw new RuntimeException(
                     'CURLFile steht nicht zur Verfügung / libCurl ggf. in einer zu alten Version.'
                 );
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -64,7 +76,7 @@ class SendToPushover implements SendToInterface {
             if ($this->getConfig()) {
                 if (!\is_array($parsedWarnInfo)) {
                     // Keine Warnwetter-Daten zum senden an PushOver vorhanden -> harter Fehler
-                    throw new Exception('Die im Archiv zu speicherenden Wetter-Informationen sind ungültig');
+                    throw new RuntimeException('Die im Archiv zu speicherenden Wetter-Informationen sind ungültig');
                 }
 
                 // Status-Ausgabe der aktuellen Wetterwarnung
@@ -100,14 +112,14 @@ class SendToPushover implements SendToInterface {
                     if (false === $result) {
                         // Befehl wurde nicht abgesetzt
                         // Nachricht konnte nicht konvertiert werden
-                        throw new Exception(
+                        throw new RuntimeException(
                             'Verbindung zur Pushover Fehlgeschlagen (' . curl_error($curl) . ')'
                         );
                     }
 
                     // Prüfe ob Befehl erfolgreich abgesetzt wurde
                     if (200 !== curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
-                        throw new Exception(
+                        throw new RuntimeException(
                             'Pushover Webhook API Liefert ein Fehler zurück (' .
                             curl_getinfo($curl, CURLINFO_HTTP_CODE) . ' / ' . $result . ')'
                         );
@@ -121,10 +133,10 @@ class SendToPushover implements SendToInterface {
                 return 0;
             }
             // Konfiguration ist nicht gsetzt
-            throw new Exception(
+            throw new RuntimeException(
                 'Die Action-Funktion wurde nicht erfolgreich konfiguriert'
             );
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -137,7 +149,7 @@ class SendToPushover implements SendToInterface {
      *
      * @throws Exception
      */
-    public function setConfig(array $config) {
+    public function setConfig(array $config): void {
         try {
             $configParameter = [
                 'apiKey', 'userKey', 'localIconFolder',
@@ -147,7 +159,7 @@ class SendToPushover implements SendToInterface {
             // Alle Paramter verfügbar?
             foreach ($configParameter as $parameter) {
                 if (!\array_key_exists($parameter, $config)) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         'Der Konfigurationsparamter ["ActionConfig"]["' . $parameter . '"] wurde nicht gesetzt.'
                     );
                 }
@@ -155,7 +167,7 @@ class SendToPushover implements SendToInterface {
 
             // Werte setzen
             $this->config = $config;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -196,7 +208,7 @@ class SendToPushover implements SendToInterface {
             }
 
             return $message;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -220,22 +232,21 @@ class SendToPushover implements SendToInterface {
 
             // Prä-/Postfix anfügen
             if (!empty($this->config['MessagePrefix']) && false !== $this->config['MessagePrefix']) {
-                $message = $message . ' ' . $this->config['MessagePrefix'] . ' ';
+                $message .= ' ' . $this->config['MessagePrefix'] . ' ';
             }
 
-            $message = $message . $parsedWarnInfo['description'];
+            $message .= $parsedWarnInfo['description'];
             if (!empty($parsedWarnInfo['instruction'])) {
-                $message = $message . ' ' . $parsedWarnInfo['instruction'];
+                $message .= ' ' . $parsedWarnInfo['instruction'];
             }
 
-            $message = $message . PHP_EOL . PHP_EOL;
+            $message .= PHP_EOL . PHP_EOL;
 
-            $message = $message . 'Quelle: ' . $parsedWarnInfo['sender'] . ' (' . $parsedWarnInfo['event'] .
-                ' / Stufe: ' . $parsedWarnInfo['severity'] . ')';
+            $message .= 'Quelle: ' . $parsedWarnInfo['sender'] . ' (' . $parsedWarnInfo['event'] . ' / Stufe: ' . $parsedWarnInfo['severity'] . ')';
 
             if (!empty($this->config['MessagePostfix']) && false !== $this->config['MessagePostfix']) {
                 // Postfix erst einmal für spätere Verwendung zwischenspeichern
-                $message = $message . ' ' . $this->config['MessagePostfix'];
+                $message .= ' ' . $this->config['MessagePostfix'];
             }
 
             //
@@ -243,8 +254,8 @@ class SendToPushover implements SendToInterface {
             //
 
             // Uhrzeit ermitteln
-            $startZeit = unserialize($parsedWarnInfo['startzeit']);
-            $endzeit = unserialize($parsedWarnInfo['endzeit']);
+            $startZeit = unserialize($parsedWarnInfo['startzeit'], ['allowed_classes' => true]);
+            $endzeit = unserialize($parsedWarnInfo['endzeit'], ['allowed_classes' => true]);
 
             $header = $parsedWarnInfo['severity'] . ' des DWD für ' . $parsedWarnInfo['area'] .
                 ' vor ' . $parsedWarnInfo['event'] .
@@ -260,7 +271,7 @@ class SendToPushover implements SendToInterface {
                 'title' => $header,
                 'message' => $message,
             ];
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

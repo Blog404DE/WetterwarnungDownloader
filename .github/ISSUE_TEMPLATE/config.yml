@@ -1,0 +1,6 @@
+contact_links:
+    - name: Get help
+      url: https://github.com/Blog404DE/WetterwarnungDownloader/wiki
+      about: If you need help using this Script, please contact support [at] neuthardwetter.de
+
+blank_issues_enabled: false

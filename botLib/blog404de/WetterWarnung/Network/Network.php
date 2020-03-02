@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - Network.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -18,6 +29,7 @@ namespace blog404de\WetterWarnung\Network;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use RuntimeException;
 
 /**
  * Netzwerk-Funktionen des WarnParser für den Download
@@ -42,7 +54,7 @@ class Network {
      *
      * @throws Exception
      */
-    public function disconnectFromFTP() {
+    public function disconnectFromFTP(): void {
         try {
             // Schließe Verbindung sofern notwendig
             if (\is_resource($this->ftpConnectionId)) {
@@ -50,7 +62,7 @@ class Network {
                 ftp_close($this->ftpConnectionId);
                 echo "\t-> Verbindung zu erfolgreich geschlossen." . PHP_EOL;
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -65,14 +77,14 @@ class Network {
      *
      * @throws Exception
      */
-    public function connectToFTP(string $host, string $username, string $password) {
+    public function connectToFTP(string $host, string $username, string $password): void {
         try {
             echo '*** Baue Verbindung zum DWD-FTP Server auf.' . PHP_EOL;
 
             // FTP-Verbindung aufbauen
             $this->ftpConnectionId = ftp_connect($host);
             if (false === $this->ftpConnectionId) {
-                throw new Exception(
+                throw new RuntimeException(
                     'FTP Verbindungsaufbau zu ' . $host . ' ist fehlgeschlagen' . PHP_EOL
                 );
             }
@@ -82,7 +94,7 @@ class Network {
 
             // Verbindung überprüfen
             if ((!($this->ftpConnectionId)) || (!$loginResult)) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Verbindungsaufbau zu zu ' . $host . ' mit Benutzername ' . $username . ' fehlgeschlagen.'
                 );
             }
@@ -93,7 +105,7 @@ class Network {
                 echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
                 @ftp_pasv(($this->ftpConnectionId), true);
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -104,20 +116,20 @@ class Network {
      *
      * @throws Exception
      */
-    public function updateFromFTP() {
+    public function updateFromFTP(): void {
         try {
             // Starte Verarbeitung der Dateien
             echo PHP_EOL . '*** Verarbeite alle Dateien auf dem DWD FTP Server' . PHP_EOL;
 
             // Prüfe ob Verbindung aktiv ist
             if (!\is_resource($this->ftpConnectionId)) {
-                throw new Exception('FTP Verbindung steht nicht mehr zur Verfügung.');
+                throw new RuntimeException('FTP Verbindung steht nicht mehr zur Verfügung.');
             }
 
             // Versuche, in das benötigte Verzeichnis zu wechseln
             echo '-> Wechsle in das Verzeichnis: ' . ftp_pwd($this->ftpConnectionId) . PHP_EOL;
             if (!@ftp_chdir($this->ftpConnectionId, $this->remoteFolder)) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Fehler beim Wechsel in das Verzeichnis '" . $this->remoteFolder . "' auf dem DWD FTP-Server."
                 );
             }
@@ -125,7 +137,7 @@ class Network {
             // Verzeichnisliste auslesen und sortieren
             $arrFTPContent = @ftp_nlist($this->ftpConnectionId, '.');
             if (false === $arrFTPContent) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Fehler beim auslesen des Verezichnis ' . $this->remoteFolder . ' auf dem DWD FTP-Server.'
                 );
             }
@@ -142,7 +154,7 @@ class Network {
                     $fileDate = @ftp_mdtm($this->ftpConnectionId, $defaultfilename);
                     $detectMode = 'via FTP';
                     if (!$fileDate) {
-                        throw new Exception(
+                        throw new RuntimeException(
                             'Fehler beim ermitteln des Änderungs-Zeitpunkts der Datei ' . $defaultfilename
                         );
                     }
@@ -159,7 +171,7 @@ class Network {
 
             // Starte Download der Liste
             $this->downloadFromFTP($arrDownloadList);
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -170,7 +182,7 @@ class Network {
      *
      * @throws Exception
      */
-    public function cleanLocalDownloadFolder() {
+    public function cleanLocalDownloadFolder(): void {
         try {
             // Starte Verarbeitung der Dateien
             echo PHP_EOL . '*** Lösche veraltete Wetterwarnungen aus Cache-Ordner.' . PHP_EOL;
@@ -184,7 +196,7 @@ class Network {
                     $localFiles[filectime($filename)] = basename($filename);
                 } else {
                     // Zeitpunkt der Datei kann nicht festgestellt werden
-                    throw new Exception(
+                    throw new RuntimeException(
                         'Fehler beim ermitteln des alters der Datei ' . basename($filename) .
                         ' im Download-Cache Ordner oder der Datei-Typ kann nicht bestimmt werden.'
                     );
@@ -204,7 +216,7 @@ class Network {
                 foreach ($obsoletFiles as $filename) {
                     echo "\tLösche veraltete Wetterwarnung-Datei " . $filename . ': ';
                     if (!@unlink($this->localFolder . \DIRECTORY_SEPARATOR . $filename)) {
-                        throw new Exception(
+                        throw new RuntimeException(
                             "Fehler beim aufräumen des Caches: '" .
                             $this->localFolder . \DIRECTORY_SEPARATOR . $filename .
                             "'' konnte nicht erfolgreich gelöscht werden."
@@ -215,7 +227,7 @@ class Network {
             } else {
                 echo "\t-> Es muss keine Datei gelöscht werden" . PHP_EOL;
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -233,7 +245,7 @@ class Network {
      *
      * @param bool $ftpPassiv Konfigurationsparameter für passive FTP Nutzung
      */
-    public function setFtpPassiv(bool $ftpPassiv) {
+    public function setFtpPassiv(bool $ftpPassiv): void {
         $this->ftpPassiv = $ftpPassiv;
     }
 
@@ -242,7 +254,7 @@ class Network {
      *
      * @param string $remoteFolder Ordner auf dem DWD FTP Server in dem sich die Warnungen befinden
      */
-    public function setRemoteFolder(string $remoteFolder) {
+    public function setRemoteFolder(string $remoteFolder): void {
         $this->remoteFolder = $remoteFolder;
     }
 
@@ -258,7 +270,7 @@ class Network {
      *
      * @param string $localFolder Ordner in denen die Dateien vom DWD-FTP Server gespeichert werden
      */
-    public function setLocalFolder(string $localFolder) {
+    public function setLocalFolder(string $localFolder): void {
         $this->localFolder = $localFolder;
     }
 
@@ -291,7 +303,7 @@ class Network {
                     );
                     if ($extractFileInfo) {
                         $dateTimeFormater = new DateTime();
-                        $dateFileM = $dateTimeFormater->createFromFormat('YmdHis', $regs['Datum'], new DateTimeZone('UTC'));
+                        $dateFileM = $dateTimeFormater::createFromFormat('YmdHis', $regs['Datum'], new DateTimeZone('UTC'));
                         if (false === $dateFileM) {
                             $fileDate = @ftp_mdtm($this->ftpConnectionId, $filename);
                             $detectMode = 'via FTP / Lesen des Datums fehlgeschlagen';
@@ -320,7 +332,7 @@ class Network {
             array_splice($arrDownloadList, 1);
 
             return $arrDownloadList;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -333,7 +345,7 @@ class Network {
      *
      * @throws Exception
      */
-    private function downloadFromFTP(array $arrDownloadList) {
+    private function downloadFromFTP(array $arrDownloadList): void {
         try {
             // Starte Download der aktuellsten Warn-Datei
             if (\count($arrDownloadList) > 0) {
@@ -353,9 +365,10 @@ class Network {
 
                     if ($remoteFileMTime !== $localFileMTime) {
                         // Öffne lokale Datei
+                        /** @noinspection FopenBinaryUnsafeUsageInspection */
                         $localFileHandle = fopen($localFile, 'w');
                         if (!$localFileHandle) {
-                            throw new Exception('Kann ' . $localFile . ' nicht zum schreiben öffnen');
+                            throw new RuntimeException('Kann ' . $localFile . ' nicht zum schreiben öffnen');
                         }
 
                         if (ftp_fget($this->ftpConnectionId, $localFileHandle, $filename, FTP_BINARY)) {
@@ -368,7 +381,7 @@ class Network {
                                     'Remote: ' . date('d.m.Y H:i:s', $remoteFileMTime) . ').' . PHP_EOL;
                             }
                         } else {
-                            throw new Exception(sprintf("\tDatei %s war nicht erfolgreich.", $localFile));
+                            throw new RuntimeException(sprintf("\tDatei %s war nicht erfolgreich.", $localFile));
                         }
 
                         // Schließe Datei-Handle
@@ -381,7 +394,7 @@ class Network {
                     }
                 }
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

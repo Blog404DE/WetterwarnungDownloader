@@ -1,4 +1,15 @@
 <?php
+/**
+ * Standard-Klassen für neuthardwetter.de by Jens Dutzi - Toolbox.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -15,7 +26,7 @@ declare(strict_types=1);
 
 namespace blog404de\Standard;
 
-use Exception;
+use RuntimeException;
 use ZipArchive;
 
 /**
@@ -30,15 +41,15 @@ class Toolbox {
      *
      * @throws
      */
-    public function extractZipFile(string $source, string $destination) {
+    public function extractZipFile(string $source, string $destination): void {
         // Eigentlich darf aktuell nur eine ZIP Datei vorhanden sein (vorbereitet aber für >1 ZIP Datei)
         if (!is_readable($source)) {
-            throw new Exception('Die ZIP-Datei (' . $source . ') kann nicht lesend geöffnet werden');
+            throw new RuntimeException('Die ZIP-Datei (' . $source . ') kann nicht lesend geöffnet werden');
         }
 
         // Existiert der Ordner?
         if (!is_writable($destination)) {
-            throw new Exception(
+            throw new RuntimeException(
                 'Der Ziel-Ordner ' . $destination .
                 ' für die entpackten ZIP-Dateien existiert nicht oder hat keine Schreib-Rechte'
             );
@@ -58,7 +69,7 @@ class Toolbox {
             $zip->extractTo($destination);
             $zip->close();
         } else {
-            throw new Exception(
+            throw new RuntimeException(
                 "Fehler beim öffnen der ZIP Datei '" .
                 basename($source) .
                 "'. Fehlercode: " . $res . ' / ' . $this->getZipErrorMessage($res)
@@ -81,7 +92,7 @@ class Toolbox {
      * @param int         $mode        Octal file permission mask for the newly-created dir. Should begin with a 0.
      * @param int         $maxAttempts maximum attempts before giving up (to prevent endless loops)
      *
-     * @throws Exception
+     * @throws \Exception
      *
      * @return bool|string full path to newly-created dir, or false on failure
      */
@@ -106,10 +117,9 @@ class Toolbox {
 
         // Tries to create a random directory until it works. Abort if we reach $maxAttempts.
         // Something screwy could be happening with the filesystem and our loop could otherwise become endless.
-        $attempts = 0;
         do {
-            $path = sprintf('%s/%s%s', $dir, $prefix, random_int(100000, mt_getrandmax()));
-        } while (!mkdir($path, $mode) && $attempts++ < $maxAttempts);
+            $path = sprintf('%s/%s%s', $dir, $prefix, random_int($maxAttempts, mt_getrandmax()));
+        } while (!mkdir($path, $mode) && !is_dir($path));
 
         return $path;
     }
@@ -121,7 +131,7 @@ class Toolbox {
      *
      * @return bool
      */
-    public function removeTempDir(string $dir) {
+    public function removeTempDir(string $dir): bool {
         // TMP Ordner löschen (sofern möglich)
         if (false !== $dir && null !== $dir) {
             // Prüfe ob Verzeichnis existiert
@@ -148,7 +158,7 @@ class Toolbox {
      *
      * @return string
      */
-    public function getZipErrorMessage($errCode) {
+    public function getZipErrorMessage($errCode): string {
         $errorCodeTable = [
             ZipArchive::ER_EXISTS => 'Datei existiert bereits',
             ZipArchive::ER_INCONS => 'Zip-Archiv ist nicht konsistent',
@@ -173,7 +183,7 @@ class Toolbox {
      *
      * @return string
      */
-    public function getJsonErrorMessage($errCode) {
+    public function getJsonErrorMessage($errCode): string {
         $errorCodeTable = [
             JSON_ERROR_NONE => 'Keine Fehler',
             JSON_ERROR_DEPTH => 'Maximale Stacktiefe überschritten',

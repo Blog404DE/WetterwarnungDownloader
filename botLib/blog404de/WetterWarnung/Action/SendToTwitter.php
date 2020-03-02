@@ -1,4 +1,15 @@
 <?php
+/**
+ * WarnParser für neuthardwetter.de by Jens Dutzi - SendToTwitter.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -17,6 +28,7 @@ namespace blog404de\WetterWarnung\Action;
 
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Exception;
+use RuntimeException;
 
 /**
  * Action-Klasse für WetterWarnung Downloader zum senden eines Tweets bei einer neuen Nachricht.
@@ -42,13 +54,11 @@ class SendToTwitter implements SendToInterface {
     public function __construct() {
         try {
             // TwitterOAuth-Klasse Pfad ermitteln
-            $composerAutoloader = realpath(
-                __DIR__ . '/../../../../vendor/abraham/twitteroauth/autoload.php'
-            );
+            $composerAutoloader = \dirname(__DIR__, 4) . '/vendor/abraham/twitteroauth/autoload.php';
 
             // Prüfen ob Source-Code existiert
             if (false === $composerAutoloader) {
-                throw new Exception(
+                throw new RuntimeException(
                     'TwitterOAuth-Library ist nicht im System vorhanden - ' .
                     'zur Installation lesen Sie bitte readme.md'
                 );
@@ -58,13 +68,13 @@ class SendToTwitter implements SendToInterface {
             require_once $composerAutoloader;
 
             // Prüfe ob entsprechende Klasse geladen ist
-            if (!class_exists('Abraham\\TwitterOAuth\\TwitterOAuth', true)) {
-                throw new Exception(
+            if (!class_exists(TwitterOAuth::class, true)) {
+                throw new RuntimeException(
                     'TwitterOAuth-Library wurde nicht erfolgreich geladen - ' .
                     'zur Installation lesen Sie bitte readme.md'
                 );
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -84,7 +94,7 @@ class SendToTwitter implements SendToInterface {
             if ($this->getConfig()) {
                 if (!\is_array($parsedWarnInfo)) {
                     // Keine Warnwetter-Daten zum twittern vorhanden -> harter Fehler
-                    throw new Exception('Die im Archiv zu speicherenden Wetter-Informationen sind ungültig');
+                    throw new RuntimeException('Die im Archiv zu speicherenden Wetter-Informationen sind ungültig');
                 }
 
                 // Status-Ausgabe der aktuellen Wetterwarnung
@@ -102,7 +112,7 @@ class SendToTwitter implements SendToInterface {
                         $this->config['oauthTokenSecret']
                     );
                     if (!$this->connectionId) {
-                        throw new Exception(
+                        throw new RuntimeException(
                             'Twitter API Anmeldung fehlgeschlagen: ' .
                             $this->getErrorText($this->connectionId->getLastHttpCode()) . PHP_EOL
                         );
@@ -119,13 +129,13 @@ class SendToTwitter implements SendToInterface {
                             'include_email' => false, ]
                     );
                     if (200 !== $this->connectionId->getLastHttpCode()) {
-                        throw new Exception(
+                        throw new RuntimeException(
                             'Fehler beim ermitteln des Account-Namen: ' .
                             $this->getErrorText($this->connectionId->getLastHttpCode()) . PHP_EOL
                         );
                     }
                     if (!property_exists($getScreenname, 'screen_name')) {
-                        throw new Exception(
+                        throw new RuntimeException(
                             'Fehler beim ermitteln des Account-Namen ' .
                              '(Account-Name in der API Rückmeldung nicht vorhanden)' . PHP_EOL
                         );
@@ -153,10 +163,10 @@ class SendToTwitter implements SendToInterface {
                 return 0;
             }
             // Konfiguration ist nicht gsetzt
-            throw new Exception(
+            throw new RuntimeException(
                 'Die Action-Funktion wurde nicht erfolgreich konfiguriert'
             );
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -169,7 +179,7 @@ class SendToTwitter implements SendToInterface {
      *
      * @throws Exception
      */
-    public function setConfig(array $config) {
+    public function setConfig(array $config): void {
         try {
             $configParameter = [
                 'consumerKey', 'consumerSecret',
@@ -181,7 +191,7 @@ class SendToTwitter implements SendToInterface {
             // Alle Paramter verfügbar?
             foreach ($configParameter as $parameter) {
                 if (!\array_key_exists($parameter, $config)) {
-                    throw new Exception(
+                    throw new RuntimeException(
                         'Der Konfigurationsparamter ["ActionConfig"]["' . $parameter . '"] wurde nicht gesetzt.'
                     );
                 }
@@ -189,7 +199,7 @@ class SendToTwitter implements SendToInterface {
 
             // Werte setzen
             $this->config = $config;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -209,7 +219,7 @@ class SendToTwitter implements SendToInterface {
      *
      * @throws Exception
      */
-    private function sendTweet(array $tweetParameter) {
+    private function sendTweet(array $tweetParameter): void {
         try {
             // Sende Tweet
             echo "\t\t -> Sende Tweet " .
@@ -218,14 +228,14 @@ class SendToTwitter implements SendToInterface {
 
             $this->connectionId->post('statuses/update', $tweetParameter);
             if (200 !== $this->connectionId->getLastHttpCode()) {
-                throw new Exception(
+                throw new RuntimeException(
                     "Verbindungsfehler zu Twitter: Befehl 'statuses/update' " .
                     $this->getErrorText($this->connectionId->getLastHttpCode())
                 );
             }
 
             echo 'erfolgreich' . PHP_EOL;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -236,7 +246,7 @@ class SendToTwitter implements SendToInterface {
      *
      * @throws Exception
      */
-    private function updatePlaceIdInfo() {
+    private function updatePlaceIdInfo(): void {
         try {
             // Ort ermitteln?
             if (!empty($this->config['TweetPlace']) && false !== $this->config['TweetPlace']) {
@@ -248,21 +258,21 @@ class SendToTwitter implements SendToInterface {
                     );
 
                     if (200 !== $this->connectionId->getLastHttpCode()) {
-                        throw new Exception(
+                        throw new RuntimeException(
                             "Verbindungsfehler zu Twitter: Befehl 'geo/search' " .
                             $this->getErrorText($this->connectionId->getLastHttpCode())
                         );
                     }
 
                     if (!property_exists($geoSearch, 'result')) {
-                        throw new Exception(
+                        throw new RuntimeException(
                             'Fehler beim ermitteln der Twitter PlaceID anhang des angegebenen Ortes ' .
                             '(Result fehlt in Antwort)'
                         );
                     }
 
                     if (!property_exists($geoSearch->{'result'}, 'places')) {
-                        throw new Exception(
+                        throw new RuntimeException(
                             'Fehler beim ermitteln der Twitter PlaceID anhang des angegebenen Ortes ' .
                             '(Places fehlt in Antwort)'
                         );
@@ -288,7 +298,7 @@ class SendToTwitter implements SendToInterface {
                     echo $this->placeid['id'] . ' / ' . $this->placeid['full_name'] . PHP_EOL;
                 }
             }
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -313,7 +323,7 @@ class SendToTwitter implements SendToInterface {
                 ),
                 'UTF-8'
             );
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -344,7 +354,7 @@ class SendToTwitter implements SendToInterface {
             }
 
             return $message;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -374,14 +384,14 @@ class SendToTwitter implements SendToInterface {
             $tweet = $severity . ' des #DWD';
 
             // Gebiet einfügen
-            $tweet = $tweet . ' für ' . $parsedWarnInfo['area'];
+            $tweet .= ' für ' . $parsedWarnInfo['area'];
 
             // Uhrzeit einfügen
-            $endzeit = unserialize($parsedWarnInfo['endzeit']);
-            $tweet = $tweet . ' (gültig bis ' . $endzeit->format('H:i') . ' / Stand: ' . date('d.m.Y H:i') . '):';
+            $endzeit = unserialize($parsedWarnInfo['endzeit'], ['allowed_classes' => true]);
+            $tweet .= ' (gültig bis ' . $endzeit->format('H:i') . ' / Stand: ' . date('d.m.Y H:i') . '):';
 
             // Haedline hinzufügen
-            $tweet = $tweet . ' ' . $parsedWarnInfo['headline'] . '.';
+            $tweet .= ' ' . $parsedWarnInfo['headline'] . '.';
 
             // Prä-/Postfix anfügen
             if (!empty($this->config['MessagePrefix']) && false !== $this->config['MessagePrefix']) {
@@ -402,7 +412,7 @@ class SendToTwitter implements SendToInterface {
                     (280 - $this->getTweetLength($tweet . ' ...' . $postfix))
                 ) . ' ...';
             }
-            $tweet = $tweet . $postfix;
+            $tweet .= $postfix;
             $tweetParameter['status'] = $tweet;
 
             // Attachment zusammenstellen
@@ -413,7 +423,7 @@ class SendToTwitter implements SendToInterface {
             }
 
             return $tweetParameter;
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -461,7 +471,7 @@ class SendToTwitter implements SendToInterface {
             }
 
             return '(' . $code . ') Unbekannter Fehler';
-        } catch (Exception $e) {
+        } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

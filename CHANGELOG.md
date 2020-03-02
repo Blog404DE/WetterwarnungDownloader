@@ -1,5 +1,12 @@
 # Changelog
 
+2020-03-01, 3.1.5 stable
+----------
+* Unterstützung für PHP 7.4 (Hinweis: unbedingt die Librarys via composer aktualisieren)
+* (BUGFIX) versehentliche Debug-Ausgabe entfernt
+* Code an diversen stellen optimiert
+* Rückgabe-Parameter auf strict-types umgestellt
+
 2019-12-31, 3.1.4 stable
 ----------
 * Parser für die einzelnen Warnungen optimiert

@@ -1,4 +1,15 @@
 <?php
+/**
+ * Standard-Klassen für neuthardwetter.de by Jens Dutzi - ErrorLogging.php.
+ *
+ * @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *
+ * @version    v3.1.5
+ *
+ * @see       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
 
 declare(strict_types=1);
 
@@ -16,6 +27,7 @@ declare(strict_types=1);
 namespace blog404de\Standard;
 
 use Exception;
+use RuntimeException;
 
 /**
  * Generische Error-Logging Klasse für NeuthardWetter.de-Scripte.
@@ -38,7 +50,7 @@ class ErrorLogging {
      * @param Exception $exception Inhalt der Exception
      * @param string    $tmpPath   Temporär-Pfad
      */
-    public function logError(Exception $exception, string $tmpPath = '') {
+    public function logError(Exception $exception, string $tmpPath = ''): void {
         // Zeitpunkt
         $strDate = date('Y-m-d H:i:s');
 
@@ -67,24 +79,21 @@ class ErrorLogging {
         // Temporär-Pfad bei Bedarf löschen
         if ('' !== $tmpPath) {
             if (!$this->cleanTempFiles($tmpPath)) {
-                $shortText = $shortText . ' - Cleanup: temporärer Ordner (' . $tmpPath . ') kann nicht gelöscht werden';
-                $longText = $longText .
-                    PHP_EOL .
-                    "\tCleanup Fehler beim löschen des temporären Ordner (" . $tmpPath . ')';
+                $shortText .= ' - Cleanup: temporärer Ordner (' . $tmpPath . ') kann nicht gelöscht werden';
+                $longText .= PHP_EOL . "\tCleanup Fehler beim löschen des temporären Ordner (" . $tmpPath . ')';
             } else {
-                $shortText = $shortText . ' - Cleanup: temporärer Ordner gelöscht';
-                $longText = $longText . PHP_EOL . "\tCleanup: temporärer Ordner gelöscht";
+                $shortText .= ' - Cleanup: temporärer Ordner gelöscht';
+                $longText .= PHP_EOL . "\tCleanup: temporärer Ordner gelöscht";
             }
         }
 
         // Error-Trace noch hinzufügen?
         if ($this->withTrace) {
             // Trace bei Bedarf anfügen
-            $longText = $longText . PHP_EOL . PHP_EOL .
-                sprintf(
-                    "\tError-Trace:" . PHP_EOL . '%s',
-                    preg_replace('/^/m', "\t", $exception->getTraceAsString())
-                );
+            $longText .= PHP_EOL . PHP_EOL . sprintf(
+                "\tError-Trace:" . PHP_EOL . '%s',
+                preg_replace('/^/m', "\t", $exception->getTraceAsString())
+            );
         }
 
         // Loggen in Datei
@@ -93,12 +102,9 @@ class ErrorLogging {
         }
 
         // Loggen per E-Mail
-        if (\is_array($this->logToMailSettings)) {
-            if (\array_key_exists('empfaenger', $this->logToMailSettings) &&
-                \array_key_exists('absender', $this->logToMailSettings)
-            ) {
-                $this->logToMail($longText, $strDate);
-            }
+        if (\is_array($this->logToMailSettings) && \array_key_exists('empfaenger', $this->logToMailSettings) &&
+            \array_key_exists('absender', $this->logToMailSettings)) {
+            $this->logToMail($longText, $strDate);
         }
 
         // Ausgabe auf die Konsole
@@ -132,7 +138,7 @@ class ErrorLogging {
                 // Error-Logging Konfiguration ist falsch
                 $this->logToMailSettings = [];
 
-                throw new Exception("LogToMail benötigt ein Array mit den Keys 'empfaenger' und 'absender'");
+                throw new RuntimeException("LogToMail benötigt ein Array mit den Keys 'empfaenger' und 'absender'");
             }
 
             if (!filter_var(
@@ -140,7 +146,7 @@ class ErrorLogging {
                 FILTER_VALIDATE_EMAIL
             ) || !filter_var($logToMail['absender'], FILTER_VALIDATE_EMAIL)
             ) {
-                throw new Exception(
+                throw new RuntimeException(
                     "LogToMail beinhaltet für die Array-Keys 'empfaenger' oder " .
                     "'absender' keine gültige E-Mail Adresse"
                 );
@@ -179,10 +185,10 @@ class ErrorLogging {
                     // Log-Datei kann nicht neu angelegt werden
                     $this->logToFileSettings = [];
 
-                    throw new Exception('Fehler beim anlegen der Log-Datei in: ' . $filename);
+                    throw new RuntimeException('Fehler beim anlegen der Log-Datei in: ' . $filename);
                 }
             } else {
-                throw new Exception(
+                throw new RuntimeException(
                     "Es besteht kein Schreib-Zugriff um Log-Datei '" . basename($filename) . "''" .
                     ' in den angegebenen Ordner zu speichern'
                 );
@@ -220,7 +226,7 @@ class ErrorLogging {
      *
      * @param bool $withTrace
      */
-    public function setWithTrace(bool $withTrace) {
+    public function setWithTrace(bool $withTrace): void {
         $this->withTrace = $withTrace;
     }
 
@@ -232,7 +238,7 @@ class ErrorLogging {
      *
      * @return bool
      */
-    private function logToMail(string $longText, string $strDate) {
+    private function logToMail(string $longText, string $strDate): ?bool {
         try {
             $mailHeader = sprintf(
                 "From: Wetterwarn-Bot <%s>\r\n" .
@@ -247,7 +253,7 @@ class ErrorLogging {
             $mailBetreff = 'Fehler beim verarbeiten der Wetterwarndaten: ' . $strDate;
 
             if (!mail($this->logToMailSettings['empfaenger'], $mailBetreff, $longText, $mailHeader)) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Fehler beim senden der Fehler-Email an ' . $this->logToMailSettings['empfaenger']
                 );
             }
@@ -267,7 +273,7 @@ class ErrorLogging {
      *
      * @return bool
      */
-    private function logToFile(string $shortText) {
+    private function logToFile(string $shortText): ?bool {
         try {
             $writeFile = file_put_contents(
                 $this->logToFileSettings['filename'],
@@ -275,7 +281,7 @@ class ErrorLogging {
                 FILE_APPEND
             );
             if (!$writeFile) {
-                throw new Exception(
+                throw new RuntimeException(
                     'Fehler beim schreiben der ErrorLog-Datei ' . $this->logToFileSettings['filename']
                 );
             }
@@ -295,7 +301,7 @@ class ErrorLogging {
      *
      * @return bool
      */
-    private function cleanTempFiles($tmpPath) {
+    private function cleanTempFiles($tmpPath): ?bool {
         try {
             // Lösche evntuell vorhandenes Temporäre Verzeichnis
             $tmpclean = true;
