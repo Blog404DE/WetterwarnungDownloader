@@ -1,0 +1,97 @@
+name: PHP CI
+
+on:
+    pull_request: ~
+    push:
+        branches:
+            - master
+            - develop
+        tags:
+            - '*'
+    schedule:
+        - cron: 0 14 * * SAT
+
+jobs:
+    compatiblity-check:
+        name: compatibility test
+        runs-on: [ubuntu-latest]
+        steps:
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 7.4
+                  extensions: simplexml, json, ftp, pdo, zip, zlib, libxml, curl
+                  coverage: none
+
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - name: Get composer cache directory
+              id: composer-cache
+              run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            - name: Cache dependencies
+              uses: actions/cache@v1
+              with:
+                path: ${{ steps.composer-cache.outputs.dir }}
+                key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+                restore-keys: ${{ runner.os }}-composer-
+
+            - name: Install dependencies
+              run: composer install --prefer-dist
+
+            - name: Validate composer.json and composer.lock
+              run: composer validate
+
+            - name: Install dependencies
+              run: composer install --prefer-dist --no-progress --no-suggest
+
+            - name: Check the coding style
+              run: |
+                ./vendor/bin/phpcf -t 7.1 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpcf -t 7.2 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpcf -t 7.3 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpcf -t 7.4 getWetterWarnung.php config.sample.php ./botLib
+
+    coding-style:
+        runs-on: [ubuntu-latest]
+        name: code-style test
+        steps:
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 7.4
+                  extensions: simplexml, json, ftp, pdo, zip, zlib, libxml, curl
+                  coverage: none
+                  tools: cs2pr, php-cs-fixer, phpcpd, phpcs, phpmd
+
+            - name: Checkout
+              uses: actions/checkout@v2
+
+            - name: Get composer cache directory
+              id: composer-cache
+              run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+            - name: Cache dependencies
+              uses: actions/cache@v1
+              with:
+                path: ${{ steps.composer-cache.outputs.dir }}
+                key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
+                restore-keys: ${{ runner.os }}-composer-
+
+            - name: Install dependencies
+              run: composer install --prefer-dist --no-progress --no-suggest
+
+            - name: phpmd
+              run: |
+                phpmd getWetterWarnung.php text phpmd.xml
+                phpmd botLib/ text phpmd.xml
+
+            - name: phpcpd
+              run: phpcpd --no-interaction getWetterWarnung.php config.sample.php ./botLib
+
+            - name: phpcs
+              run: phpcs --report=checkstyle --colors --standard=PSR1 --extensions=php getWetterWarnung.php config.sample.php botLib/* | cs2pr
+
+            - name: php-cs-fixer
+              run: php-cs-fixer fix -v --dry-run --format=checkstyle --config=./.php_cs.dist | cs2pr

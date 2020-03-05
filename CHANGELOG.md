@@ -1,5 +1,10 @@
 # Changelog
 
+2020-03-05, 3.1.6 stable
+----------
+* Hauptscript umgestelt von Exception auf RuntimeException (best-practice)
+* CI umgestellt von Travis-CI auf Github Actions
+
 2020-03-01, 3.1.5 stable
 ----------
 * Unterstützung für PHP 7.4 (Hinweis: unbedingt die Librarys via composer aktualisieren)

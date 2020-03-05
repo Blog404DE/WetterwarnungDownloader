@@ -1,4 +1,4 @@
-[![Travis branch](https://img.shields.io/travis/Blog404DE/WetterwarnungDownloader/master.svg?style=flat-square)](https://travis-ci.org/Blog404DE/WetterwarnungDownloader) [![GitHub release](https://img.shields.io/github/release/Blog404DE/WetterwarnungDownloader.svg?style=flat-square)](https://github.com/Blog404DE/WetterwarnungDownloader) [![license](https://img.shields.io/github/license/Blog404DE/WetterwarnungDownloader.svg?style=flat-square)](https://github.com/Blog404DE/WetterwarnungDownloader)
+![PHP CI](https://github.com/Blog404DE/WetterwarnungDownloader/workflows/PHP%20CI/badge.svg) [![GitHub release](https://img.shields.io/github/release/Blog404DE/WetterwarnungDownloader.svg?style=square)](https://github.com/Blog404DE/WetterwarnungDownloader) [![license](https://img.shields.io/github/license/Blog404DE/WetterwarnungDownloader.svg?style=square)](https://github.com/Blog404DE/WetterwarnungDownloader)
 
 
 # Wetterwarnung Downloader Script
