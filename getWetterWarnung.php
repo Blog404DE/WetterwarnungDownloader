@@ -10,7 +10,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.5
+ *  @version    v3.1.6
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
