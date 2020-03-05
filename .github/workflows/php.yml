@@ -9,7 +9,7 @@ on:
         tags:
             - '*'
     schedule:
-        - cron: 0 13 * * SA
+        - cron: 0 14 * * 7
 
 jobs:
     compatiblity-check:
