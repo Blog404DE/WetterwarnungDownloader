@@ -27,7 +27,7 @@ try {
     if (is_readable(__DIR__ . '/config.local.php')) {
         require_once __DIR__ . '/config.local.php';
     } else {
-        throw new Exception(
+        throw new RuntimeException(
             "Konfigurationsdatei 'config.local.php' existiert nicht. Zur Konfiguration lesen Sie README.md"
         );
     }
@@ -63,14 +63,12 @@ try {
     }
 
     // Auf unbekannter Paramter prüfen
-    if (\count($argv) > 1) {
-        // Parameter wurden gesetzt -> prüfe ob Parameter gültig ist
-        if (!\in_array('--forceAction', $argv, true) && !\in_array('-f', $argv, true)) {
-            throw new Exception(
-                'Der angegebene Parameter ist unbekannt. Mit --hilfe bekommen Sie alle ' .
-                'zur Verfügung stehenden Parameter angezeigt.'
-            );
-        }
+    // Parameter wurden gesetzt -> prüfe ob Parameter gültig ist
+    if ((\count($argv) > 1) && !\in_array('--forceAction', $argv, true) && !\in_array('-f', $argv, true)) {
+        throw new RuntimeException(
+            'Der angegebene Parameter ist unbekannt. Mit --hilfe bekommen Sie alle ' .
+            'zur Verfügung stehenden Parameter angezeigt.'
+        );
     }
 
     // Beginn des eigentlichen Scripts
@@ -82,7 +80,7 @@ try {
     $configKeysNeeded = ['WarnCells', 'localJsonWarnfile', 'localFolder', 'ftpmode', 'Action', 'Archive'];
     foreach ($configKeysNeeded as $configKey) {
         if (!\array_key_exists($configKey, $unwetterConfig)) {
-            throw new Exception(
+            throw new RuntimeException(
                 "Die Konfigurationsdatei config.local.php ist unvollständig ('" . $configKey . "' ist nicht vorhanden)"
             );
         }
@@ -102,13 +100,13 @@ try {
     // Archiv-Support konfigurieren
     if ($unwetterConfig['Archive']) {
         if (!\array_key_exists('ArchiveConfig', $unwetterConfig)) {
-            throw new Exception(
+            throw new RuntimeException(
                 'Einer oder mehrere Konfigurationsparameter für die Archive-Klasse fehlen (siehe README.md)'
             );
         }
 
         if (!\is_array($unwetterConfig['ArchiveConfig'])) {
-            throw new Exception(
+            throw new RuntimeException(
                 'Bei dem Konfigurationsparameter für die Archive-Klasse handelt es sich um ' .
                 'kein Array (siehe README.md)'
             );
@@ -121,14 +119,14 @@ try {
     // Action-Support konfigurieren
     if ($unwetterConfig['Action']) {
         if (!\array_key_exists('ActionConfig', $unwetterConfig)) {
-            throw new Exception(
+            throw new RuntimeException(
                 'Einer oder mehrere Konfigurationsparameter für die Action-Klasse fehlen ' .
                 '(siehe README.md)'
             );
         }
 
         if (!\is_array($unwetterConfig['ActionConfig'])) {
-            throw new Exception(
+            throw new RuntimeException(
                 'Bei dem Konfigurationsparameter für die Action-Klasse handelt es sich um ' .
                 'kein Array (siehe README.md)'
             );
@@ -171,7 +169,7 @@ try {
                 $warnBot->parseWetterWarnungen($warnCell['warnCellId'], $warnCell['stateShort']);
             } else {
                 // WarnCell-Konfiguration fehlen die benötigten Angaben
-                throw new Exception(
+                throw new RuntimeException(
                     'Der Konfigurationsparameterfür die WarnCellId-Array beinhaltet nicht die ' .
                     'notwendigen Informationen (siehe README.md)'
                 );
@@ -179,7 +177,7 @@ try {
         }
     } else {
         // Variablen-Typ ist falsch
-        throw new Exception(
+        throw new RuntimeException(
             'Der Konfigurationsparameter für die WarnCellId ist kein Array oder Array beinhaltet kein Eintrag'
         );
     }
@@ -198,7 +196,7 @@ try {
     echo '*** WetterWarnung-Script erfolgreich abgeschlossen (Laufzeit: ';
     echo sprintf('%.3f', $timeLaufzeit) . ' Sekunden) ***';
     echo PHP_EOL;
-} catch (Exception $e) {
+} catch (RuntimeException | \Exception $e) {
     // Fehler-Handling
     if (\is_object($warnBot)) {
         $logger->logError($e, $warnBot->getTmpFolder());
