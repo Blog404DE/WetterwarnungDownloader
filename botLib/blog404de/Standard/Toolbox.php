@@ -122,7 +122,7 @@ class Toolbox {
      */
     public function removeTempDir(string $dir): bool {
         // TMP Ordner löschen (sofern möglich)
-        if (!$dir) {
+        if (null !== $dir && false !== $dir) {
             // Prüfe ob Verzeichnis existiert
             if (is_dir($dir)) {
                 // Lösche Inhalt des Verzeichnis und Verzeichnis selber
