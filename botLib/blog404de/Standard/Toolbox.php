@@ -1,15 +1,4 @@
 <?php
-/**
- * Standard-Klassen für neuthardwetter.de by Jens Dutzi - Toolbox.php.
- *
- * @author     Jens Dutzi <jens.dutzi@tf-network.de>
- * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
- * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *
- * @version    v3.1.5
- *
- * @see       https://github.com/Blog404DE/WetterwarnungDownloader
- */
 
 declare(strict_types=1);
 
@@ -18,9 +7,9 @@ declare(strict_types=1);
  *
  *  @package    blog404de\WetterWarnung
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
- *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
+ *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.6
+ *  @version    v3.1.7
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -39,7 +28,7 @@ class Toolbox {
      * @param string $source      Ordner mit den beinhalteten XML Dateien
      * @param string $destination Ordner in den der Inhalt der ZIP-Dateien entpackt werden soll
      *
-     * @throws
+     * @throws RuntimeException
      */
     public function extractZipFile(string $source, string $destination): void {
         // Eigentlich darf aktuell nur eine ZIP Datei vorhanden sein (vorbereitet aber für >1 ZIP Datei)
@@ -133,7 +122,7 @@ class Toolbox {
      */
     public function removeTempDir(string $dir): bool {
         // TMP Ordner löschen (sofern möglich)
-        if (false !== $dir && null !== $dir) {
+        if (!$dir) {
             // Prüfe ob Verzeichnis existiert
             if (is_dir($dir)) {
                 // Lösche Inhalt des Verzeichnis und Verzeichnis selber
@@ -154,11 +143,11 @@ class Toolbox {
     /**
      * Methode zum generieren der Klartext-Fehlermeldung beim Zugriff auf ZIP-Dateien.
      *
-     * @param $errCode ZIP-Archive Fehler-Konstante
+     * @param int $errCode ZIP-Archive Fehler-Konstante
      *
      * @return string
      */
-    public function getZipErrorMessage($errCode): string {
+    public function getZipErrorMessage(int $errCode): string {
         $errorCodeTable = [
             ZipArchive::ER_EXISTS => 'Datei existiert bereits',
             ZipArchive::ER_INCONS => 'Zip-Archiv ist nicht konsistent',
@@ -178,12 +167,12 @@ class Toolbox {
         return 'Unbekannter Fehler';
     }
 
-    /** Methode zum generieren von Klartext-Fehlermeldung während der JSON Kodierung
-     * @param $errCode JSON-Fehlerkonstante
+    /** Methode zum generieren von Klartext-Fehlermeldung während der JSON Kodierung.
+     * @param int $errCode JSON-Fehlerkonstante
      *
      * @return string
      */
-    public function getJsonErrorMessage($errCode): string {
+    public function getJsonErrorMessage(int $errCode): string {
         $errorCodeTable = [
             JSON_ERROR_NONE => 'Keine Fehler',
             JSON_ERROR_DEPTH => 'Maximale Stacktiefe überschritten',

@@ -10,7 +10,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.6
+ *  @version    v3.1.7
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -18,6 +18,9 @@ use blog404de\Standard\ErrorLogging;
 use blog404de\WetterWarnung\WetterWarnung;
 
 // Root-Verzeichnis festlegen
+$warnBot = null;
+$logger = null;
+
 try {
     // Zeitmessung starten
     $timeStart = microtime(true);

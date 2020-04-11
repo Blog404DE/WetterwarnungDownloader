@@ -1,15 +1,4 @@
 <?php
-/**
- * WarnParser für neuthardwetter.de by Jens Dutzi - ArchiveToMySQL.php.
- *
- * @author     Jens Dutzi <jens.dutzi@tf-network.de>
- * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
- * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *
- * @version    v3.1.5
- *
- * @see       https://github.com/Blog404DE/WetterwarnungDownloader
- */
 
 declare(strict_types=1);
 
@@ -18,9 +7,9 @@ declare(strict_types=1);
  *
  *  @package    blog404de\WetterWarnung
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
- *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
+ *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.6
+ *  @version    v3.1.7
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -123,7 +112,7 @@ class ArchiveToMySQL implements ArchiveToInterface {
                 $sth->bindParam(':identifier', $parsedWarnInfo['identifier'], PDO::PARAM_STR, 32);
                 if (!$sth->execute()) {
                     throw new RuntimeException(
-                        'Fehler beim prüfen ob Warnung bereits im Archiv ist: ' . $this->connectionId->errorInfo()
+                        'Fehler beim prüfen ob Warnung bereits im Archiv ist: ' . $this->connectionId->errorInfo()[2]
                     );
                 }
 
@@ -177,7 +166,7 @@ class ArchiveToMySQL implements ArchiveToInterface {
                     if (!$sth->execute()) {
                         throw new RuntimeException(
                             'Fehler beim prüfen ob Warnung bereits im Archiv ist: ' .
-                            $this->connectionId->errorInfo()
+                            $this->connectionId->errorInfo()[2]
                         );
                     }
 

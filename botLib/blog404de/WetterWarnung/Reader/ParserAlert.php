@@ -1,15 +1,4 @@
 <?php
-/**
- * WarnParser für neuthardwetter.de by Jens Dutzi - ParserAlert.php.
- *
- * @author     Jens Dutzi <jens.dutzi@tf-network.de>
- * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
- * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *
- * @version    v3.1.5
- *
- * @see       https://github.com/Blog404DE/WetterwarnungDownloader
- */
 
 declare(strict_types=1);
 
@@ -18,9 +7,9 @@ declare(strict_types=1);
  *
  *  @package    blog404de\WetterWarnung
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
- *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
+ *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.6
+ *  @version    v3.1.7
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -36,7 +25,7 @@ use RuntimeException;
  * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.
  */
 trait ParserAlert {
-    /** @var string $localIconFolder Ordner in denen sich die Warnlagen-Icons befinden */
+    /** @var string Ordner in denen sich die Warnlagen-Icons befinden */
     private $localIconFolder = '';
 
     /**

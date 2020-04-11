@@ -1,15 +1,4 @@
 <?php
-/**
- * Standard-Klassen für neuthardwetter.de by Jens Dutzi - ErrorLogging.php.
- *
- * @author     Jens Dutzi <jens.dutzi@tf-network.de>
- * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
- * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *
- * @version    v3.1.5
- *
- * @see       https://github.com/Blog404DE/WetterwarnungDownloader
- */
 
 declare(strict_types=1);
 
@@ -18,9 +7,9 @@ declare(strict_types=1);
  *
  *  @package    blog404de\WetterWarnung
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
- *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
+ *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.6
+ *  @version    v3.1.7
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -238,7 +227,7 @@ class ErrorLogging {
      *
      * @return bool
      */
-    private function logToMail(string $longText, string $strDate): ?bool {
+    private function logToMail(string $longText, string $strDate): bool {
         try {
             $mailHeader = sprintf(
                 "From: Wetterwarn-Bot <%s>\r\n" .
@@ -273,7 +262,7 @@ class ErrorLogging {
      *
      * @return bool
      */
-    private function logToFile(string $shortText): ?bool {
+    private function logToFile(string $shortText): bool {
         try {
             $writeFile = file_put_contents(
                 $this->logToFileSettings['filename'],
@@ -297,15 +286,15 @@ class ErrorLogging {
     /**
      * Entferne temporäre Dateien.
      *
-     * @param $tmpPath Temporär-Pfad
+     * @param string $tmpPath Temporär-Pfad
      *
      * @return bool
      */
-    private function cleanTempFiles($tmpPath): ?bool {
+    private function cleanTempFiles(string $tmpPath): bool {
         try {
             // Lösche evntuell vorhandenes Temporäre Verzeichnis
             $tmpclean = true;
-            if (false !== $tmpPath && null !== $tmpPath) {
+            if (false !== $tmpPath) {
                 $toolbox = new Toolbox();
                 $tmpclean = $toolbox->removeTempDir($tmpPath);
             }
