@@ -1,15 +1,4 @@
 <?php
-/**
- * WarnParser für neuthardwetter.de by Jens Dutzi - WetterWarnung.php.
- *
- * @author     Jens Dutzi <jens.dutzi@tf-network.de>
- * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
- * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *
- * @version    v3.1.5
- *
- * @see       https://github.com/Blog404DE/WetterwarnungDownloader
- */
 
 declare(strict_types=1);
 
@@ -18,9 +7,9 @@ declare(strict_types=1);
  *
  *  @package    blog404de\WetterWarnung
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
- *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
+ *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.6
+ *  @version    v3.1.7
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -40,13 +29,13 @@ class WetterWarnung extends Save\SaveToFile {
     /** @var Network\Network Instanz der Warnparser/Netzwerk Klasse */
     public $network;
 
-    /** @var string $localJsonFile Lokale Datei in der die verarbeiteten Wetterwarnungen gespeichert werden */
+    /** @var string Lokale Datei in der die verarbeiteten Wetterwarnungen gespeichert werden */
     private $localJsonFile = '';
 
-    /** @var bool|string $tmpFolder Ordner für temporäre Dateien */
+    /** @var bool|string Ordner für temporäre Dateien */
     private $tmpFolder = '';
 
-    /** @var array $wetterWarnungen Aktuelle geparsten Wetterwarnungen */
+    /** @var array Aktuelle geparsten Wetterwarnungen */
     private $wetterWarnungen = [];
 
     /** @var Standard\Toolbox Instanz der generischen Toolbox-Klasse */

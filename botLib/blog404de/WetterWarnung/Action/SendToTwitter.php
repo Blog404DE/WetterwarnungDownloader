@@ -1,15 +1,4 @@
 <?php
-/**
- * WarnParser für neuthardwetter.de by Jens Dutzi - SendToTwitter.php.
- *
- * @author     Jens Dutzi <jens.dutzi@tf-network.de>
- * @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
- * @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *
- * @version    v3.1.5
- *
- * @see       https://github.com/Blog404DE/WetterwarnungDownloader
- */
 
 declare(strict_types=1);
 
@@ -18,9 +7,9 @@ declare(strict_types=1);
  *
  *  @package    blog404de\WetterWarnung
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
- *  @copyright  Copyright (c) 2012-2019 Jens Dutzi (http://www.neuthardwetter.de)
+ *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.6
+ *  @version    v3.1.7
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -350,7 +339,7 @@ class SendToTwitter implements SendToInterface {
 
                 // Lade Icon auf Twitter hoch
                 $attachment = $this->connectionId->upload('media/upload', ['media' => $filename]);
-                $message = $attachment->media_id_string;
+                $message = $attachment->{'media_id_string'};
             }
 
             return $message;
@@ -432,11 +421,11 @@ class SendToTwitter implements SendToInterface {
     /**
      * Methode zum unwandeln der Error-Codes in Klartext-Fehlermeldungen von Twitter.
      *
-     * @param $code Fehler-Codes von Twitter
+     * @param int $code Fehler-Codes von Twitter
      *
      * @throws Exception
      */
-    private function getErrorText($code): string {
+    private function getErrorText(int $code): string {
         try {
             $error = [
                 200 => 'Success.',

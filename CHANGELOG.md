@@ -1,5 +1,10 @@
 # Changelog
 
+2020-04-11, 3.1.7 stable
+----------
+* Bugfix: Löschen des Temporär-Ordner führte fälschlicherweise zu einem Fehler unter bestimmten Konfigurationen.
+* Kompatibilitäts-Update für CI (php-cs-fixer)
+
 2020-03-05, 3.1.6 stable
 ----------
 * Hauptscript umgestelt von Exception auf RuntimeException (best-practice)
