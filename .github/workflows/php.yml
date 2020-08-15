@@ -88,7 +88,7 @@ jobs:
                 phpmd botLib/ text phpmd.xml
 
             - name: phpcpd
-              run: phpcpd --no-interaction getWetterWarnung.php config.sample.php ./botLib
+              run: phpcpd getWetterWarnung.php config.sample.php ./botLib
 
             - name: phpcs
               run: phpcs --report=checkstyle --colors --standard=PSR1 --extensions=php getWetterWarnung.php config.sample.php botLib/* | cs2pr

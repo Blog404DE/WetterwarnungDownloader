@@ -1,5 +1,9 @@
 # Changelog
 
+2020-04-11, 3.1.8 stable
+----------
+* CI-Integration angepasst
+
 2020-04-11, 3.1.7 stable
 ----------
 * Bugfix: Löschen des Temporär-Ordner führte fälschlicherweise zu einem Fehler unter bestimmten Konfigurationen.
