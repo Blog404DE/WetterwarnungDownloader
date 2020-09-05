@@ -1,12 +1,16 @@
 # Changelog
 
+2020-09-05, 3.1.9 stable
+----------
+* Ausgabe von PHP-Warnungen komplett deaktiviert, nachdem potenzielle Fehler abgefangen werden.
+
 2020-04-11, 3.1.8 stable
 ----------
 * CI-Integration angepasst
 
 2020-04-11, 3.1.7 stable
 ----------
-* Bugfix: Löschen des Temporär-Ordner führte fälschlicherweise zu einem Fehler unter bestimmten Konfigurationen.
+* Bugfix: Löschen des Temporär-Ordners führte fälschlicherweise zu einem Fehler unter bestimmten Konfigurationen.
 * Kompatibilitäts-Update für CI (php-cs-fixer)
 
 2020-03-05, 3.1.6 stable
@@ -24,7 +28,7 @@
 2019-12-31, 3.1.4 stable
 ----------
 * Parser für die einzelnen Warnungen optimiert
-* (BUGFIX) Potentielle Notices entfernt im "failsafe"-Mode bei der Erkennung der Warnmeldung-Dateinamen.
+* (BUGFIX) potenzielle Notices entfernt im "failsafe"-Mode bei der Erkennung der Warnmeldung-Dateinamen.
 
 2019-12-31, 3.1.3 stable
 ----------
@@ -74,14 +78,14 @@ Die Warnlage-Icons werden vom [Deutschen Wetterdienst](https://www.dwd.de/DE/wet
 * (NEU) Kompletter Re-Write für eine deutlich größere Erweiterbarkeit des Scripts
 * (NEU) Archiv-Erweiterung: Unterstützung der Archivierung vorhandener Wettergefahren in eine MySQL Datenbank
 * (NEU) Action-Erweiterung 1: Bei einer Änderung der Warnwetter-Lage automatisch ein Tweet absetzen
-* (NEU) Action-Erweiterung 2: Eine IFTTT-Aktion (http://www.ifttt.com) auslösen wie z.B. das versenden einer Push-Nachricht an eine Benutzergruppe oder das versenden einer SMS.
+* (NEU) Action-Erweiterung 2: Eine IFTTT-Aktion (http://www.ifttt.com) auslösen wie z.B. das Versenden einer Push-Nachricht an eine Benutzergruppe oder das Versenden einer SMS.
 * (NEU) Möglichkeit die vorhandenen mittels "Action"- und "Archiv"-Klassen zu erweitern und mit neuen Funktionen versehen
 * (NEU) Unterstützung mehrere Action-Klassen gleichzeitig ermöglicht
 * (NEU) Deutlich verbesserte Fehlerbehandlung (z.B. Log-Datei anlegen oder per E-Mail informieren im Fehlerfall)
 * (NEU) Script deutlich modularisierter erstellt und damit eine bessere Übersichtlichkeit gewährleistet über den Programmcode
 * (NEU) Durchgehende Unterstützung des PSR-2 Coding-Standards
 * (NEU) Integration von Travis-CI zur automatischen Prüfung des Programmcodes auf Fehler und Einhaltung diverser Coding-Standards
-* (NEU) Verbessertes Ladeverhalten von neuen Warn-Dateien des DWD durch ein vom DWD gesetzten Symlink zur aktuellsten gültigen Warn-Datei (Falls Symlink fehlt erfolgt FallBack auf die bisherige Methode zum erkennen der aktuellsten Warn-Datei).
+* (NEU) Verbessertes Ladeverhalten von neuen Warn-Dateien des DWD durch ein vom DWD gesetzten Symlink zur aktuellsten gültigen Warn-Datei (Falls Symlink fehlt erfolgt FallBack auf die bisherige Methode zum Erkennen der aktuellsten Warn-Datei).
 
 2018-01-04, 2.6.0 stable
 ----------
@@ -89,7 +93,7 @@ Die Warnlage-Icons werden vom [Deutschen Wetterdienst](https://www.dwd.de/DE/wet
 
  * (NEU) Erste Stable Version mit Unterstützung des DWD OpenData Programm
  * (NEU) Anleitung erweitert mit Beispiel für das verarbeiten des DateTime-Felds
- * (NEU) Script zum herunterladen der DWD-Dokumentation und der WarnCellID-Datenbank verbessert
+ * (NEU) Script zum Herunterladen der DWD-Dokumentation und der WarnCellID-Datenbank verbessert
 
 
 2017-08-26, 2.5.5 dev
@@ -97,7 +101,7 @@ Die Warnlage-Icons werden vom [Deutschen Wetterdienst](https://www.dwd.de/DE/wet
 **Wichtig: Umstellung auf den frei zugänglichen OpenData Server des DWD. Dadurch sind Änderungen an der Konfigurationsdateien im Zusammenhang mit den FTP Daten notwendig.**
 
 * (NEU) Verwendung des frei zugänglichen DWD OpenData Server. *Keine Anmeldung beim DWD mehr notwendig.*
-* (NEU) Anpassung an der Logik zur Erkennung der neusten Wetterwarnung-Datei für ein schnelleres verarbeiten der Dateien (ermöglicht durch Änderung der Datei-Struktur auf dem DWD-Server)
+* (NEU) Anpassung an der Logik zur Erkennung der neusten Wetterwarnung-Datei für ein schnelleres Verarbeiten der Dateien (ermöglicht durch Änderung der Datei-Struktur auf dem DWD-Server)
 
 2017-07-14, 2.5.3 dev
 ----------
@@ -106,7 +110,7 @@ Die Warnlage-Icons werden vom [Deutschen Wetterdienst](https://www.dwd.de/DE/wet
 
 - (BUGFIX) Zwingend notwendige Anpassung des Scripts an das CAP DWD Profil  v1.2
 
-	-> Änderung zwingend notwendig, da neu als optional markierte Felder bereits nicht mehr durch den DWD ausgeliefert werden (z.B. Bundesland-Code)
+	→ Änderung zwingend notwendig, da neu als optional markierte Felder bereits nicht mehr durch den DWD ausgeliefert werden (z.B. Bundesland-Code)
 
 
 2017-07-07, 2.5.1 dev
@@ -114,7 +118,7 @@ Die Warnlage-Icons werden vom [Deutschen Wetterdienst](https://www.dwd.de/DE/wet
 **Wichtig: Umstellung die geänderten Warnprodukte (siehe Newsletter vom GDS-Newsletter 07.07.2017)**
 
 - Neu: Optionales speichern der Wetterwarnungen in eine MySQL Datenbank
-- Neu: Ausgabe beinhaltet Typ der Aussendung (Alert = Neue Meldung, Update = Aktualisierung einer bestehenden Meldung)
+- Neu: Ausgabe beinhaltet Typ der Aussendung (Alert = neue Meldung, Update = Aktualisierung einer bestehenden Meldung)
 - Neu: Ausgabe beinhaltet den Identifier der Aussendung (bezieht sich auf eine Aussendung, nicht auf einzelne Wetterwarnungen und kann daher mehreren Meldungen zugeordnet sein)
 - Neu: Ausgabe beinhaltet bei Update-Meldungen den Identifier der Meldung, die aktualisiert wurde
 - Bugfix: Phrase für markantes Wetter korrigiert

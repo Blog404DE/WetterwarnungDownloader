@@ -79,7 +79,7 @@ class Network {
             }
 
             // Login mit Benutzername und Passwort
-            $loginResult = @ftp_login($this->ftpConnectionId, $username, $password);
+            $loginResult = ftp_login($this->ftpConnectionId, $username, $password);
 
             // Verbindung überprüfen
             if ((!($this->ftpConnectionId)) || (!$loginResult)) {
@@ -92,7 +92,7 @@ class Network {
             // Auf Passive Nutzung umschalten
             if (true === $this->ftpPassiv) {
                 echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
-                @ftp_pasv(($this->ftpConnectionId), true);
+                ftp_pasv(($this->ftpConnectionId), true);
             }
         } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
@@ -117,14 +117,14 @@ class Network {
 
             // Versuche, in das benötigte Verzeichnis zu wechseln
             echo '-> Wechsle in das Verzeichnis: ' . ftp_pwd($this->ftpConnectionId) . PHP_EOL;
-            if (!@ftp_chdir($this->ftpConnectionId, $this->remoteFolder)) {
+            if (!ftp_chdir($this->ftpConnectionId, $this->remoteFolder)) {
                 throw new RuntimeException(
                     "Fehler beim Wechsel in das Verzeichnis '" . $this->remoteFolder . "' auf dem DWD FTP-Server."
                 );
             }
 
             // Verzeichnisliste auslesen und sortieren
-            $arrFTPContent = @ftp_nlist($this->ftpConnectionId, '.');
+            $arrFTPContent = ftp_nlist($this->ftpConnectionId, '.');
             if (false === $arrFTPContent) {
                 throw new RuntimeException(
                     'Fehler beim auslesen des Verezichnis ' . $this->remoteFolder . ' auf dem DWD FTP-Server.'
@@ -140,7 +140,7 @@ class Network {
                     // Verwende vom DWD erzeugte Symlink
                     echo '-> Erzeuge Download-Liste im Standard-Modus:' . PHP_EOL;
 
-                    $fileDate = @ftp_mdtm($this->ftpConnectionId, $defaultfilename);
+                    $fileDate = ftp_mdtm($this->ftpConnectionId, $defaultfilename);
                     $detectMode = 'via FTP';
                     if (!$fileDate) {
                         throw new RuntimeException(
@@ -179,7 +179,7 @@ class Network {
             // Erzeuge Array mit allen bereits vorhandenen Dateien und bestimmte das alter der Datei
             $localFiles = [];
             foreach (glob($this->localFolder . \DIRECTORY_SEPARATOR . '*.zip', GLOB_NOSORT) as $filename) {
-                $createtime = @filectime($filename);
+                $createtime = filectime($filename);
                 if (false !== $createtime && is_file($filename)) {
                     // Übertrage Datei in Array
                     $localFiles[filectime($filename)] = basename($filename);
@@ -204,7 +204,7 @@ class Network {
                 echo '-> Starte Löschvorgang ' . PHP_EOL;
                 foreach ($obsoletFiles as $filename) {
                     echo "\tLösche veraltete Wetterwarnung-Datei " . $filename . ': ';
-                    if (!@unlink($this->localFolder . \DIRECTORY_SEPARATOR . $filename)) {
+                    if (!unlink($this->localFolder . \DIRECTORY_SEPARATOR . $filename)) {
                         throw new RuntimeException(
                             "Fehler beim aufräumen des Caches: '" .
                             $this->localFolder . \DIRECTORY_SEPARATOR . $filename .
@@ -294,14 +294,14 @@ class Network {
                         $dateTimeFormater = new DateTime();
                         $dateFileM = $dateTimeFormater::createFromFormat('YmdHis', $regs['Datum'], new DateTimeZone('UTC'));
                         if (false === $dateFileM) {
-                            $fileDate = @ftp_mdtm($this->ftpConnectionId, $filename);
+                            $fileDate = ftp_mdtm($this->ftpConnectionId, $filename);
                             $detectMode = 'via FTP / Lesen des Datums fehlgeschlagen';
                         } else {
                             $fileDate = $dateFileM->getTimestamp();
                             $detectMode = 'via RegExp';
                         }
                     } else {
-                        $fileDate = @ftp_mdtm($this->ftpConnectionId, $filename);
+                        $fileDate = ftp_mdtm($this->ftpConnectionId, $filename);
                         $detectMode = 'via FTP / Lesen des Dateinamens fehlgeschlagen';
                     }
 
@@ -345,7 +345,7 @@ class Network {
                     $localFile = $this->localFolder . \DIRECTORY_SEPARATOR . $filename;
 
                     // Ermittle Zeitpunkt der letzten Modifikation der lokalen Datei
-                    $localFileMTime = @filemtime($localFile);
+                    $localFileMTime = filemtime($localFile);
 
                     if (false === $localFileMTime) {
                         // Da keine lokale Datei existiert, Zeitpunkt in die Vergangenheit setzen
@@ -374,7 +374,7 @@ class Network {
                         }
 
                         // Schließe Datei-Handle
-                        @fclose($localFileHandle);
+                        fclose($localFileHandle);
 
                         // Zeitstempel der lokalen Datei identisch zur Remote-Datei setzen (für Cache-Funktion)
                         touch($localFile, $remoteFileMTime);

@@ -127,7 +127,7 @@ class Toolbox {
             if (is_dir($dir)) {
                 // Lösche Inhalt des Verzeichnis und Verzeichnis selber
                 array_map('unlink', glob($dir . \DIRECTORY_SEPARATOR . '*.xml'));
-                if (@rmdir($dir)) {
+                if (rmdir($dir)) {
                     return true;
                 }
 

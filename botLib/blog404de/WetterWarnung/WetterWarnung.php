@@ -278,7 +278,7 @@ class WetterWarnung extends Save\SaveToFile {
         }
         if (is_writable(\dirname($localJsonFile))) {
             // Datei existiert nicht - Schreibrechte auf den Ordner existieren
-            if (!@touch($localJsonFile)) {
+            if (!touch($localJsonFile)) {
                 // Leere Datei anlegen ist nicht erfolgreich
                 throw new RuntimeException(
                     'Leere JSON Datei für die geparsten Wetterwarnungen konnte nicht angelegt werden'
@@ -328,7 +328,7 @@ class WetterWarnung extends Save\SaveToFile {
             ' (' . number_format(round(filesize($xmlFile) / 1024, 2), 2) . ' kbyte): ';
 
         // Öffne XML Datei zum lesen
-        $content = @file_get_contents($xmlFile);
+        $content = file_get_contents($xmlFile);
         if (!$content) {
             throw new RuntimeException(PHP_EOL . 'Fehler beim lesen der XML Datei ' . $xmlFile);
         }
