@@ -65,7 +65,7 @@ class SaveToFile extends Parser {
 
             // Wandle in JSON um
             echo "\t* Konvertiere Wetterwarnungen in JSON-Daten" . PHP_EOL;
-            $jsonWetterWarnung = @json_encode($wetterWarnungen, JSON_PRETTY_PRINT);
+            $jsonWetterWarnung = json_encode($wetterWarnungen, JSON_PRETTY_PRINT);
             if (json_last_error() > 0) {
                 throw new RuntimeException(
                     'Fehler während der JSON Kodierung der Wetter-Warnungen ' .
@@ -156,7 +156,7 @@ class SaveToFile extends Parser {
             // Prüfe ob schon eine Warnung verarbeitet wurde
             if (file_exists($localJsonFile)) {
                 // Öffne letzte Warnung
-                $lastWarnContent = @file_get_contents($localJsonFile);
+                $lastWarnContent = file_get_contents($localJsonFile);
                 if (false === $lastWarnContent) {
                     throw new RuntimeException(
                         'Fehler beim lesen der bisher vorhandenen Wetterwarnungen ' .
@@ -206,12 +206,12 @@ class SaveToFile extends Parser {
                 'der neuen Wetterwarnung um Änderungen festzustellen' . PHP_EOL
             ;
             $md5hashes = [];
-            $md5hashes['new'] = @md5($jsonWetterWarnung);
+            $md5hashes['new'] = md5($jsonWetterWarnung);
             if (empty($md5hashes['new'] || false === $md5hashes['new'])) {
                 throw new RuntimeException('Fehler beim erzeugen des MD5-Hashs der neuen Wetterwarnungen');
             }
 
-            $md5hashes['old'] = @md5_file($localJsonFile);
+            $md5hashes['old'] = md5_file($localJsonFile);
             if (empty($md5hashes['old'] || false === $md5hashes['old'])) {
                 throw new RuntimeException('Fehler beim erzeugen des MD5-Hashs der bisherigen Wetterwarnungen');
             }
