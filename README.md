@@ -42,4 +42,4 @@ Solltet Ihr Fragen oder Anregungen haben, so steht euch offen sich jederzeit an 
 --
 ##### Lizenz-Information:
 
-Copyright Jens Dutzi 2015-2020 / Stand: 03.01.2020 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
+Copyright Jens Dutzi 2015-2020 / Stand: 20.10.2020 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
