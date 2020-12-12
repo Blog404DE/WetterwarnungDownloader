@@ -220,13 +220,13 @@ trait ParserGeo {
     final protected function getRegionHoehenangabe(\SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe welche Höhenangabe verwendet werden muss für das Warngebiet (siehe Doku des DWD)
-            if (0 === $this->getRegionAltitude($currentWarnGeo, false) &&
-                9842.5197 !== $this->getRegionCeiling($currentWarnGeo, false)
+            if (0 === $this->getRegionAltitude($currentWarnGeo, false)
+                && 9842.5197 !== $this->getRegionCeiling($currentWarnGeo, false)
             ) {
                 // Warngebiet unter angegebener Mindest-Höhe
                 $hoehenangabe = 'Höhenlagen unter ' . $this->getRegionCeiling($currentWarnGeo, true) . 'm';
-            } elseif (0 !== $this->getRegionAltitude($currentWarnGeo, false) &&
-                      9842.5197 === $this->getRegionCeiling($currentWarnGeo, false)
+            } elseif (0 !== $this->getRegionAltitude($currentWarnGeo, false)
+                      && 9842.5197 === $this->getRegionCeiling($currentWarnGeo, false)
             ) {
                 // Warngebiet über angegebener Höchstgebiet
                 $hoehenangabe = 'Höhenlagen über ' . $this->getRegionAltitude($currentWarnGeo, true) . 'm';

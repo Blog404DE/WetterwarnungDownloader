@@ -97,10 +97,10 @@ class Parser extends Network {
         try {
             $parsedWarnInfo = [];
             // Existieren alle benötigten Array-Elemente zum parsen?
-            if (!\array_key_exists('warnung', $rawWarnung) ||
-                !\array_key_exists('region', $rawWarnung) ||
-                !\array_key_exists('identifier', $rawWarnung) ||
-                !\array_key_exists('msgType', $rawWarnung)
+            if (!\array_key_exists('warnung', $rawWarnung)
+                || !\array_key_exists('region', $rawWarnung)
+                || !\array_key_exists('identifier', $rawWarnung)
+                || !\array_key_exists('msgType', $rawWarnung)
             ) {
                 throw new RuntimeException(
                     'Die aktuell verarbeitete Roh-Wetterwarnung ist nicht vollständig - ' .
@@ -123,8 +123,8 @@ class Parser extends Network {
 
             // Prüfe ob Warnung bereits abgelaufen ist und übersprungen werden kann
             /** @noinspection NotOptimalIfConditionsInspection */
-            if ($objEndzeit->getTimestamp() <= $dateCurrent->getTimestamp() &&
-                $objEndzeit->getTimestamp() !== $objStartzeit->getTimestamp()
+            if ($objEndzeit->getTimestamp() <= $dateCurrent->getTimestamp()
+                && $objEndzeit->getTimestamp() !== $objStartzeit->getTimestamp()
             ) {
                 // Warnung ist bereits abgelaufen
                 echo "\t\t* Hinweis: Warnung über " . $parsedWarnInfo['event'] .

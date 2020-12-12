@@ -91,8 +91,8 @@ class ErrorLogging {
         }
 
         // Loggen per E-Mail
-        if (\is_array($this->logToMailSettings) && \array_key_exists('empfaenger', $this->logToMailSettings) &&
-            \array_key_exists('absender', $this->logToMailSettings)) {
+        if (\is_array($this->logToMailSettings) && \array_key_exists('empfaenger', $this->logToMailSettings)
+            && \array_key_exists('absender', $this->logToMailSettings)) {
             $this->logToMail($longText, $strDate);
         }
 

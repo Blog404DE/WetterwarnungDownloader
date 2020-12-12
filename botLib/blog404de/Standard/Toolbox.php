@@ -48,8 +48,7 @@ class Toolbox {
         $zip = new ZipArchive();
         $res = $zip->open($source, ZipArchive::CHECKCONS);
         if (true === $res) {
-            echo
-                "\tEntpacke ZIP-Datei: " .
+            echo "\tEntpacke ZIP-Datei: " .
                 basename($source) . ' (' . $zip->numFiles . ' Datei' .
                 ($zip->numFiles > 1 ? 'en' : '') . ')' .
                 PHP_EOL

@@ -63,6 +63,7 @@ try {
         echo 'Parameter:' . PHP_EOL;
         echo "--help | -h\t\tDiese Hilfe anzeigen" . PHP_EOL;
         echo "--forceAction | -f\tAction auslösen unabhängig davon ob eine Änderung der Warnlage vorliegt" . PHP_EOL;
+
         exit(0);
     }
 
@@ -207,5 +208,6 @@ try {
     } else {
         $logger->logError($e);
     }
+
     exit(-1);
 }

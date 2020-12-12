@@ -66,7 +66,7 @@ trait ParserAlert {
      */
     public function getLocalIconFolder(): string {
         try {
-            return  $this->localIconFolder;
+            return $this->localIconFolder;
         } catch (RuntimeException | \Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -198,18 +198,22 @@ trait ParserAlert {
                         $severity = 'Wetterwarnung';
 
                         break;
+
                     case 'Moderate':
                         $severity = 'Markantes Wetter';
 
                         break;
+
                     case 'Severe':
                         $severity = 'Unwetterwarnung';
 
                         break;
+
                     case 'Extreme':
                         $severity = 'Extreme Unwetterwarnung';
 
                         break;
+
                     default:
                         $severity = 'Unbekannt';
                 }
@@ -250,18 +254,22 @@ trait ParserAlert {
                         $warnstufe = 1;
 
                         break;
+
                     case 'Moderate':
                         $warnstufe = 2;
 
                         break;
+
                     case 'Severe':
                         $warnstufe = 3;
 
                         break;
+
                     case 'Extreme':
                         $warnstufe = 4;
 
                         break;
+
                     default:
                         $warnstufe = -1;
                 }
@@ -460,13 +468,11 @@ trait ParserAlert {
 
             // Prüfe ob WarnFile existiert
             if (empty($warnIconFilename)) {
-                echo
-                    "\t\t* Warnung: Für den Warn-Event Code  " . $eventcode .
+                echo "\t\t* Warnung: Für den Warn-Event Code  " . $eventcode .
                     ' wurde in der zuordnung.json noch kein Warn-Icon zugeordnet (ggf. neuer Warn-Code?)' . PHP_EOL
                 ;
             } elseif (!is_readable($this->getLocalIconFolder() . \DIRECTORY_SEPARATOR . $warnIconFilename)) {
-                echo
-                    "\t\t* Warnung: Zugeordnetes Wetter-Icon " .
+                echo "\t\t* Warnung: Zugeordnetes Wetter-Icon " .
                     $warnIconFilename . ' steht nicht zur Verfügung. Verwende daher kein Warn-Icon' . PHP_EOL
                 ;
                 $warnIconFilename = '';
@@ -491,8 +497,8 @@ trait ParserAlert {
             $eventcode = -1;
             foreach ($currentWarnAlert->children() as $child) {
                 /** @noinspection NotOptimalIfConditionsInspection */
-                if (('eventCode' === $child->getName()) &&
-                    property_exists($child, 'valueName') && property_exists(
+                if (('eventCode' === $child->getName())
+                    && property_exists($child, 'valueName') && property_exists(
                         $child,
                         'value'
                     ) && 'II' === (string)$child->{'valueName'}[0]->__toString()) {

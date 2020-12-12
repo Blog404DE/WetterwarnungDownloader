@@ -108,8 +108,8 @@ class SaveToFile extends Parser {
             $hashExists = false;
 
             // Prüfe ob Hash der Wetterwarnung vorkommt in der letzten Wetterwarnung
-            if (!\array_key_exists('anzahl', $this->lastWetterWarnungen) ||
-                !\array_key_exists('wetterwarnungen', $this->lastWetterWarnungen)
+            if (!\array_key_exists('anzahl', $this->lastWetterWarnungen)
+                || !\array_key_exists('wetterwarnungen', $this->lastWetterWarnungen)
             ) {
                 throw new RuntimeException(
                     'Inhalt der zuletzt gespeicherten Wetterwarnung beinhaltet' .
