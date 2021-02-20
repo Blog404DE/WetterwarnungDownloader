@@ -8,6 +8,8 @@ on:
             - develop
         tags:
             - '*'
+    schedule:
+        - cron: 0 14 * * THU
 
 jobs:
     compatiblity-check:
@@ -29,7 +31,7 @@ jobs:
               run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
             - name: Cache dependencies
-              uses: actions/cache@v1
+              uses: actions/cache@v2
               with:
                 path: ${{ steps.composer-cache.outputs.dir }}
                 key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -71,7 +73,7 @@ jobs:
               run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
             - name: Cache dependencies
-              uses: actions/cache@v1
+              uses: actions/cache@v2
               with:
                 path: ${{ steps.composer-cache.outputs.dir }}
                 key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
