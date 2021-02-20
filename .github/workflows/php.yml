@@ -8,8 +8,6 @@ on:
             - develop
         tags:
             - '*'
-    schedule:
-        - cron: 0 14 * * SAT
 
 jobs:
     compatiblity-check:
@@ -48,10 +46,10 @@ jobs:
 
             - name: Check the coding style
               run: |
-                ./vendor/bin/phpcf -t 7.1 getWetterWarnung.php config.sample.php ./botLib
-                ./vendor/bin/phpcf -t 7.2 getWetterWarnung.php config.sample.php ./botLib
-                ./vendor/bin/phpcf -t 7.3 getWetterWarnung.php config.sample.php ./botLib
-                ./vendor/bin/phpcf -t 7.4 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpdd -t 7.1 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpdd -t 7.2 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpdd -t 7.3 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpdd -t 7.4 getWetterWarnung.php config.sample.php ./botLib
 
     coding-style:
         runs-on: [ubuntu-latest]
