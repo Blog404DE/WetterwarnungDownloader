@@ -9,7 +9,7 @@ on:
         tags:
             - '*'
     schedule:
-        - cron: 0 14 * * SAT
+        - cron: 0 14 * * THU
 
 jobs:
     compatiblity-check:
@@ -31,7 +31,7 @@ jobs:
               run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
             - name: Cache dependencies
-              uses: actions/cache@v1
+              uses: actions/cache@v2
               with:
                 path: ${{ steps.composer-cache.outputs.dir }}
                 key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
@@ -48,10 +48,10 @@ jobs:
 
             - name: Check the coding style
               run: |
-                ./vendor/bin/phpcf -t 7.1 getWetterWarnung.php config.sample.php ./botLib
-                ./vendor/bin/phpcf -t 7.2 getWetterWarnung.php config.sample.php ./botLib
-                ./vendor/bin/phpcf -t 7.3 getWetterWarnung.php config.sample.php ./botLib
-                ./vendor/bin/phpcf -t 7.4 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpdd -t 7.1 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpdd -t 7.2 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpdd -t 7.3 getWetterWarnung.php config.sample.php ./botLib
+                ./vendor/bin/phpdd -t 7.4 getWetterWarnung.php config.sample.php ./botLib
 
     coding-style:
         runs-on: [ubuntu-latest]
@@ -73,7 +73,7 @@ jobs:
               run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
             - name: Cache dependencies
-              uses: actions/cache@v1
+              uses: actions/cache@v2
               with:
                 path: ${{ steps.composer-cache.outputs.dir }}
                 key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
