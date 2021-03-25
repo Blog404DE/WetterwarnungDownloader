@@ -23,7 +23,8 @@ use RuntimeException;
  *
  * @SuppressWarnings("ExitExpression")
  */
-class ErrorLogging {
+class ErrorLogging
+{
     /** @var array E-Mail Absender/Empfänger in ["empfaenger"] und ["absender"] */
     private $logToMailSettings = [];
 

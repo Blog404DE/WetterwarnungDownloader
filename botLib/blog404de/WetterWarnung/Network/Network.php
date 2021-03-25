@@ -25,7 +25,8 @@ use RuntimeException;
  * und aufbereiten der Wetterwarnungen vom DWD Open Data
  * FTP Server.
  */
-class Network {
+class Network
+{
     /** @var resource Link identifier der FTP Verbindung */
     private $ftpConnectionId;
 

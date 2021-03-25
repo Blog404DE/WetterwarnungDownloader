@@ -21,7 +21,8 @@ use RuntimeException;
 /**
  * Interface für die Archiv-Unterstützung.
  */
-interface ArchiveToInterface {
+interface ArchiveToInterface
+{
     /**
      * Setter für MySQL Zugangsdaten.
      *
