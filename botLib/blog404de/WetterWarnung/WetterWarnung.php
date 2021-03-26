@@ -23,7 +23,8 @@ use SimpleXMLElement;
 /**
  * Parser-Hauptklasse für die Wetter-Warnungen des DWD.
  */
-class WetterWarnung extends Save\SaveToFile {
+class WetterWarnung extends Save\SaveToFile
+{
     use Extensions;
 
     /** @var Network\Network Instanz der Warnparser/Netzwerk Klasse */

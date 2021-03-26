@@ -22,7 +22,8 @@ use RuntimeException;
 /**
  * Action-Klasse für WetterWarnung Downloader zum senden eines Tweets bei einer neuen Nachricht.
  */
-class SendToTwitter implements SendToInterface {
+class SendToTwitter implements SendToInterface
+{
     /** @var TwitterOAuth Twitter-Klasse */
     private $connectionId;
 

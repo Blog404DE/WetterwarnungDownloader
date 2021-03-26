@@ -24,7 +24,8 @@ use RuntimeException;
 /**
  * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.
  */
-trait ParserAlert {
+trait ParserAlert
+{
     /** @var string Ordner in denen sich die Warnlagen-Icons befinden */
     private $localIconFolder = '';
 

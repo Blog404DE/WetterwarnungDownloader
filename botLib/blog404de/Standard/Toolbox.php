@@ -21,7 +21,8 @@ use ZipArchive;
 /**
  * Generische Toolbox Klasse für NeuthardWetter.de-Scripte.
  */
-class Toolbox {
+class Toolbox
+{
     /**
      * Methode zum extrahieren aller ZIP-Dateien die sich in einem bestimmten Ordner befinden.
      *

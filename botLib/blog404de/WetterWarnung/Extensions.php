@@ -23,7 +23,8 @@ use RuntimeException;
 /**
  * Trait für die Extensions-Unterstützung im WetterWarnung Parser.
  */
-trait Extensions {
+trait Extensions
+{
     /** @var ArchiveToInterface Klasse für Archiv-Unterstützung via MySQL */
     public $archiveClass;
 
