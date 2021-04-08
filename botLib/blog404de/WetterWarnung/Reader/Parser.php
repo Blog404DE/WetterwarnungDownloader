@@ -24,8 +24,7 @@ use SimpleXMLElement;
 /**
  * Haupt-Klasse des Parser - beinhaltet alle internen Methoden die zum parsen der Wetterwarnungen benötigt werden.
  */
-class Parser extends Network
-{
+class Parser extends Network {
     use ParserAlert;
     use ParserGeo;
     use ParserHeader;

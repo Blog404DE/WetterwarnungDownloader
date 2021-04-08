@@ -23,8 +23,7 @@ use RuntimeException;
 /**
  * Klasse für das speichern der aktuell gültigen Wetterwarnungen in eine einzelne Datei.
  */
-class SaveToFile extends Parser
-{
+class SaveToFile extends Parser {
     /** @var Standard\Toolbox Instanz der generischen Toolbox-Klasse */
     private $toolbox;
 
