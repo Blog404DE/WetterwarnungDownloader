@@ -22,8 +22,7 @@ use SimpleXMLElement;
 /**
  * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.
  */
-trait ParserHeader
-{
+trait ParserHeader {
     /**
      * Info-Node der Wetterwarnungen des DWD nach einer bestimmten WarnCellID durchsuchen.
      *

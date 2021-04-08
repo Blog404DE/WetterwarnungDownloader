@@ -23,8 +23,7 @@ use RuntimeException;
  * Klasse für die Archiv-Anbindung des WarnParser
  * unter Verwendung einer MySQL-Datenbank.
  */
-class ArchiveToMySQL implements ArchiveToInterface
-{
+class ArchiveToMySQL implements ArchiveToInterface {
     /** @var PDO MySQL Connection ResourceID */
     private $connectionId;
 

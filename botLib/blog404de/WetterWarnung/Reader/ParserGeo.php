@@ -21,8 +21,7 @@ use RuntimeException;
 /**
  * Traint zum auslesen diverser Geo-Elemente aus der Roh-XML Datei.
  */
-trait ParserGeo
-{
+trait ParserGeo {
     /** @var array Array mit Bundesländer in Deutschland */
     private $regionames = [
         'BB' => 'Brandenburg',

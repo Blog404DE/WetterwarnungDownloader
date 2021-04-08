@@ -22,8 +22,7 @@ use RuntimeException;
 /**
  * Action-Klasse für WetterWarnung Downloader zum senden eines Tweets bei einer neuen Nachricht.
  */
-class SendToPushover implements SendToInterface
-{
+class SendToPushover implements SendToInterface {
     /** @var array Konfigurationsdaten für die Action */
     private $config = [];
 
