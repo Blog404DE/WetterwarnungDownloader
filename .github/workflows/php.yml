@@ -84,14 +84,14 @@ jobs:
 
             - name: phpmd
               run: |
-                phpmd getWetterWarnung.php text phpmd.xml
-                phpmd botLib/ text phpmd.xml
+                ./vendor/bin/phpmd getWetterWarnung.php text phpmd.xml
+                ./vendor/bin/phpmd botLib/ text phpmd.xml
 
             - name: phpcpd
-              run: phpcpd getWetterWarnung.php config.sample.php ./botLib
+              run: ./vendor/bin/phpcpd getWetterWarnung.php config.sample.php ./botLib
 
             - name: phpcs
-              run: phpcs --report=checkstyle --colors --standard=PSR1 --extensions=php getWetterWarnung.php config.sample.php botLib/* | cs2pr
+              run: ./vendor/bin/phpcs --report=checkstyle --colors --standard=PSR1 --extensions=php getWetterWarnung.php config.sample.php botLib/* | cs2pr
 
             - name: php-cs-fixer
-              run: php-cs-fixer fix -v --dry-run --format=checkstyle --config=./.php_cs.dist | cs2pr
+              run: ./vendor/bin/php-cs-fixer fix -v --dry-run --format=checkstyle --config=./.php_cs.dist | cs2pr
