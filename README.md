@@ -1,4 +1,5 @@
 ![PHP CI](https://github.com/Blog404DE/WetterwarnungDownloader/workflows/PHP%20CI/badge.svg) [![GitHub release](https://img.shields.io/github/release/Blog404DE/WetterwarnungDownloader.svg?style=square)](https://github.com/Blog404DE/WetterwarnungDownloader) [![license](https://img.shields.io/github/license/Blog404DE/WetterwarnungDownloader.svg?style=square)](https://github.com/Blog404DE/WetterwarnungDownloader)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FBlog404DE%2FWetterwarnungDownloader.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FBlog404DE%2FWetterwarnungDownloader?ref=badge_shield)
 
 
 # Wetterwarnung Downloader Script
@@ -43,3 +44,7 @@ Solltet Ihr Fragen oder Anregungen haben, so steht euch offen sich jederzeit an 
 ##### Lizenz-Information:
 
 Copyright Jens Dutzi 2015-2020 / Stand: 20.10.2020 / Dieses Werk ist lizenziert unter einer [MIT Lizenz](http://opensource.org/licenses/mit-license.php)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FBlog404DE%2FWetterwarnungDownloader.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FBlog404DE%2FWetterwarnungDownloader?ref=badge_large)
