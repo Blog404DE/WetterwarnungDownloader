@@ -20,6 +20,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use RuntimeException;
+use SimpleXMLElement;
 
 /**
  * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.
@@ -53,7 +54,7 @@ trait ParserAlert {
             }
 
             $this->localIconFolder = $localIconFolder;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -67,7 +68,7 @@ trait ParserAlert {
     public function getLocalIconFolder(): string {
         try {
             return $this->localIconFolder;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -76,11 +77,11 @@ trait ParserAlert {
     /**
      * Startzeitpunkt der Wetterwarnung ermitteln.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertStartzeit(\SimpleXMLElement $currentWarnAlert): DateTime {
+    final protected function getAlertStartzeit(SimpleXMLElement $currentWarnAlert): DateTime {
         try {
             // Startzeitpunkt ermitteln
             if (!property_exists($currentWarnAlert, 'onset')) {
@@ -104,7 +105,7 @@ trait ParserAlert {
             $objDateOnset->setTimezone(new DateTimeZone('Europe/Berlin'));
 
             return $objDateOnset;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -113,11 +114,11 @@ trait ParserAlert {
     /**
      * Endzeitpunkt der Wetterwarnung ermitteln.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertEndzeit(\SimpleXMLElement $currentWarnAlert): DateTime {
+    final protected function getAlertEndzeit(SimpleXMLElement $currentWarnAlert): DateTime {
         try {
             // Endzeitpunkt ermitteln
             if (!property_exists($currentWarnAlert, 'expires')) {
@@ -141,7 +142,7 @@ trait ParserAlert {
             }
 
             return $objDateExpire;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -150,11 +151,11 @@ trait ParserAlert {
     /**
      * Urgency-Typ aus der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertUrgency(\SimpleXMLElement $currentWarnAlert): string {
+    final protected function getAlertUrgency(SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'urgency')) {
@@ -164,7 +165,7 @@ trait ParserAlert {
             }
 
             return $currentWarnAlert->{'urgency'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -173,11 +174,11 @@ trait ParserAlert {
     /**
      * Warnstufe (Text) der Meldung der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertSeverity(\SimpleXMLElement $currentWarnAlert): string {
+    final protected function getAlertSeverity(SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'severity')) {
@@ -220,7 +221,7 @@ trait ParserAlert {
             }
 
             return $severity;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -229,11 +230,11 @@ trait ParserAlert {
     /**
      * Warnstufe (Zahl) der Meldung der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertWarnstufe(\SimpleXMLElement $currentWarnAlert): int {
+    final protected function getAlertWarnstufe(SimpleXMLElement $currentWarnAlert): int {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'severity')) {
@@ -276,7 +277,7 @@ trait ParserAlert {
             }
 
             return $warnstufe;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -285,11 +286,11 @@ trait ParserAlert {
     /**
      * Event-Typ aus der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertEvent(\SimpleXMLElement $currentWarnAlert): string {
+    final protected function getAlertEvent(SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'event')) {
@@ -299,7 +300,7 @@ trait ParserAlert {
             }
 
             return $currentWarnAlert->{'event'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -308,11 +309,11 @@ trait ParserAlert {
     /**
      * headline aus der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertHeadline(\SimpleXMLElement $currentWarnAlert): string {
+    final protected function getAlertHeadline(SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
@@ -322,7 +323,7 @@ trait ParserAlert {
             }
 
             return $currentWarnAlert->{'headline'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -331,11 +332,11 @@ trait ParserAlert {
     /**
      * description aus der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertDescription(\SimpleXMLElement $currentWarnAlert): string {
+    final protected function getAlertDescription(SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
@@ -345,7 +346,7 @@ trait ParserAlert {
             }
 
             return $currentWarnAlert->{'description'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -354,11 +355,11 @@ trait ParserAlert {
     /**
      * instruction aus der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertInstruction(\SimpleXMLElement $currentWarnAlert): string {
+    final protected function getAlertInstruction(SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
@@ -368,7 +369,7 @@ trait ParserAlert {
             }
 
             return $currentWarnAlert->{'instruction'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -377,11 +378,11 @@ trait ParserAlert {
     /**
      * senderName aus der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertSender(\SimpleXMLElement $currentWarnAlert): string {
+    final protected function getAlertSender(SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
@@ -391,7 +392,7 @@ trait ParserAlert {
             }
 
             return $currentWarnAlert->{'senderName'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -400,11 +401,11 @@ trait ParserAlert {
     /**
      * web aus der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertWeb(\SimpleXMLElement $currentWarnAlert): string {
+    final protected function getAlertWeb(SimpleXMLElement $currentWarnAlert): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'web')) {
@@ -414,7 +415,7 @@ trait ParserAlert {
             }
 
             return $currentWarnAlert->{'web'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -423,11 +424,11 @@ trait ParserAlert {
     /**
      * Icon passend zum WarnEvent ermitteln.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getAlertIcon(\SimpleXMLElement $currentWarnAlert): string {
+    final protected function getAlertIcon(SimpleXMLElement $currentWarnAlert): string {
         try {
             // Zuordnungs-Tabelle öffnen
             $jsonZuordnung = file_get_contents(
@@ -479,7 +480,7 @@ trait ParserAlert {
             }
 
             return $warnIconFilename;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -488,11 +489,11 @@ trait ParserAlert {
     /**
      * Event-Code ermitteln für die spätere Icon-Auflösung.
      *
-     * @param \SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnAlert Alert-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    private function getEventCode(\SimpleXMLElement $currentWarnAlert): int {
+    private function getEventCode(SimpleXMLElement $currentWarnAlert): int {
         try {
             $eventcode = -1;
             foreach ($currentWarnAlert->children() as $child) {
@@ -507,7 +508,7 @@ trait ParserAlert {
             }
 
             return $eventcode;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

@@ -78,7 +78,7 @@ try {
 
     // Beginn des eigentlichen Scripts
     $header = 'Starte Warnlage-Update ' . date('d.m.Y H:i:s') . ':' . PHP_EOL;
-    $header .= str_repeat('=', \mb_strlen(trim($header))) . PHP_EOL;
+    $header .= str_repeat('=', mb_strlen(trim($header))) . PHP_EOL;
     echo $header;
 
     // Prüfe Konfigurationsdatei auf Vollständigkeit
@@ -201,7 +201,7 @@ try {
     echo '*** WetterWarnung-Script erfolgreich abgeschlossen (Laufzeit: ';
     echo sprintf('%.3f', $timeLaufzeit) . ' Sekunden) ***';
     echo PHP_EOL;
-} catch (RuntimeException | \Exception $e) {
+} catch (RuntimeException|\Exception $e) {
     // Fehler-Handling
     if (\is_object($warnBot)) {
         $logger->logError($e, $warnBot->getTmpFolder());

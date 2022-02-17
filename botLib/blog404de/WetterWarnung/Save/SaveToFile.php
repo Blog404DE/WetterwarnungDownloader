@@ -90,7 +90,7 @@ class SaveToFile extends Parser {
             }
 
             return $fileupdated;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -135,7 +135,7 @@ class SaveToFile extends Parser {
             }
 
             return $hashExists;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -185,7 +185,7 @@ class SaveToFile extends Parser {
             echo '-> Anzahl der geladenen Wetterwarnungen: ' .
                 \count($this->lastWetterWarnungen['wetterwarnungen']) .
                 PHP_EOL;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -221,7 +221,7 @@ class SaveToFile extends Parser {
 
             // Gab es eine Änderung?
             return !($md5hashes['old'] === $md5hashes['new']);
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

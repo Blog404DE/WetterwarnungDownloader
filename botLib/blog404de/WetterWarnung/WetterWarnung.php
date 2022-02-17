@@ -132,7 +132,7 @@ class WetterWarnung extends Save\SaveToFile {
             foreach ($zipfiles as $filename) {
                 $this->toolbox->extractZipFile($filename, $this->tmpFolder);
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -202,7 +202,7 @@ class WetterWarnung extends Save\SaveToFile {
             } else {
                 echo "\tKeine Warnmeldungen zum verarbeiten vorhanden" . PHP_EOL;
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -320,7 +320,7 @@ class WetterWarnung extends Save\SaveToFile {
      *
      * @throws RuntimeException
      *
-     * @return \SimpleXMLElement
+     * @return SimpleXMLElement
      */
     private function readXmlFile(string $xmlFile): SimpleXMLElement {
         echo "\tPrüfe " . basename($xmlFile) .

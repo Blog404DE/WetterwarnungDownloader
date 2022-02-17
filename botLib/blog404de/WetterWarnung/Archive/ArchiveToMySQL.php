@@ -71,7 +71,7 @@ class ArchiveToMySQL implements ArchiveToInterface {
 
             // Werte setzen
             $this->config = $config;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -181,7 +181,7 @@ class ArchiveToMySQL implements ArchiveToInterface {
                     'Die Archiv-Funktion wurde nicht erfolgreich konfiguriert'
                 );
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

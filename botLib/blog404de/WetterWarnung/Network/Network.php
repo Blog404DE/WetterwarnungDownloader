@@ -51,7 +51,7 @@ class Network {
                 ftp_close($this->ftpConnectionId);
                 echo "\t-> Verbindung zu erfolgreich geschlossen." . PHP_EOL;
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -94,7 +94,7 @@ class Network {
                 echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
                 ftp_pasv(($this->ftpConnectionId), true);
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -160,7 +160,7 @@ class Network {
 
             // Starte Download der Liste
             $this->downloadFromFTP($arrDownloadList);
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -216,7 +216,7 @@ class Network {
             } else {
                 echo "\t-> Es muss keine Datei gelöscht werden" . PHP_EOL;
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -321,7 +321,7 @@ class Network {
             array_splice($arrDownloadList, 1);
 
             return $arrDownloadList;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -383,7 +383,7 @@ class Network {
                     }
                 }
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

@@ -63,7 +63,7 @@ class SendToTwitter implements SendToInterface {
                     'zur Installation lesen Sie bitte readme.md'
                 );
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -155,7 +155,7 @@ class SendToTwitter implements SendToInterface {
             throw new RuntimeException(
                 'Die Action-Funktion wurde nicht erfolgreich konfiguriert'
             );
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -188,7 +188,7 @@ class SendToTwitter implements SendToInterface {
 
             // Werte setzen
             $this->config = $config;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -224,7 +224,7 @@ class SendToTwitter implements SendToInterface {
             }
 
             echo 'erfolgreich' . PHP_EOL;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -287,7 +287,7 @@ class SendToTwitter implements SendToInterface {
                     echo $this->placeid['id'] . ' / ' . $this->placeid['full_name'] . PHP_EOL;
                 }
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -312,7 +312,7 @@ class SendToTwitter implements SendToInterface {
                 ),
                 'UTF-8'
             );
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -343,7 +343,7 @@ class SendToTwitter implements SendToInterface {
             }
 
             return $message;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -412,7 +412,7 @@ class SendToTwitter implements SendToInterface {
             }
 
             return $tweetParameter;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -460,7 +460,7 @@ class SendToTwitter implements SendToInterface {
             }
 
             return '(' . $code . ') Unbekannter Fehler';
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
