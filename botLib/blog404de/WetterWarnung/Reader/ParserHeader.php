@@ -26,13 +26,13 @@ trait ParserHeader {
     /**
      * Info-Node der Wetterwarnungen des DWD nach einer bestimmten WarnCellID durchsuchen.
      *
-     * @param \SimpleXMLElement $xml        komplette XML-Wetterwarnung
-     * @param int               $warnCellId WarnCellID nach der gesucht werden soll
-     * @param string            $stateCode  Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
+     * @param SimpleXMLElement $xml        komplette XML-Wetterwarnung
+     * @param int              $warnCellId WarnCellID nach der gesucht werden soll
+     * @param string           $stateCode  Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
      *
      * @throws
      *
-     * @return bool|\SimpleXMLElement
+     * @return bool|SimpleXMLElement
      */
     final protected function searchForWarnArea(
         SimpleXMLElement $xml,
@@ -93,7 +93,7 @@ trait ParserHeader {
     /**
      *  Art der Meldung auslesen.
      *
-     * @param \SimpleXMLElement $xml komplette XML-Wetterwarnung
+     * @param SimpleXMLElement $xml komplette XML-Wetterwarnung
      *
      * @throws Exception
      */
@@ -106,7 +106,7 @@ trait ParserHeader {
             }
 
             return $xml->{'identifier'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -115,7 +115,7 @@ trait ParserHeader {
     /**
      * Art der Meldung auslesen (Update, Cancel, Alert etc.).
      *
-     * @param \SimpleXMLElement $xml komplette XML-Wetterwarnung
+     * @param SimpleXMLElement $xml komplette XML-Wetterwarnung
      *
      * @throws Exception
      */
@@ -128,7 +128,7 @@ trait ParserHeader {
             }
 
             return mb_strtolower($xml->{'msgType'}->__toString());
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -137,7 +137,7 @@ trait ParserHeader {
     /**
      * Reference-Feld bei Bedarf auslesen (sofern es sich um eine Update-Meldung handelt).
      *
-     * @param \SimpleXMLElement $xml komplette XML-Wetterwarnung
+     * @param SimpleXMLElement $xml komplette XML-Wetterwarnung
      *
      * @throws Exception
      */
@@ -156,7 +156,7 @@ trait ParserHeader {
             }
 
             return $reference;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -165,7 +165,7 @@ trait ParserHeader {
     /**
      * Durchsuche GeoInfo-Feld nach allen vorhandenen WarnCellIDs und stelle diese in einem Array zusammen.
      *
-     * @param \SimpleXMLElement $area Area-Node der XML-Wetterwarnung
+     * @param SimpleXMLElement $area Area-Node der XML-Wetterwarnung
      *
      * @throws Exception
      */

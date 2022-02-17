@@ -65,7 +65,7 @@ trait Extensions {
                     $this->startExtensionAction();
                 }
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -113,7 +113,7 @@ trait Extensions {
             $this->actionConfig = $actionConfig;
             $this->systemConfig = $systemConfig;
             $this->forceAction = $forceAction;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -153,7 +153,7 @@ trait Extensions {
                     $this->archiveClass->saveToArchive($parsedWarnInfo);
                 }
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -200,7 +200,7 @@ trait Extensions {
                     $this->actionClass->startAction($parsedWarnInfo, $warnExists);
                 }
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

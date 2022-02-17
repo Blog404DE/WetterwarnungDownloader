@@ -52,7 +52,8 @@ jobs:
                 ./vendor/bin/phpdd -t 7.2 getWetterWarnung.php config.sample.php ./botLib
                 ./vendor/bin/phpdd -t 7.3 getWetterWarnung.php config.sample.php ./botLib
                 ./vendor/bin/phpdd -t 7.4 getWetterWarnung.php config.sample.php ./botLib
-
+                ./vendor/bin/phpdd -t 8.0 getWetterWarnung.php config.sample.php ./botLib
+                  
     coding-style:
         runs-on: [ubuntu-latest]
         name: code-style test
@@ -94,4 +95,4 @@ jobs:
               run: ./vendor/bin/phpcs --report=checkstyle --colors --standard=PSR1 --extensions=php getWetterWarnung.php config.sample.php botLib/* | cs2pr
 
             - name: php-cs-fixer
-              run: ./vendor/bin/php-cs-fixer fix -v --dry-run --format=checkstyle --config=./.php_cs.dist | cs2pr
+              run: ./vendor/bin/php-cs-fixer fix -v --dry-run --format=checkstyle --config=.php-cs-fixer.dist.php | cs2pr

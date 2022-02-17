@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace blog404de\Standard;
 
+use Exception;
 use RuntimeException;
 use ZipArchive;
 
@@ -80,7 +81,7 @@ class Toolbox {
      * @param int         $mode        Octal file permission mask for the newly-created dir. Should begin with a 0.
      * @param int         $maxAttempts maximum attempts before giving up (to prevent endless loops)
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return bool|string full path to newly-created dir, or false on failure
      */

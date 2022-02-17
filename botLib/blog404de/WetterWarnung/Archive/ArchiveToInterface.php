@@ -27,7 +27,7 @@ interface ArchiveToInterface {
      *
      * @param array $config Konfigurations-Array
      *
-     * @throws Exception | RuntimeException
+     * @throws Exception|RuntimeException
      */
     public function setConfig(array $config);
 
@@ -41,7 +41,7 @@ interface ArchiveToInterface {
      *
      * @param array $parsedWarnInfo Inhalt der WetterWarnung
      *
-     * @throws Exception | RuntimeException
+     * @throws Exception|RuntimeException
      */
     public function saveToArchive(array $parsedWarnInfo);
 }

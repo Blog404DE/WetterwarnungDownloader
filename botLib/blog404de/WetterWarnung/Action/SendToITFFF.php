@@ -38,7 +38,7 @@ class SendToITFFF implements SendToInterface {
                     'libCurl bzw. die das libCurl-PHP Modul steht nicht zur Verfügung.'
                 );
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -125,7 +125,7 @@ class SendToITFFF implements SendToInterface {
             throw new RuntimeException(
                 'Die Action-Funktion wurde nicht erfolgreich konfiguriert'
             );
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -156,7 +156,7 @@ class SendToITFFF implements SendToInterface {
 
             // Werte setzen
             $this->config = $config;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -205,7 +205,7 @@ class SendToITFFF implements SendToInterface {
             $header = $parsedWarnInfo['severity'] . ' des DWD vor ' . $parsedWarnInfo['event'];
 
             return ['value1' => $header, 'value2' => $message];
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

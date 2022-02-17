@@ -37,7 +37,7 @@ interface SendToInterface {
      *
      * @param array $config Konfigurations-Array
      *
-     * @throws Exception | RuntimeException
+     * @throws Exception|RuntimeException
      */
     public function setConfig(array $config);
 

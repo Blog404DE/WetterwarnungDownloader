@@ -57,7 +57,7 @@ $unwetterConfig['ArchiveConfig']['ArchiveToMySQL'] = [
     'database' => '',
 ];
 
-// Optionale Action Module aktivieren um Aktionen bei neuen Warnwetterlagen zu signalisieren
+// Optionale Action Module aktivieren, um Aktionen bei neuen Warnwetterlagen zu signalisieren
 
 $unwetterConfig['Action'] = false;
 

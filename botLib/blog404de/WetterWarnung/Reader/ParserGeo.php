@@ -17,6 +17,7 @@ namespace blog404de\WetterWarnung\Reader;
 
 use Exception;
 use RuntimeException;
+use SimpleXMLElement;
 
 /**
  * Traint zum auslesen diverser Geo-Elemente aus der Roh-XML Datei.
@@ -46,11 +47,11 @@ trait ParserGeo {
     /**
      * WarnCellID aus den Geo-Daten der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getRegioWarncellid(\SimpleXMLElement $currentWarnGeo): string {
+    final protected function getRegioWarncellid(SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'warncellid')) {
@@ -60,7 +61,7 @@ trait ParserGeo {
             }
 
             return $currentWarnGeo->{'warncellid'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -69,11 +70,11 @@ trait ParserGeo {
     /**
      * areaDesc aus den Geo-Daten der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getRegionArea(\SimpleXMLElement $currentWarnGeo): string {
+    final protected function getRegionArea(SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'areaDesc')) {
@@ -83,7 +84,7 @@ trait ParserGeo {
             }
 
             return $currentWarnGeo->{'areaDesc'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -92,11 +93,11 @@ trait ParserGeo {
     /**
      * State (Kurzform) aus den Geo-Daten der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getRegionStateShort(\SimpleXMLElement $currentWarnGeo): string {
+    final protected function getRegionStateShort(SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'state')) {
@@ -106,7 +107,7 @@ trait ParserGeo {
             }
 
             return $currentWarnGeo->{'state'}->__toString();
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -115,11 +116,11 @@ trait ParserGeo {
     /**
      * State (Langform) aus den Geo-Daten der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getRegionStateLong(\SimpleXMLElement $currentWarnGeo): string {
+    final protected function getRegionStateLong(SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'state')) {
@@ -137,7 +138,7 @@ trait ParserGeo {
             }
 
             return (string)$this->regionames[$currentWarnGeo->{'state'}->__toString()];
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -146,12 +147,12 @@ trait ParserGeo {
     /**
      * altitude aus den Geo-Daten der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
-     * @param bool              $metric         Wert in metrischen Metern zurückgeben
+     * @param SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
+     * @param bool             $metric         Wert in metrischen Metern zurückgeben
      *
      * @throws Exception
      */
-    final protected function getRegionAltitude(\SimpleXMLElement $currentWarnGeo, bool $metric): float {
+    final protected function getRegionAltitude(SimpleXMLElement $currentWarnGeo, bool $metric): float {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'altitude')) {
@@ -170,7 +171,7 @@ trait ParserGeo {
             }
 
             return $altitude;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -179,12 +180,12 @@ trait ParserGeo {
     /**
      * ceiling aus den Geo-Daten der Wetterwarnung auslesen.
      *
-     * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
-     * @param bool              $metric         Wert in metrischen Metern zurückgeben
+     * @param SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
+     * @param bool             $metric         Wert in metrischen Metern zurückgeben
      *
      * @throws Exception
      */
-    final protected function getRegionCeiling(\SimpleXMLElement $currentWarnGeo, bool $metric): float {
+    final protected function getRegionCeiling(SimpleXMLElement $currentWarnGeo, bool $metric): float {
         try {
             // Prüfe ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'ceiling')) {
@@ -204,7 +205,7 @@ trait ParserGeo {
             }
 
             return $ceiling;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -213,11 +214,11 @@ trait ParserGeo {
     /**
      * Höehenangabe aus den Geo-Daten der Wetterwarnung ermitteln.
      *
-     * @param \SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
+     * @param SimpleXMLElement $currentWarnGeo Geo-Teil der aktuellen Wetterwarnung
      *
      * @throws Exception
      */
-    final protected function getRegionHoehenangabe(\SimpleXMLElement $currentWarnGeo): string {
+    final protected function getRegionHoehenangabe(SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe welche Höhenangabe verwendet werden muss für das Warngebiet (siehe Doku des DWD)
             if (0 === $this->getRegionAltitude($currentWarnGeo, false)
@@ -236,7 +237,7 @@ trait ParserGeo {
             }
 
             return $hoehenangabe;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

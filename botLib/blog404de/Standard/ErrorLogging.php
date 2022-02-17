@@ -143,7 +143,7 @@ class ErrorLogging {
 
             // Setze LogToMail-Einstellung
             $this->logToMailSettings = $logToMail;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logError($e);
         }
 
@@ -155,7 +155,7 @@ class ErrorLogging {
      *
      * @param array $logToFile Konfigurationsparameter für die Log-To-File Funktion
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return ErrorLogging
      */
@@ -182,7 +182,7 @@ class ErrorLogging {
                     ' in den angegebenen Ordner zu speichern'
                 );
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logError($e);
         }
 
@@ -248,7 +248,7 @@ class ErrorLogging {
             }
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logError($e);
 
             return false;
@@ -276,7 +276,7 @@ class ErrorLogging {
             }
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logError($e);
 
             return false;
@@ -300,7 +300,7 @@ class ErrorLogging {
             }
 
             return $tmpclean;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->logError($e);
 
             return false;

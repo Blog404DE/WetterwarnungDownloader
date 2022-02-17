@@ -18,6 +18,7 @@ namespace blog404de\WetterWarnung\Reader;
 use blog404de\WetterWarnung\Network\Network;
 use DateTime;
 use DateTimeZone;
+use Exception;
 use RuntimeException;
 use SimpleXMLElement;
 
@@ -80,7 +81,7 @@ class Parser extends Network {
             }
 
             return $arrRohWarnungen;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -176,7 +177,7 @@ class Parser extends Network {
                 $parsedWarnInfo['instruction']);
 
             return $parsedWarnInfo;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -211,7 +212,7 @@ class Parser extends Network {
             }
 
             return $testwarnung;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }

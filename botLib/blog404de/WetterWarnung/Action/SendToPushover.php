@@ -45,7 +45,7 @@ class SendToPushover implements SendToInterface {
                     'CURLFile steht nicht zur Verfügung / libCurl ggf. in einer zu alten Version.'
                 );
             }
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -125,7 +125,7 @@ class SendToPushover implements SendToInterface {
             throw new RuntimeException(
                 'Die Action-Funktion wurde nicht erfolgreich konfiguriert'
             );
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -156,7 +156,7 @@ class SendToPushover implements SendToInterface {
 
             // Werte setzen
             $this->config = $config;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -197,7 +197,7 @@ class SendToPushover implements SendToInterface {
             }
 
             return $message;
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
@@ -260,7 +260,7 @@ class SendToPushover implements SendToInterface {
                 'title' => $header,
                 'message' => $message,
             ];
-        } catch (RuntimeException | \Exception $e) {
+        } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
         }
