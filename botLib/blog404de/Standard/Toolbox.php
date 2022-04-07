@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.7
+ *  @version    v3.2.0
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -91,7 +91,7 @@ class Toolbox {
             $dir = sys_get_temp_dir();
         }
 
-        /// Trim trailing slashes from $dir.
+        // / Trim trailing slashes from $dir.
         $dir = rtrim($dir, '/');
 
         // If we don't have permission to create a directory, fail, otherwise we will be stuck in an endless loop.

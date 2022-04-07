@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.7
+ *  @version    v3.2.0
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -119,6 +119,7 @@ class WetterWarnung extends Save\SaveToFile {
             // ZIP-Dateien in Temporär-Ordner entpacken
             echo '-> Entpacke die Wetterwarnungen des DWD' . PHP_EOL;
             $zipfiles = glob($this->getLocalFolder() . \DIRECTORY_SEPARATOR . '*.zip');
+
             /** @noinspection NotOptimalIfConditionsInspection */
             if (0 === \count($zipfiles) || false === $zipfiles) {
                 throw new RuntimeException('Es befindet sich keine ZIP Datei im Download-Ordner.');

@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.7
+ *  @version    v3.2.0
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -56,7 +56,7 @@ class Parser extends Network {
             $valid = $this->shouldParseWetterwarnung($xml);
             if ($valid) {
                 // Da keine Test-Warnung: beginne Suche nach WarnCellID
-                //$info = $xml->{"info"};
+                // $info = $xml->{"info"};
                 $warnRegionFound = $this->searchForWarnArea($xml, $warnCellId, $stateCode);
                 if (!empty($warnRegionFound)) {
                     // Treffer gefunden
