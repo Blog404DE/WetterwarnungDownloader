@@ -1,5 +1,9 @@
 # Changelog
 
+2022-04-07, 3.2.0 stable
+----------
+* Korrekturen für Unterstützung von PHP 8.1
+
 2020-09-05, 3.1.9 stable
 ----------
 * Ausgabe von PHP-Warnungen komplett deaktiviert, nachdem potenzielle Fehler abgefangen werden.

@@ -2,6 +2,18 @@
 <?php
 
 declare(strict_types=1);
+
+/*
+ *  WarnParser für neuthardwetter.de by Jens Dutzi
+ *
+ *  @package    blog404de\WetterWarnung
+ *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
+ *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
+ *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
+ *  @version    v3.2.0
+ *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
+ */
+
 error_reporting(E_ERROR | E_PARSE);
 
 /*

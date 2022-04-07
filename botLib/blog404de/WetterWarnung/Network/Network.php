@@ -9,7 +9,7 @@ declare(strict_types=1);
  *  @author     Jens Dutzi <jens.dutzi@tf-network.de>
  *  @copyright  Copyright (c) 2012-2020 Jens Dutzi (http://www.neuthardwetter.de)
  *  @license    https://github.com/Blog404DE/WetterwarnungDownloader/blob/master/LICENSE.md
- *  @version    v3.1.7
+ *  @version    v3.2.0
  *  @link       https://github.com/Blog404DE/WetterwarnungDownloader
  */
 
@@ -21,7 +21,7 @@ use Exception;
 use RuntimeException;
 
 /**
- * Netzwerk-Funktionen des WarnParser für den Download
+ * Netzwerk-Funktionen dem WarnParser für den Download
  * und aufbereiten der Wetterwarnungen vom DWD Open Data
  * FTP Server.
  */
@@ -46,7 +46,7 @@ class Network {
     public function disconnectFromFTP(): void {
         try {
             // Schließe Verbindung sofern notwendig
-            if (\is_resource($this->ftpConnectionId)) {
+            if ($this->ftpConnectionId) {
                 echo PHP_EOL . '*** Schließe Verbindung zum DWD-FTP Server' . PHP_EOL;
                 ftp_close($this->ftpConnectionId);
                 echo "\t-> Verbindung zu erfolgreich geschlossen." . PHP_EOL;
@@ -111,7 +111,7 @@ class Network {
             echo PHP_EOL . '*** Verarbeite alle Dateien auf dem DWD FTP Server' . PHP_EOL;
 
             // Prüfe ob Verbindung aktiv ist
-            if (!\is_resource($this->ftpConnectionId)) {
+            if (!$this->ftpConnectionId) {
                 throw new RuntimeException('FTP Verbindung steht nicht mehr zur Verfügung.');
             }
 
