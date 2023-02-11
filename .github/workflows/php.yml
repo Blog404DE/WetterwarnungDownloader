@@ -77,5 +77,8 @@ jobs:
             - name: phpcs
               run: ./vendor/bin/phpcs --report=checkstyle --colors --standard=PSR1 --extensions=php getWetterWarnung.php config.sample.php botLib/* | cs2pr
 
+            - name: phpstan
+              run: ./vendor/bin/phpstan analyse --error-format=checkstyle | cs2pr
+
             - name: php-cs-fixer
               run: PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix -v --dry-run --format=checkstyle --config=.php-cs-fixer.dist.php | cs2pr

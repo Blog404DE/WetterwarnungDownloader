@@ -1,24 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<phpdoc>
+<phpdocumentor
+        configVersion="3"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="https://www.phpdoc.org"
+>
 	<title>WetterwarnungDownloader</title>
-	<template name="responsive"/>
-	<parser>
-		<target>tmp/cache</target>
-		<extensions>
-			<extension>module</extension>
-			<extension>inc</extension>
-			<extension>php</extension>
-		</extensions>
-	</parser>
-	<transformer>
-		<target>docs/api</target>
-	</transformer>
-	<files>
-		<ignore>tests/*</ignore>
-		<ignore>Tests/*</ignore>
-		<ignore>Temp/*</ignore>
-		<ignore>temp/*</ignore>
-		<ignore>vendor/*</ignore>
-		<ignore>config.local.php</ignore>
-	</files>
-</phpdoc>
+    <paths>
+        <output>docs/api</output>
+		<cache>tmp/cache</cache>
+    </paths>
+	<version number="3.0.0">
+        <api>
+            <source dsn=".">
+                <path>botLib</path>
+                <path>getWetterWarnung.php</path>
+            </source>
+			<extensions>
+				<extension>php</extension>
+			</extensions>						
+        </api>
+    </version>
+</phpdocumentor>
