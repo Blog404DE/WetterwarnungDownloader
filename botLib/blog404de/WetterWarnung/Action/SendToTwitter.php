@@ -48,7 +48,7 @@ class SendToTwitter implements SendToInterface {
             $composerAutoloader = \dirname(__DIR__, 4) . '/vendor/abraham/twitteroauth/autoload.php';
 
             // Prüfen ob Source-Code existiert
-            if (false === $composerAutoloader) {
+            if (false === file_exists($composerAutoloader)) {
                 throw new RuntimeException(
                     'TwitterOAuth-Library ist nicht im System vorhanden - ' .
                     'zur Installation lesen Sie bitte readme.md'
@@ -92,54 +92,42 @@ class SendToTwitter implements SendToInterface {
                     $parsedWarnInfo['area'] . PHP_EOL;
 
                 // Aktiviere Verbindung zu Twitter
-                if (!\is_object($this->connectionId)) {
-                    echo "\t\t-> Baue neue Verbindung zu Twitter auf: ";
+                echo "\t\t-> Baue neue Verbindung zu Twitter auf: ";
 
-                    $this->connectionId = new TwitterOAuth(
-                        $this->config['consumerKey'],
-                        $this->config['consumerSecret'],
-                        $this->config['oauthToken'],
-                        $this->config['oauthTokenSecret']
+                $this->connectionId = new TwitterOAuth(
+                    $this->config['consumerKey'],
+                    $this->config['consumerSecret'],
+                    $this->config['oauthToken'],
+                    $this->config['oauthTokenSecret']
+                );
+
+                // UserAgent setzen
+                $this->connectionId->setUserAgent('WetterwarnngDownloader (+http://www.neuthardwetter.de');
+
+                // Ermittle ScreenName
+                /** @var object $getScreenname */
+                $getScreenname = $this->connectionId->get(
+                    'account/verify_credentials',
+                    ['include_entities' => true,
+                        'skip_status' => true,
+                        'include_email' => false, ]
+                );
+                if (200 !== $this->connectionId->getLastHttpCode()) {
+                    throw new RuntimeException(
+                        'Fehler beim ermitteln des Account-Namen: ' .
+                        $this->getErrorText($this->connectionId->getLastHttpCode()) . PHP_EOL
                     );
-                    if (!$this->connectionId) {
-                        throw new RuntimeException(
-                            'Twitter API Anmeldung fehlgeschlagen: ' .
-                            $this->getErrorText($this->connectionId->getLastHttpCode()) . PHP_EOL
-                        );
-                    }
-
-                    // UserAgent setzen
-                    $this->connectionId->setUserAgent('WetterwarnngDownloader (+http://www.neuthardwetter.de');
-
-                    // Ermittle ScreenName
-                    /** @var object $getScreenname */
-                    $getScreenname = $this->connectionId->get(
-                        'account/verify_credentials',
-                        ['include_entities' => true,
-                            'skip_status' => true,
-                            'include_email' => false, ]
-                    );
-                    if (200 !== $this->connectionId->getLastHttpCode()) {
-                        throw new RuntimeException(
-                            'Fehler beim ermitteln des Account-Namen: ' .
-                            $this->getErrorText($this->connectionId->getLastHttpCode()) . PHP_EOL
-                        );
-                    }
-                    if (!property_exists($getScreenname, 'screen_name')) {
-                        throw new RuntimeException(
-                            'Fehler beim ermitteln des Account-Namen ' .
-                             '(Account-Name in der API Rückmeldung nicht vorhanden)' . PHP_EOL
-                        );
-                    }
-                    $this->screenname = $getScreenname->{'screen_name'};
-
-                    // Status Ausgabe:
-                    echo 'Benutzername @' . $this->screenname . PHP_EOL;
-                } else {
-                    // Verbindung twitter besteht bereits
-                    echo "\t\t -> Verwende bestehende Verbindung zu Twitter auf: ";
-                    echo 'Benutzername @' . $this->screenname . PHP_EOL;
                 }
+                if (!property_exists($getScreenname, 'screen_name')) {
+                    throw new RuntimeException(
+                        'Fehler beim ermitteln des Account-Namen ' .
+                        '(Account-Name in der API Rückmeldung nicht vorhanden)' . PHP_EOL
+                    );
+                }
+                $this->screenname = $getScreenname->{'screen_name'};
+
+                // Status Ausgabe:
+                echo 'Benutzername @' . $this->screenname . PHP_EOL;
 
                 if (!$warnExists) {
                     // Stelle Tweet zusammen

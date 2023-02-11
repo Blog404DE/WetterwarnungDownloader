@@ -69,7 +69,7 @@ class SendToITFFF implements SendToInterface {
                     // Stelle Parameter zusammen die an IFTTT gesendet werden
                     $message = $this->composeMessage($parsedWarnInfo);
                     $jsonMessage = json_encode($message, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
-                    if (false === $jsonMessage) {
+                    if (!\is_string($jsonMessage)) {
                         // Nachricht konnte nicht konvertiert werden
                         throw new RuntimeException(
                             'Konvertieren der WetterWarnung als JSON Nachricht für IFFFT ist fehlgeschlagen'

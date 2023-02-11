@@ -207,12 +207,12 @@ class SaveToFile extends Parser {
             ;
             $md5hashes = [];
             $md5hashes['new'] = md5($jsonWetterWarnung);
-            if (empty($md5hashes['new'] || false === $md5hashes['new'])) {
+            if (empty($md5hashes['new'])) {
                 throw new RuntimeException('Fehler beim erzeugen des MD5-Hashs der neuen Wetterwarnungen');
             }
 
             $md5hashes['old'] = md5_file($localJsonFile);
-            if (empty($md5hashes['old'] || false === $md5hashes['old'])) {
+            if (empty($md5hashes['old'])) {
                 throw new RuntimeException('Fehler beim erzeugen des MD5-Hashs der bisherigen Wetterwarnungen');
             }
 

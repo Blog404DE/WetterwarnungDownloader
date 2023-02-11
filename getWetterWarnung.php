@@ -39,7 +39,8 @@ try {
     $timeStart = microtime(true);
 
     // Script initialisieren
-    $unwetterConfig = [];
+    /** @var array $unwetterConfig */
+    $unwetterConfig = null;
     if (is_readable(__DIR__ . '/config.local.php')) {
         require_once __DIR__ . '/config.local.php';
     } else {

@@ -66,12 +66,7 @@ trait ParserAlert {
      * @throws Exception
      */
     public function getLocalIconFolder(): string {
-        try {
-            return $this->localIconFolder;
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
-        }
+        return $this->localIconFolder;
     }
 
     /**

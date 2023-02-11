@@ -82,7 +82,7 @@ class Network {
             $loginResult = ftp_login($this->ftpConnectionId, $username, $password);
 
             // Verbindung überprüfen
-            if ((!$this->ftpConnectionId) || (!$loginResult)) {
+            if (!$loginResult) {
                 throw new RuntimeException(
                     'Verbindungsaufbau zu zu ' . $host . ' mit Benutzername ' . $username . ' fehlgeschlagen.'
                 );

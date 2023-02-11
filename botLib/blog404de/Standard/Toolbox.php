@@ -121,23 +121,18 @@ class Toolbox {
      * @return bool
      */
     public function removeTempDir(string $dir): bool {
-        // TMP Ordner löschen (sofern möglich)
-        if (null !== $dir && false !== $dir) {
-            // Prüfe, ob Verzeichnis existiert
-            if (is_dir($dir)) {
-                // Lösche Inhalt des Verzeichnises und das Verzeichnis selber
-                array_map('unlink', glob($dir . \DIRECTORY_SEPARATOR . '*.xml'));
-                if (rmdir($dir)) {
-                    return true;
-                }
-
+        // Prüfe, ob Verzeichnis existiert
+        if (is_dir($dir)) {
+            // Lösche Inhalt des Verzeichnises und das Verzeichnis selber
+            array_map('unlink', glob($dir . \DIRECTORY_SEPARATOR . '*.xml'));
+            if (!rmdir($dir)) {
                 return false;
             }
 
-            return false;
+            return true;
         }
 
-        return false;
+        return true;
     }
 
     /**

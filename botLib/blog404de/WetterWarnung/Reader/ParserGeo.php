@@ -162,12 +162,9 @@ trait ParserGeo {
             }
 
             if ($metric) {
-                $altitude = floor((float)$currentWarnGeo->{'altitude'}->__toString() * 0.3048);
+                $altitude = floor((int)$currentWarnGeo->{'altitude'}->__toString() * 0.3048);
             } else {
-                $altitude = floor((float)$currentWarnGeo->{'altitude'}->__toString());
-            }
-            if (false === $altitude) {
-                throw new RuntimeException('Umwandlung des Altitude-Wertes von Feet in Meter fehlgeschlagen');
+                $altitude = floor((int)$currentWarnGeo->{'altitude'}->__toString());
             }
 
             return $altitude;
@@ -200,10 +197,6 @@ trait ParserGeo {
                 $ceiling = floor((float)$currentWarnGeo->{'ceiling'}->__toString());
             }
 
-            if (false === $ceiling) {
-                throw new RuntimeException('Umwandlung des Ceiling-Wertes von Feet in Meter fehlgeschlagen');
-            }
-
             return $ceiling;
         } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
@@ -221,13 +214,13 @@ trait ParserGeo {
     final protected function getRegionHoehenangabe(SimpleXMLElement $currentWarnGeo): string {
         try {
             // Prüfe welche Höhenangabe verwendet werden muss für das Warngebiet (siehe Doku des DWD)
-            if (0 === $this->getRegionAltitude($currentWarnGeo, false)
-                && 9842.5197 !== $this->getRegionCeiling($currentWarnGeo, false)
+            if (0.0 === $this->getRegionAltitude($currentWarnGeo, false)
+                && 9842.0 !== $this->getRegionCeiling($currentWarnGeo, false)
             ) {
                 // Warngebiet unter angegebener Mindest-Höhe
                 $hoehenangabe = 'Höhenlagen unter ' . $this->getRegionCeiling($currentWarnGeo, true) . 'm';
-            } elseif (0 !== $this->getRegionAltitude($currentWarnGeo, false)
-                      && 9842.5197 === $this->getRegionCeiling($currentWarnGeo, false)
+            } elseif (0.0 !== $this->getRegionAltitude($currentWarnGeo, false)
+                      && 9842.0 === $this->getRegionCeiling($currentWarnGeo, false)
             ) {
                 // Warngebiet über angegebener Höchstgebiet
                 $hoehenangabe = 'Höhenlagen über ' . $this->getRegionAltitude($currentWarnGeo, true) . 'm';
