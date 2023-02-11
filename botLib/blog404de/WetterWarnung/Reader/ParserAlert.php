@@ -23,11 +23,11 @@ use RuntimeException;
 use SimpleXMLElement;
 
 /**
- * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.
+ * Traint zum Auslesen diverser Header-Elemente aus der Roh-XML Datei.
  */
 trait ParserAlert {
     /** @var string Ordner in denen sich die Warnlagen-Icons befinden */
-    private $localIconFolder = '';
+    private string $localIconFolder = '';
 
     /**
      * Setter für den Ordner in dem sich die Warnlagen-Icons befinden.
@@ -157,7 +157,7 @@ trait ParserAlert {
      */
     final protected function getAlertUrgency(SimpleXMLElement $currentWarnAlert): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'urgency')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'urgency'."
@@ -180,7 +180,7 @@ trait ParserAlert {
      */
     final protected function getAlertSeverity(SimpleXMLElement $currentWarnAlert): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'severity')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'severity'."
@@ -190,10 +190,10 @@ trait ParserAlert {
             if ('Future' === $this->getAlertUrgency($currentWarnAlert)
                 || $this->getAlertStartzeit($currentWarnAlert)->getTimestamp() > time()
             ) {
-                // Warnung liegt in der Zukunft -> daher Warnstufe auf 0 setzen
+                // Warnung liegt in der Zukunft → daher Warnstufe auf 0 setzen
                 $severity = 'Vorwarnung';
             } else {
-                // Warnung ist aktuell gültig -> daher Warnstufe ermitteln
+                // Warnung ist aktuell gültig → daher Warnstufe ermitteln
                 switch ($currentWarnAlert->{'severity'}->__toString()) {
                     case 'Minor':
                         $severity = 'Wetterwarnung';
@@ -236,7 +236,7 @@ trait ParserAlert {
      */
     final protected function getAlertWarnstufe(SimpleXMLElement $currentWarnAlert): int {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'severity')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'severity'."
@@ -246,10 +246,10 @@ trait ParserAlert {
             if ('Future' === $this->getAlertUrgency($currentWarnAlert)
                 || $this->getAlertStartzeit($currentWarnAlert)->getTimestamp() > time()
             ) {
-                // Warnung liegt in der Zukunft -> daher Warnstufe auf 0 setzen
+                // Warnung liegt in der Zukunft → daher Warnstufe auf 0 setzen
                 $warnstufe = 0;
             } else {
-                // Warnung ist aktuell gültig -> daher Warnstufe ermitteln
+                // Warnung ist aktuell gültig → daher Warnstufe ermitteln
                 switch ($currentWarnAlert->{'severity'}->__toString()) {
                     case 'Minor':
                         $warnstufe = 1;
@@ -292,7 +292,7 @@ trait ParserAlert {
      */
     final protected function getAlertEvent(SimpleXMLElement $currentWarnAlert): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'event')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'event'."
@@ -315,7 +315,7 @@ trait ParserAlert {
      */
     final protected function getAlertHeadline(SimpleXMLElement $currentWarnAlert): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'headline'."
@@ -338,7 +338,7 @@ trait ParserAlert {
      */
     final protected function getAlertDescription(SimpleXMLElement $currentWarnAlert): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'description'."
@@ -361,7 +361,7 @@ trait ParserAlert {
      */
     final protected function getAlertInstruction(SimpleXMLElement $currentWarnAlert): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'instruction'."
@@ -384,7 +384,7 @@ trait ParserAlert {
      */
     final protected function getAlertSender(SimpleXMLElement $currentWarnAlert): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'headline')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'senderName'."
@@ -407,7 +407,7 @@ trait ParserAlert {
      */
     final protected function getAlertWeb(SimpleXMLElement $currentWarnAlert): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnAlert, 'web')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt in 'warnung' das XML-Node 'web'."
@@ -441,7 +441,7 @@ trait ParserAlert {
             }
 
             // JSON Daten in Array umwandeln
-            $warnIcons = json_decode($jsonZuordnung, true);
+            $warnIcons = json_decode($jsonZuordnung, true, 512, JSON_THROW_ON_ERROR);
             if (json_last_error()) {
                 $toolbox = new Toolbox();
 
@@ -502,8 +502,8 @@ trait ParserAlert {
                     && property_exists($child, 'valueName') && property_exists(
                         $child,
                         'value'
-                    ) && 'II' === (string)$child->{'valueName'}[0]->__toString()) {
-                    $eventcode = (int)($child->{'value'}->__toString());
+                    ) && 'II' === $child->{'valueName'}[0]->__toString()) {
+                    $eventcode = (int)$child->{'value'}->__toString();
                 }
             }
 

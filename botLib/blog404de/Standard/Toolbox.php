@@ -24,7 +24,7 @@ use ZipArchive;
  */
 class Toolbox {
     /**
-     * Methode zum extrahieren aller ZIP-Dateien die sich in einem bestimmten Ordner befinden.
+     * Methode zum Extrahieren aller ZIP-Dateien die sich in einem bestimmten Ordner befinden.
      *
      * @param string $source      Ordner mit den beinhalteten XML Dateien
      * @param string $destination Ordner in den der Inhalt der ZIP-Dateien entpackt werden soll
@@ -123,9 +123,9 @@ class Toolbox {
     public function removeTempDir(string $dir): bool {
         // TMP Ordner löschen (sofern möglich)
         if (null !== $dir && false !== $dir) {
-            // Prüfe ob Verzeichnis existiert
+            // Prüfe, ob Verzeichnis existiert
             if (is_dir($dir)) {
-                // Lösche Inhalt des Verzeichnis und Verzeichnis selber
+                // Lösche Inhalt des Verzeichnises und das Verzeichnis selber
                 array_map('unlink', glob($dir . \DIRECTORY_SEPARATOR . '*.xml'));
                 if (rmdir($dir)) {
                     return true;
@@ -141,7 +141,7 @@ class Toolbox {
     }
 
     /**
-     * Methode zum generieren der Klartext-Fehlermeldung beim Zugriff auf ZIP-Dateien.
+     * Methode zum Generieren der Klartext-Fehlermeldung beim Zugriff auf ZIP-Dateien.
      *
      * @param int $errCode ZIP-Archive Fehler-Konstante
      *
@@ -167,7 +167,7 @@ class Toolbox {
         return 'Unbekannter Fehler';
     }
 
-    /** Methode zum generieren von Klartext-Fehlermeldung während der JSON Kodierung.
+    /** Methode zum Generieren von Klartext-Fehlermeldung während der JSON Kodierung.
      * @param int $errCode JSON-Fehlerkonstante
      *
      * @return string

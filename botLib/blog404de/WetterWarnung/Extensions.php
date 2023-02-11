@@ -15,7 +15,6 @@ declare(strict_types=1);
 
 namespace blog404de\WetterWarnung;
 
-use blog404de\WetterWarnung\Action\SendToInterface;
 use blog404de\WetterWarnung\Archive\ArchiveToInterface;
 use Exception;
 use RuntimeException;
@@ -25,22 +24,19 @@ use RuntimeException;
  */
 trait Extensions {
     /** @var ArchiveToInterface Klasse für Archiv-Unterstützung via MySQL */
-    public $archiveClass;
+    public ArchiveToInterface $archiveClass;
 
     /** @var array Array mit Konfiguration für die Action-Unterstützung */
-    public $actionConfig;
+    public array $actionConfig;
 
     /** @var array Array mit Konfiguration für das System */
-    public $systemConfig;
+    public array $systemConfig;
 
     /** @var array Array mit Konfiguration für die Action-Unterstützung */
-    public $archiveConfig;
+    public array $archiveConfig;
 
-    /** @var SendToInterface Action-Klasse */
-    private $actionClass;
-
-    /** @var bool Erzwinge ausführen der Action unabhängig davon ob es eine Aktualisierung gab */
-    private $forceAction = false;
+    /** @var bool Erzwinge ausführen der Action unabhängig davon, ob es eine Aktualisierung gab */
+    private bool $forceAction = false;
 
     /**
      * Starte ausführen der hinterlegten Archiv-Funktion.
@@ -48,7 +44,7 @@ trait Extensions {
      * @param bool $archive Archiv-Funktion aufrufen
      * @param bool $action  Action-Funktion aufrufen
      *
-     * @throws
+     * @throws Exception
      */
     public function startExtensions(bool $archive, bool $action): void {
         try {
@@ -76,7 +72,7 @@ trait Extensions {
      * Setzen der Konfiguration der Action-Funktion.
      *
      * @param array $systemConfig Konfigurationsparameter über das System
-     * @param array $actionConfig Konfigurationsparameter für ein spezifische Action
+     * @param array $actionConfig Konfigurationsparameter für eine spezifische Action
      * @param bool  $forceAction  Action-Ausführung erzwingen
      *
      * @throws Exception
@@ -150,7 +146,7 @@ trait Extensions {
 
                 // Verarbeite jede Wetterwarnung
                 foreach ($this->wetterWarnungen as $parsedWarnInfo) {
-                    // Speichere Wetterwarnung in's Archiv
+                    // Speichere Wetterwarnung in das Archiv
                     $this->archiveClass->saveToArchive($parsedWarnInfo);
                 }
             }
@@ -183,11 +179,11 @@ trait Extensions {
                 }
                 // Instanziere Klasse
                 $actionClassPath = '\\blog404de\\WetterWarnung\\Action\\' . $actionClassName;
-                $this->actionClass = new $actionClassPath();
+                $actionClass = new $actionClassPath();
 
                 // Konfiguriere Action-Klasse
                 // -> füge System-Konfiguration und Konfiguration der Action-Klasse zusammen
-                $this->actionClass->setConfig(array_merge($this->systemConfig, $actionConfig));
+                $actionClass->setConfig(array_merge($this->systemConfig, $actionConfig));
 
                 // Verarbeite jede Wetterwarnung
                 foreach ($this->wetterWarnungen as $parsedWarnInfo) {
@@ -198,7 +194,7 @@ trait Extensions {
                     }
 
                     // Warnmeldung existiert nicht und führe Action aus
-                    $this->actionClass->startAction($parsedWarnInfo, $warnExists);
+                    $actionClass->startAction($parsedWarnInfo, $warnExists);
                 }
             }
         } catch (RuntimeException|Exception $e) {

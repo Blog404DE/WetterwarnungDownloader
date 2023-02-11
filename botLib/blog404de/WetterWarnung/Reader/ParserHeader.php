@@ -20,7 +20,7 @@ use RuntimeException;
 use SimpleXMLElement;
 
 /**
- * Traint zum auslesen diverser Header-Elemente aus der Roh-XML Datei.
+ * Traint zum Auslesen diverser Header-Elemente aus der Roh-XML Datei.
  */
 trait ParserHeader {
     /**
@@ -28,18 +28,18 @@ trait ParserHeader {
      *
      * @param SimpleXMLElement $xml        komplette XML-Wetterwarnung
      * @param int              $warnCellId WarnCellID nach der gesucht werden soll
-     * @param string           $stateCode  Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
+     * @param string           $stateCode  Die Abkürzung des Bundeslandes, in dem sich die WarnCellID befindet
      *
-     * @throws
+     * @throws Exception
      *
-     * @return bool|SimpleXMLElement
+     * @return SimpleXMLElement
      */
     final protected function searchForWarnArea(
         SimpleXMLElement $xml,
         int $warnCellId,
         string $stateCode
     ): SimpleXMLElement {
-        // Prüfen ob die entsprechenden Felder in der XML Datei existieren
+        // Prüfen, ob die entsprechenden Felder in der XML Datei existieren
         if (!property_exists($xml, 'info')) {
             throw new RuntimeException(
                 "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'info'-Node."
@@ -53,7 +53,7 @@ trait ParserHeader {
 
         // Durchlaufe den gesamten Info->Area Node
         foreach ($xml->{'info'}->{'area'} as $area) {
-            // Prüfe ob es sich um kein Node mit Polygon-Informationen ist, sondern mit Orts-Informationen
+            // Prüfe, ob es sich um kein Node mit Polygon-Informationen ist, sondern mit Orts-Informationen
             if (!property_exists($area, 'polygon')) {
                 // Speichere areaDesc
                 if (!property_exists($area, 'areaDesc')) {
@@ -65,7 +65,7 @@ trait ParserHeader {
                 // Alle GeoInfo-Felder auslesen bei denen eine WarnCellID vorkommt
                 $cellinformation = $this->extractInfosFromGeoField($area);
 
-                // Prüfe ob mindestens ein gültiger Eintrag existiert in dem geprüften Area-Node
+                // Prüfe, ob mindestens ein gültiger Eintrag existiert in dem geprüften Area-Node
                 if (0 === \count($cellinformation)) {
                     throw new RuntimeException(
                         'Fehler beim durchsuchen der Geo-Informationen: ' .
@@ -183,7 +183,7 @@ trait ParserHeader {
                 );
             }
 
-            if (('WARNCELLID' === $currentGeoCode->{'valueName'}->__toString())) {
+            if ('WARNCELLID' === $currentGeoCode->{'valueName'}->__toString()) {
                 // Prüfe nach Höhenangaben-Nodes
                 if (!property_exists($area, 'altitude')) {
                     throw new RuntimeException(
@@ -199,8 +199,8 @@ trait ParserHeader {
                 // Ergebnis zusammenstellen
                 $result[(string)$currentGeoCode->{'value'}] =
                     [
-                        'altitude' => (float)($area->{'altitude'}),
-                        'ceiling' => (float)($area->{'ceiling'}),
+                        'altitude' => (float)$area->{'altitude'},
+                        'ceiling' => (float)$area->{'ceiling'},
                         'areaDesc' => $area->{'areaDesc'}->__toString(),
                     ];
             }

@@ -93,7 +93,7 @@ class WetterWarnung extends Save\SaveToFile {
     /**
      * Parse lokale Wetterwarnungen nach WarnCellID.
      *
-     * @throws
+     * @throws Exception
      */
     public function prepareWetterWarnungen(): void {
         try {
@@ -169,7 +169,7 @@ class WetterWarnung extends Save\SaveToFile {
                 $xml = $this->readXmlFile($xmlFile);
 
                 // Warn-File an Header-Parser übergeben
-                $currentWarnData = ($this->checkWarnFile($xml, $warnCellId, $stateCode));
+                $currentWarnData = $this->checkWarnFile($xml, $warnCellId, $stateCode);
                 if (!empty($currentWarnData)) {
                     // State noch hinzufügen
                     $currentWarnData['identifier'] = $this->getHeaderIdentifier($xml);
@@ -212,9 +212,9 @@ class WetterWarnung extends Save\SaveToFile {
     /**
      * Speichere Wetterwarnungen.
      *
-     * @param bool $cleanCache Cache nach dem speichern aufräumen
+     * @param bool $cleanCache Cache nach dem Speichern aufräumen
      *
-     * @throws
+     * @throws Exception
      */
     public function saveToFile(bool $cleanCache): bool {
         // Speichere lokale JSON Datei
@@ -263,7 +263,7 @@ class WetterWarnung extends Save\SaveToFile {
      *
      * @param string $localJsonFile Pfad zur XML Datei mit den der WetterWarnung
      *
-     * @throws
+     * @throws Exception
      */
     public function setLocalJsonFile(string $localJsonFile): void {
         if (empty($localJsonFile)) {

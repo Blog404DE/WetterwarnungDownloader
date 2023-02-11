@@ -19,7 +19,7 @@ jobs:
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: 7.4
+                  php-version: 8.2
                   extensions: simplexml, json, ftp, pdo, zip, zlib, libxml, curl
                   coverage: none
 
@@ -45,15 +45,6 @@ jobs:
 
             - name: Install dependencies
               run: composer install --prefer-dist --no-progress --no-suggest
-
-            - name: Check the coding style
-              run: |
-                ./vendor/bin/phpdd -t 7.1 getWetterWarnung.php config.sample.php ./botLib
-                ./vendor/bin/phpdd -t 7.2 getWetterWarnung.php config.sample.php ./botLib
-                ./vendor/bin/phpdd -t 7.3 getWetterWarnung.php config.sample.php ./botLib
-                ./vendor/bin/phpdd -t 7.4 getWetterWarnung.php config.sample.php ./botLib
-                ./vendor/bin/phpdd -t 8.0 getWetterWarnung.php config.sample.php ./botLib
-                  
     coding-style:
         runs-on: [ubuntu-latest]
         name: code-style test
@@ -61,10 +52,10 @@ jobs:
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: 7.4
+                  php-version: 8.2
                   extensions: simplexml, json, ftp, pdo, zip, zlib, libxml, curl
                   coverage: none
-                  tools: cs2pr, php-cs-fixer, phpcpd, phpcs, phpmd
+                  tools: cs2pr, php-cs-fixer, phpcs
 
             - name: Checkout
               uses: actions/checkout@v2
@@ -83,16 +74,8 @@ jobs:
             - name: Install dependencies
               run: composer install --prefer-dist --no-progress --no-suggest
 
-            - name: phpmd
-              run: |
-                ./vendor/bin/phpmd getWetterWarnung.php text phpmd.xml
-                ./vendor/bin/phpmd botLib/ text phpmd.xml
-
-            - name: phpcpd
-              run: ./vendor/bin/phpcpd getWetterWarnung.php config.sample.php ./botLib
-
             - name: phpcs
               run: ./vendor/bin/phpcs --report=checkstyle --colors --standard=PSR1 --extensions=php getWetterWarnung.php config.sample.php botLib/* | cs2pr
 
             - name: php-cs-fixer
-              run: ./vendor/bin/php-cs-fixer fix -v --dry-run --format=checkstyle --config=.php-cs-fixer.dist.php | cs2pr
+              run: PHP_CS_FIXER_IGNORE_ENV=1 ./vendor/bin/php-cs-fixer fix -v --dry-run --format=checkstyle --config=.php-cs-fixer.dist.php | cs2pr

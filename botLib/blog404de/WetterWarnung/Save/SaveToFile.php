@@ -21,14 +21,14 @@ use Exception;
 use RuntimeException;
 
 /**
- * Klasse für das speichern der aktuell gültigen Wetterwarnungen in eine einzelne Datei.
+ * Klasse für das Speichern der aktuell gültigen Wetterwarnungen in eine einzelne Datei.
  */
 class SaveToFile extends Parser {
     /** @var Standard\Toolbox Instanz der generischen Toolbox-Klasse */
-    private $toolbox;
+    private Standard\Toolbox $toolbox;
 
     /** @var array Array mit den Wetterwarnungen des letzten Laufs */
-    private $lastWetterWarnungen;
+    private array $lastWetterWarnungen;
 
     /**
      * SaveToFile constructor.
@@ -51,7 +51,7 @@ class SaveToFile extends Parser {
      */
     public function saveFile(array $wetterWarnungen, string $localJsonFile): ?bool {
         try {
-            // Prüfe ob Zugriff auf json-Datei existiert
+            // Prüfe, ob Zugriff auf json-Datei existiert
             if (empty($localJsonFile) || !is_writable($localJsonFile)) {
                 throw new RuntimeException(
                     'Es ist kein Pfad zu der lokalen JSON-Datei mit den Wetterwarnungen vorhanden oder es ' .
@@ -65,7 +65,7 @@ class SaveToFile extends Parser {
 
             // Wandle in JSON um
             echo "\t* Konvertiere Wetterwarnungen in JSON-Daten" . PHP_EOL;
-            $jsonWetterWarnung = json_encode($wetterWarnungen, JSON_PRETTY_PRINT);
+            $jsonWetterWarnung = json_encode($wetterWarnungen, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
             if (json_last_error() > 0) {
                 throw new RuntimeException(
                     'Fehler während der JSON Kodierung der Wetter-Warnungen ' .
@@ -73,7 +73,7 @@ class SaveToFile extends Parser {
                 );
             }
 
-            // Prüfe ob eine neue Datei gespeichert werden muss
+            // Prüfe, ob eine neue Datei gespeichert werden muss
             if ($this->shouldSaveFile($jsonWetterWarnung, $localJsonFile)) {
                 echo "\t* Änderung bei den Wetterwarnungen gefunden - speichere neue Wetterwarnung" . PHP_EOL;
                 $saveJson = file_put_contents($localJsonFile, $jsonWetterWarnung);
@@ -97,7 +97,7 @@ class SaveToFile extends Parser {
     }
 
     /**
-     * Prüfe ob aktuelle Wetterwarnung bereits in der letzten WetterWarnung Datei vorhanden war.
+     * Prüfe, ob aktuelle Wetterwarnung bereits in der letzten WetterWarnung Datei vorhanden war.
      *
      * @param array $parsedWarnInfo Aktuelle Wetterwarnung
      *
@@ -142,7 +142,7 @@ class SaveToFile extends Parser {
     }
 
     /**
-     * Methode zum laden der letzten Wetterwarnungen aus der Json Datei für späteren Vergleich.
+     * Methode zum Laden der letzten Wetterwarnungen aus der Json Datei für späteren Vergleich.
      *
      * @param string $localJsonFile Pfad zur lokalen JSON Datei mit den aktuellen Wetterwarnungen
      *
@@ -153,7 +153,7 @@ class SaveToFile extends Parser {
             // Nehme zuerst die bisherigen Wetterwarnungen in den Speicher
             echo PHP_EOL . '*** Lade zuerst den bisherigen Stand der WetterWarnungen:' . PHP_EOL;
 
-            // Prüfe ob schon eine Warnung verarbeitet wurde
+            // Prüfe, ob schon eine Warnung verarbeitet wurde
             if (file_exists($localJsonFile)) {
                 // Öffne letzte Warnung
                 $lastWarnContent = file_get_contents($localJsonFile);
@@ -167,7 +167,7 @@ class SaveToFile extends Parser {
                 // Dekodiere letzte Wetterwarnung
                 if (!empty($lastWarnContent)) {
                     // Inhalt vorhanden -> prüfen
-                    $this->lastWetterWarnungen = json_decode($lastWarnContent, true);
+                    $this->lastWetterWarnungen = json_decode($lastWarnContent, true, 512, JSON_THROW_ON_ERROR);
                     if (json_last_error()) {
                         throw new RuntimeException(
                             'Fehler beim interpretieren der zuletzt gespeicherten Wetterwarnungen ' .

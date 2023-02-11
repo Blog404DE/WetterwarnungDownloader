@@ -20,20 +20,22 @@ use Exception;
 use RuntimeException;
 
 /**
- * Action-Klasse für WetterWarnung Downloader zum senden eines Tweets bei einer neuen Nachricht.
+ * Action-Klasse für WetterWarnung Downloader zum Senden eines Tweets bei einer neuen Nachricht.
+ *
+ * @deprecated
  */
 class SendToTwitter implements SendToInterface {
     /** @var TwitterOAuth Twitter-Klasse */
-    private $connectionId;
+    private TwitterOAuth $connectionId;
 
     /** @var array Twitter-OAUTH Schlüssel */
-    private $config = [];
+    private array $config = [];
 
     /** @var array Twitter PlaceID */
-    private $placeid = [];
+    private array $placeid = [];
 
     /** @var string Twitter ScreenName */
-    private $screenname;
+    private string $screenname;
 
     /**
      * SendToTwitter constructor.
@@ -53,10 +55,9 @@ class SendToTwitter implements SendToInterface {
                 );
             }
 
-            /** @noinspection PhpIncludeInspection */
             require_once $composerAutoloader;
 
-            // Prüfe ob entsprechende Klasse geladen ist
+            // Prüfe, ob entsprechende Klasse geladen ist
             if (!class_exists(TwitterOAuth::class, true)) {
                 throw new RuntimeException(
                     'TwitterOAuth-Library wurde nicht erfolgreich geladen - ' .
@@ -79,10 +80,10 @@ class SendToTwitter implements SendToInterface {
      */
     public function startAction(array $parsedWarnInfo, bool $warnExists): int {
         try {
-            // Prüfe ob alles konfiguriert ist
+            // Prüfe, ob alles konfiguriert ist
             if ($this->getConfig()) {
                 if (!\is_array($parsedWarnInfo)) {
-                    // Keine Warnwetter-Daten zum twittern vorhanden -> harter Fehler
+                    // Keine Warnwetter-Daten zum Twittern vorhanden → harter Fehler
                     throw new RuntimeException('Die im Archiv zu speicherenden Wetter-Informationen sind ungültig');
                 }
 
@@ -111,6 +112,7 @@ class SendToTwitter implements SendToInterface {
                     $this->connectionId->setUserAgent('WetterwarnngDownloader (+http://www.neuthardwetter.de');
 
                     // Ermittle ScreenName
+                    /** @var object $getScreenname */
                     $getScreenname = $this->connectionId->get(
                         'account/verify_credentials',
                         ['include_entities' => true,
@@ -241,6 +243,8 @@ class SendToTwitter implements SendToInterface {
             if (!empty($this->config['TweetPlace']) && false !== $this->config['TweetPlace']) {
                 if (empty($this->placeid)) {
                     echo "\t\t -> Suche (einmalig) nach angegebener PlaceID für hinterlegten Ort: ";
+
+                    /** @var object $geoSearch */
                     $geoSearch = $this->connectionId->get(
                         'geo/search',
                         ['query' => $this->config['TweetPlace'], 'granularity' => 'city']
@@ -294,7 +298,7 @@ class SendToTwitter implements SendToInterface {
     }
 
     /**
-     * Länge des Tweet ermitteln.
+     * Länge der Tweet ermitteln.
      *
      * @param string $tweet Inhalt des Tweets
      *
@@ -330,7 +334,7 @@ class SendToTwitter implements SendToInterface {
             $message = '';
 
             //
-            // Attachment mit Icon hinzufügen sofern vorhanden
+            // Attachment mit Icon hinzufügen, sofern vorhanden
             //
             if (!empty($parsedWarnInfo['eventicon'])) {
                 // Stelle Pfad zusammen
@@ -338,6 +342,7 @@ class SendToTwitter implements SendToInterface {
                     $parsedWarnInfo['eventicon'];
 
                 // Lade Icon auf Twitter hoch
+                /** @var object $attachment */
                 $attachment = $this->connectionId->upload('media/upload', ['media' => $filename]);
                 $message = $attachment->{'media_id_string'};
             }
@@ -368,7 +373,7 @@ class SendToTwitter implements SendToInterface {
                 $tweetParameter['display_coordinates'] = true;
             }
 
-            // Typ der Warnung ermitteln,Leerzeichen entfernen und daraus ein Hashtag erzeugen
+            // Typ der Warnung ermitteln, Leerzeichen entfernen und daraus ein Hashtag erzeugen
             $severity = '#' . preg_replace('/\\s+/m', '', $parsedWarnInfo['severity']);
             $tweet = $severity . ' des #DWD';
 
@@ -398,7 +403,7 @@ class SendToTwitter implements SendToInterface {
                 $tweet = mb_substr(
                     $tweet,
                     0,
-                    (280 - $this->getTweetLength($tweet . ' ...' . $postfix))
+                    280 - $this->getTweetLength($tweet . ' ...' . $postfix)
                 ) . ' ...';
             }
             $tweet .= $postfix;
@@ -407,7 +412,7 @@ class SendToTwitter implements SendToInterface {
             // Attachment zusammenstellen
             $attachment = $this->composeAttachment($parsedWarnInfo);
             if (!empty($attachment)) {
-                // Attachment vorhanden -> füge es zu den Parameter hinzu
+                // Attachment vorhanden → füge es zu dem Parameter hinzu
                 $tweetParameter['media_ids'] = $attachment;
             }
 

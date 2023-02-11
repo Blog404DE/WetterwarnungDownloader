@@ -26,17 +26,17 @@ use RuntimeException;
  * FTP Server.
  */
 class Network {
-    /** @var resource Link identifier der FTP Verbindung */
+    /** @var resource|false Link identifier der FTP Verbindung */
     private $ftpConnectionId;
 
     /** @var bool Verwende eine passive Verbindung zum FTP Server */
-    private $ftpPassiv = false;
+    private bool $ftpPassiv = false;
 
     /** @var string Remote Folder auf dem DWD FTP Server mit den Wetterwarnungen */
-    private $remoteFolder = '/weather/alerts/cap/COMMUNEUNION_DWD_STAT';
+    private string $remoteFolder = '/weather/alerts/cap/COMMUNEUNION_DWD_STAT';
 
     /** @var string Lokaler Ordner in dem die Wetterwarnungen gespeichert werden */
-    private $localFolder = '';
+    private string $localFolder = '';
 
     /**
      * Verbindung vom FTP Server trennen.
@@ -45,7 +45,7 @@ class Network {
      */
     public function disconnectFromFTP(): void {
         try {
-            // Schließe Verbindung sofern notwendig
+            // Schließe Verbindung, sofern notwendig
             if ($this->ftpConnectionId) {
                 echo PHP_EOL . '*** Schließe Verbindung zum DWD-FTP Server' . PHP_EOL;
                 ftp_close($this->ftpConnectionId);
@@ -82,17 +82,17 @@ class Network {
             $loginResult = ftp_login($this->ftpConnectionId, $username, $password);
 
             // Verbindung überprüfen
-            if ((!($this->ftpConnectionId)) || (!$loginResult)) {
+            if ((!$this->ftpConnectionId) || (!$loginResult)) {
                 throw new RuntimeException(
                     'Verbindungsaufbau zu zu ' . $host . ' mit Benutzername ' . $username . ' fehlgeschlagen.'
                 );
             }
             echo "\t-> Verbindungsaufbau zu " . $host . ' mit Benutzername ' . $username . ' erfolgreich' . PHP_EOL;
 
-            // Auf Passive Nutzung umschalten
+            // Auf passive Nutzung umschalten
             if (true === $this->ftpPassiv) {
                 echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
-                ftp_pasv(($this->ftpConnectionId), true);
+                ftp_pasv($this->ftpConnectionId, true);
             }
         } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
@@ -176,7 +176,7 @@ class Network {
             // Starte Verarbeitung der Dateien
             echo PHP_EOL . '*** Lösche veraltete Wetterwarnungen aus Cache-Ordner.' . PHP_EOL;
 
-            // Erzeuge Array mit allen bereits vorhandenen Dateien und bestimmte das alter der Datei
+            // Erzeuge Array mit allen bereits vorhandenen Dateien und bestimmte das Alter der Datei
             $localFiles = [];
             foreach (glob($this->localFolder . \DIRECTORY_SEPARATOR . '*.zip', GLOB_NOSORT) as $filename) {
                 $createtime = filectime($filename);
@@ -264,7 +264,7 @@ class Network {
     }
 
     /**
-     * Ermittle die aktuellste Wetterwarnung-Datei durch parsen der Dateiliste (FallBack-Modus).
+     * Ermittle die aktuellste Wetterwarnung-Datei durch Parsen der Dateiliste (FallBack-Modus).
      *
      * @param array $arrFTPContent Inhalt des Verzeichnisses auf dem DWD FTP Server
      *
@@ -272,7 +272,7 @@ class Network {
      */
     private function getCurrentWetterwarnungViaFallback(array $arrFTPContent): array {
         try {
-            // Filter erzeugen um die Dateien zu ermitteln die heute erzeugt wurden
+            // Filter erzeugen, um die Dateien zu ermitteln, die heute erzeugt wurden
             $searchTime = new DateTime('now', new DateTimeZone('GMT'));
             $fileFilter = $searchTime->format('Ymd');
 
@@ -308,7 +308,7 @@ class Network {
                     // Sprache feststellen
                     $language = $regs['Language'];
 
-                    // Bei deutscher Sprache -> verarbeiten
+                    // Bei deutscher Sprache → verarbeiten
                     if ('DE' === mb_strtoupper($language)) {
                         echo "\t" . $filename . ' => ' . date('d.m.Y H:i', $fileDate) . ' (' . $language . ' / ' . $detectMode . ')' . PHP_EOL;
                         $arrDownloadList[$filename] = $fileDate;

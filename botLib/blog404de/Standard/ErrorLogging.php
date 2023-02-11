@@ -25,13 +25,13 @@ use RuntimeException;
  */
 class ErrorLogging {
     /** @var array E-Mail Absender/Empfänger in ["empfaenger"] und ["absender"] */
-    private $logToMailSettings = [];
+    private array $logToMailSettings = [];
 
     /** @var array Pfad zur Log-Datei */
-    private $logToFileSettings = [];
+    private array $logToFileSettings = [];
 
     /** @var bool Trace-Log sanfügen im Fehlerfall */
-    private $withTrace = false;
+    private bool $withTrace = false;
 
     /**
      * Fehler innerhalb der Anwendung verarbeiten.
@@ -292,7 +292,7 @@ class ErrorLogging {
      */
     private function cleanTempFiles(string $tmpPath): bool {
         try {
-            // Lösche evntuell vorhandenes Temporäre Verzeichnis
+            // Lösche evntuell vorhandenes temporäre Verzeichnis
             $tmpclean = true;
             if (false !== $tmpPath) {
                 $toolbox = new Toolbox();

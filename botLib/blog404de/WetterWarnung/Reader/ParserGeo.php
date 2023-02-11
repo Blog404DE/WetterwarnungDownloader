@@ -20,11 +20,11 @@ use RuntimeException;
 use SimpleXMLElement;
 
 /**
- * Traint zum auslesen diverser Geo-Elemente aus der Roh-XML Datei.
+ * Traint zum Auslesen diverser Geo-Elemente aus der Roh-XML Datei.
  */
 trait ParserGeo {
     /** @var array Array mit Bundesländer in Deutschland */
-    private $regionames = [
+    private array $regionames = [
         'BB' => 'Brandenburg',
         'BL' => 'Berlin',
         'BW' => 'Baden-Württemberg',
@@ -53,7 +53,7 @@ trait ParserGeo {
      */
     final protected function getRegioWarncellid(SimpleXMLElement $currentWarnGeo): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'warncellid')) {
                 throw new RuntimeException(
                     'Die aktuell verarbeitete Roh-Wetterwarnung fehlt die WarnCellID in den Region-Angaben.'
@@ -76,7 +76,7 @@ trait ParserGeo {
      */
     final protected function getRegionArea(SimpleXMLElement $currentWarnGeo): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'areaDesc')) {
                 throw new RuntimeException(
                     'Die aktuell verarbeitete Roh-Wetterwarnung fehlt der Ortsname in den Region-Angaben.'
@@ -99,7 +99,7 @@ trait ParserGeo {
      */
     final protected function getRegionStateShort(SimpleXMLElement $currentWarnGeo): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'state')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt 'State' in den Region-Angaben."
@@ -122,7 +122,7 @@ trait ParserGeo {
      */
     final protected function getRegionStateLong(SimpleXMLElement $currentWarnGeo): string {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'state')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt 'State' in den Region-Angaben."
@@ -154,7 +154,7 @@ trait ParserGeo {
      */
     final protected function getRegionAltitude(SimpleXMLElement $currentWarnGeo, bool $metric): float {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'altitude')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt 'altitude' in den Region-Angaben."
@@ -162,9 +162,9 @@ trait ParserGeo {
             }
 
             if ($metric) {
-                $altitude = floor((float)($currentWarnGeo->{'altitude'}->__toString()) * 0.3048);
+                $altitude = floor((float)$currentWarnGeo->{'altitude'}->__toString() * 0.3048);
             } else {
-                $altitude = floor((float)($currentWarnGeo->{'altitude'}->__toString()));
+                $altitude = floor((float)$currentWarnGeo->{'altitude'}->__toString());
             }
             if (false === $altitude) {
                 throw new RuntimeException('Umwandlung des Altitude-Wertes von Feet in Meter fehlgeschlagen');
@@ -187,7 +187,7 @@ trait ParserGeo {
      */
     final protected function getRegionCeiling(SimpleXMLElement $currentWarnGeo, bool $metric): float {
         try {
-            // Prüfe ob Feld in XML Datei existiert
+            // Prüfe, ob Feld in XML Datei existiert
             if (!property_exists($currentWarnGeo, 'ceiling')) {
                 throw new RuntimeException(
                     "Die aktuell verarbeitete Roh-Wetterwarnung fehlt 'ceiling' in den Region-Angaben."
@@ -195,9 +195,9 @@ trait ParserGeo {
             }
 
             if ($metric) {
-                $ceiling = floor(((float)($currentWarnGeo->{'ceiling'}->__toString()) * 0.3048));
+                $ceiling = floor((float)$currentWarnGeo->{'ceiling'}->__toString() * 0.3048);
             } else {
-                $ceiling = floor((float)($currentWarnGeo->{'ceiling'}->__toString()));
+                $ceiling = floor((float)$currentWarnGeo->{'ceiling'}->__toString());
             }
 
             if (false === $ceiling) {
