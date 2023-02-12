@@ -22,7 +22,7 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 - (optional) MySQL-Datenbank
 - wget
 
-> **Hinweis:** PHP 7.4 wird mit dieser Version nicht mehr unterstützt. PHP 7.4 ist EOL und wird von den Entwicklern nicht mehr unterstützt (auch keine Sicherheitsupdates). Dies bedeutet nicht, dass PHP 7.4 nicht mit diesem Projekt funktionieren wird, sondern, dass wir nicht mehr gegen PHP 7.4 prüfen. 
+> **Hinweis:** PHP 7.4 wird mit dieser Version nicht mehr unterstützt. PHP 7.4 ist EOL und wird von den Entwicklern nicht mehr unterstützt (auch keine Sicherheitsupdates). Dies bedeutet nicht, dass PHP 7.4 nicht mit diesem Projekt funktionieren wird, sondern, dass wir nicht mehr gegen PHP 7.4 prüfen.
 
 ## Installationsanleitung:
 

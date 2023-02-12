@@ -19,7 +19,7 @@ jobs:
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: 8.2
+                  php-version: 8.0
                   extensions: simplexml, json, ftp, pdo, zip, zlib, libxml, curl
                   coverage: none
 
@@ -52,7 +52,7 @@ jobs:
             - name: Setup PHP
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: 8.2
+                  php-version: 8.0
                   extensions: simplexml, json, ftp, pdo, zip, zlib, libxml, curl
                   coverage: none
                   tools: cs2pr, php-cs-fixer, phpcs
