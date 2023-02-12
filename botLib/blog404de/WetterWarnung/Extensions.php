@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace blog404de\WetterWarnung;
 
+use blog404de\WetterWarnung\Action\SendToInterface;
 use blog404de\WetterWarnung\Archive\ArchiveToInterface;
 use Exception;
 use RuntimeException;
@@ -138,6 +139,7 @@ trait Extensions {
                     "' Modul:" . PHP_EOL;
 
                 // Instanziere Klasse
+                /** @var ArchiveToInterface $archiveClassPath */
                 $archiveClassPath = '\\blog404de\\WetterWarnung\\Archive\\' . $archiveClassName;
                 $this->archiveClass = new $archiveClassPath();
 
@@ -178,6 +180,7 @@ trait Extensions {
                     $warnExists = null;
                 }
                 // Instanziere Klasse
+                /** @var SendToInterface $actionClassPath */
                 $actionClassPath = '\\blog404de\\WetterWarnung\\Action\\' . $actionClassName;
                 $actionClass = new $actionClassPath();
 

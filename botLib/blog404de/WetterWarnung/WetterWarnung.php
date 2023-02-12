@@ -27,19 +27,19 @@ class WetterWarnung extends Save\SaveToFile {
     use Extensions;
 
     /** @var Network\Network Instanz der Warnparser/Netzwerk Klasse */
-    public $network;
+    public Network\Network $network;
 
     /** @var string Lokale Datei in der die verarbeiteten Wetterwarnungen gespeichert werden */
-    private $localJsonFile = '';
+    private string $localJsonFile = '';
 
-    /** @var bool|string Ordner für temporäre Dateien */
-    private $tmpFolder = '';
+    /** @var string|null Ordner für temporäre Dateien */
+    private ?string $tmpFolder = '';
 
     /** @var array Aktuelle geparsten Wetterwarnungen */
-    private $wetterWarnungen = [];
+    private array $wetterWarnungen = [];
 
     /** @var Standard\Toolbox Instanz der generischen Toolbox-Klasse */
-    private $toolbox;
+    private Standard\Toolbox $toolbox;
 
     /**
      * WarnParser constructor.
@@ -113,15 +113,13 @@ class WetterWarnung extends Save\SaveToFile {
                     "'sys_tmp_dir' oder die Umgebungsvariable 'TMPDIR' gesetzt ist."
                 );
             }
-            $this->tmpFolder = $tmpdir;
+            $this->tmpFolder = (string)$tmpdir;
             echo 'erfolgreich (' . $this->tmpFolder . ')' . PHP_EOL;
 
             // ZIP-Dateien in Temporär-Ordner entpacken
             echo '-> Entpacke die Wetterwarnungen des DWD' . PHP_EOL;
-            $zipfiles = glob($this->getLocalFolder() . \DIRECTORY_SEPARATOR . '*.zip');
-
-            /** @noinspection NotOptimalIfConditionsInspection */
-            if (0 === \count($zipfiles) || false === $zipfiles) {
+            $zipfiles = glob($this->getLocalFolder() . \DIRECTORY_SEPARATOR . '*.zip') ?: [];
+            if (!\is_array($zipfiles)) {
                 throw new RuntimeException('Es befindet sich keine ZIP Datei im Download-Ordner.');
             }
             if (\count($zipfiles) > 10) {
@@ -131,7 +129,7 @@ class WetterWarnung extends Save\SaveToFile {
                 );
             }
             foreach ($zipfiles as $filename) {
-                $this->toolbox->extractZipFile($filename, $this->tmpFolder);
+                $this->toolbox->extractZipFile($filename, (string)$this->tmpFolder);
             }
         } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
@@ -156,26 +154,27 @@ class WetterWarnung extends Save\SaveToFile {
             echo PHP_EOL . '*** Verarbeite die Wetterwarnungen:' . PHP_EOL;
             echo '-> Suche in heruntergeladenen Wetterwarnungen nach der WarnCellID ' . $warnCellId . PHP_EOL;
 
-            // Lese Verzeichnis mit XML Dateien ein
-            $localXmlFiles = glob($this->tmpFolder . \DIRECTORY_SEPARATOR . '*.xml');
-
             // Lege Array an für die ermittelten Roh-Warnungen
             $arrRohWarnungen = [];
 
-            // Parse XML Dateien
-            $xml = null;
-            foreach ($localXmlFiles as $xmlFile) {
-                // Öffne XML Datei und erzeuge ein XML Objekt aus Datei
-                $xml = $this->readXmlFile($xmlFile);
+            // Lese Verzeichnis mit XML Dateien ein
+            $localXmlFiles = glob($this->tmpFolder . \DIRECTORY_SEPARATOR . '*.xml');
+            if (\is_array($localXmlFiles)) {
+                // Parse XML Dateien
+                $xml = null;
+                foreach ($localXmlFiles as $xmlFile) {
+                    // Öffne XML Datei und erzeuge ein XML Objekt aus Datei
+                    $xml = $this->readXmlFile($xmlFile);
 
-                // Warn-File an Header-Parser übergeben
-                $currentWarnData = $this->checkWarnFile($xml, $warnCellId, $stateCode);
-                if (!empty($currentWarnData)) {
-                    // State noch hinzufügen
-                    $currentWarnData['identifier'] = $this->getHeaderIdentifier($xml);
-                    $currentWarnData['msgType'] = ucfirst($this->getHeaderMsgType($xml));
-                    $currentWarnData['reference'] = $this->getHeaderReference($xml);
-                    $arrRohWarnungen[basename($xmlFile)] = $currentWarnData;
+                    // Warn-File an Header-Parser übergeben
+                    $currentWarnData = $this->checkWarnFile($xml, $warnCellId, $stateCode);
+                    if (!empty($currentWarnData)) {
+                        // State noch hinzufügen
+                        $currentWarnData['identifier'] = $this->getHeaderIdentifier($xml);
+                        $currentWarnData['msgType'] = ucfirst($this->getHeaderMsgType($xml));
+                        $currentWarnData['reference'] = $this->getHeaderReference($xml);
+                        $arrRohWarnungen[basename($xmlFile)] = $currentWarnData;
+                    }
                 }
             }
 
@@ -308,9 +307,9 @@ class WetterWarnung extends Save\SaveToFile {
     /**
      * Getter-Methode für Zugriff auf evntl. angelegten Temporär-Ordner.
      *
-     * @return bool|string
+     * @return ?string
      */
-    public function getTmpFolder() {
+    public function getTmpFolder(): ?string {
         return $this->tmpFolder;
     }
 

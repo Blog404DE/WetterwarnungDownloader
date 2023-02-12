@@ -123,8 +123,14 @@ class Toolbox {
     public function removeTempDir(string $dir): bool {
         // Prüfe, ob Verzeichnis existiert
         if (is_dir($dir)) {
+            // Generiere Verzeichnis-Liste
+            $filelist = glob($dir . \DIRECTORY_SEPARATOR . '*.xml') ?: [];
+            if (!\is_array($filelist)) {
+                return true;
+            }
+
             // Lösche Inhalt des Verzeichnises und das Verzeichnis selber
-            array_map('unlink', glob($dir . \DIRECTORY_SEPARATOR . '*.xml'));
+            array_map('unlink', $filelist);
             if (!rmdir($dir)) {
                 return false;
             }

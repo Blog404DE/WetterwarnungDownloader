@@ -40,7 +40,7 @@ trait ParserAlert {
         try {
             if (!empty($localIconFolder) && false !== $localIconFolder) {
                 if (!is_readable(
-                    realpath($localIconFolder . \DIRECTORY_SEPARATOR . 'zuordnung.json')
+                    (string)realpath($localIconFolder . \DIRECTORY_SEPARATOR . 'zuordnung.json')
                 )) {
                     // Kein Zugriff auf Datei möglich
                     throw new RuntimeException(

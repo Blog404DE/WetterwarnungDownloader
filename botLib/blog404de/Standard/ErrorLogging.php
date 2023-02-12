@@ -36,10 +36,10 @@ class ErrorLogging {
     /**
      * Fehler innerhalb der Anwendung verarbeiten.
      *
-     * @param Exception $exception Inhalt der Exception
-     * @param string    $tmpPath   Temporär-Pfad
+     * @param Exception   $exception Inhalt der Exception
+     * @param string|null $tmpPath   Temporär-Pfad
      */
-    public function logError(Exception $exception, string $tmpPath = ''): void {
+    public function logError(Exception $exception, ?string $tmpPath = ''): void {
         // Zeitpunkt
         $strDate = date('Y-m-d H:i:s');
 

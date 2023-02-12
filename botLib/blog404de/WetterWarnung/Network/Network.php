@@ -18,7 +18,6 @@ namespace blog404de\WetterWarnung\Network;
 use DateTime;
 use DateTimeZone;
 use Exception;
-use FTP\Connection;
 use RuntimeException;
 
 /**
@@ -27,7 +26,7 @@ use RuntimeException;
  * FTP Server.
  */
 class Network {
-    /** @var resource|Connection|false Link identifier der FTP Verbindung */
+    /** @var resource|false Link identifier der FTP Verbindung */
     private $ftpConnectionId;
 
     /** @var bool Verwende eine passive Verbindung zum FTP Server */
@@ -179,23 +178,26 @@ class Network {
 
             // Erzeuge Array mit allen bereits vorhandenen Dateien und bestimmte das Alter der Datei
             $localFiles = [];
-            foreach (glob($this->localFolder . \DIRECTORY_SEPARATOR . '*.zip', GLOB_NOSORT) as $filename) {
-                $createtime = filectime($filename);
-                if (false !== $createtime && is_file($filename)) {
-                    // Übertrage Datei in Array
-                    $localFiles[filectime($filename)] = basename($filename);
-                } else {
-                    // Zeitpunkt der Datei kann nicht festgestellt werden
-                    throw new RuntimeException(
-                        'Fehler beim ermitteln des alters der Datei ' . basename($filename) .
-                        ' im Download-Cache Ordner oder der Datei-Typ kann nicht bestimmt werden.'
-                    );
+            $localZipFiles = glob($this->localFolder . \DIRECTORY_SEPARATOR . '*.zip');
+            if (\is_array($localZipFiles)) {
+                foreach ($localZipFiles as $filename) {
+                    $createtime = filectime($filename);
+                    if (false !== $createtime && is_file($filename)) {
+                        // Übertrage Datei in Array
+                        $localFiles[filectime($filename)] = basename($filename);
+                    } else {
+                        // Zeitpunkt der Datei kann nicht festgestellt werden
+                        throw new RuntimeException(
+                            'Fehler beim ermitteln des alters der Datei ' . basename($filename) .
+                            ' im Download-Cache Ordner oder der Datei-Typ kann nicht bestimmt werden.'
+                        );
+                    }
                 }
-            }
 
-            // Dateiliste sortieren
-            ksort($localFiles, SORT_NUMERIC);
-            $localFiles = array_reverse($localFiles);
+                // Dateiliste sortieren
+                ksort($localFiles, SORT_NUMERIC);
+                $localFiles = array_reverse($localFiles);
+            }
 
             // Array $localFiles aufsplitten um zu löschenende Dateien zu ermitteln (alle bis auf die älteste Datei)
             $obsoletFiles = array_splice($localFiles, 1);
@@ -291,6 +293,11 @@ class Network {
                         $filename,
                         $regs
                     );
+
+                    if (!\is_resource($this->ftpConnectionId)) {
+                        throw new RuntimeException('Verbindung zum FTP Server unterbrochen');
+                    }
+
                     if ($extractFileInfo) {
                         $dateTimeFormater = new DateTime();
                         $dateFileM = $dateTimeFormater::createFromFormat('YmdHis', $regs['Datum'], new DateTimeZone('UTC'));
@@ -359,6 +366,10 @@ class Network {
                         $localFileHandle = fopen($localFile, 'w');
                         if (!$localFileHandle) {
                             throw new RuntimeException('Kann ' . $localFile . ' nicht zum schreiben öffnen');
+                        }
+
+                        if (!\is_resource($this->ftpConnectionId)) {
+                            throw new RuntimeException('Verbindung zum FTP Server unterbrochen');
                         }
 
                         if (ftp_fget($this->ftpConnectionId, $localFileHandle, $filename, FTP_BINARY)) {

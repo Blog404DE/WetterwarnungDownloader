@@ -330,7 +330,7 @@ class SendToTwitter implements SendToInterface {
                     $parsedWarnInfo['eventicon'];
 
                 // Lade Icon auf Twitter hoch
-                /** @var object $attachment */
+                /** @var mixed $attachment */
                 $attachment = $this->connectionId->upload('media/upload', ['media' => $filename]);
                 $message = $attachment->{'media_id_string'};
             }

@@ -1,6 +1,8 @@
 parameters:
-	level: 5
+	level: 7
 	paths:
 		- botLib
 		- getWetterWarnung.php
 		- config.sample.php
+	ignoreErrors:
+		- "#no value type specified in iterable type array.#"
