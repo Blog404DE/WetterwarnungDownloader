@@ -32,8 +32,8 @@ class WetterWarnung extends Save\SaveToFile {
     /** @var string Lokale Datei in der die verarbeiteten Wetterwarnungen gespeichert werden */
     private string $localJsonFile = '';
 
-    /** @var string|null Ordner für temporäre Dateien */
-    private ?string $tmpFolder = '';
+    /** @var string Ordner für temporäre Dateien */
+    private string $tmpFolder = '';
 
     /** @var array Aktuelle geparsten Wetterwarnungen */
     private array $wetterWarnungen = [];
@@ -129,7 +129,7 @@ class WetterWarnung extends Save\SaveToFile {
                 );
             }
             foreach ($zipfiles as $filename) {
-                $this->toolbox->extractZipFile($filename, (string)$this->tmpFolder);
+                $this->toolbox->extractZipFile($filename, $this->tmpFolder);
             }
         } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
@@ -161,7 +161,6 @@ class WetterWarnung extends Save\SaveToFile {
             $localXmlFiles = glob($this->tmpFolder . \DIRECTORY_SEPARATOR . '*.xml');
             if (\is_array($localXmlFiles)) {
                 // Parse XML Dateien
-                $xml = null;
                 foreach ($localXmlFiles as $xmlFile) {
                     // Öffne XML Datei und erzeuge ein XML Objekt aus Datei
                     $xml = $this->readXmlFile($xmlFile);
@@ -219,6 +218,9 @@ class WetterWarnung extends Save\SaveToFile {
         // Speichere lokale JSON Datei
         echo PHP_EOL . '*** Speichere Wetter-Warnungen in eine Datei: ' . PHP_EOL;
         $status = $this->saveFile($this->wetterWarnungen, $this->localJsonFile);
+        if (null === $status) {
+            throw new RuntimeException('Fehler beim Speichern der Wetterwarnung in Datei');
+        }
 
         // Cache aufräumen?
         // Lösche Cache-Folder
@@ -307,9 +309,9 @@ class WetterWarnung extends Save\SaveToFile {
     /**
      * Getter-Methode für Zugriff auf evntl. angelegten Temporär-Ordner.
      *
-     * @return ?string
+     * @return string
      */
-    public function getTmpFolder(): ?string {
+    public function getTmpFolder(): string {
         return $this->tmpFolder;
     }
 
@@ -318,6 +320,7 @@ class WetterWarnung extends Save\SaveToFile {
      *
      * @param string $xmlFile Pfad zur XML Datei mit den der WetterWarnung
      *
+     * @throws Exception
      * @throws RuntimeException
      *
      * @return SimpleXMLElement
@@ -326,7 +329,7 @@ class WetterWarnung extends Save\SaveToFile {
         echo "\tPrüfe " . basename($xmlFile) .
             ' (' . number_format(round(filesize($xmlFile) / 1024, 2), 2) . ' kbyte): ';
 
-        // Öffne XML Datei zum lesen
+        // Öffne XML Datei zum Lesen
         $content = file_get_contents($xmlFile);
         if (!$content) {
             throw new RuntimeException(PHP_EOL . 'Fehler beim lesen der XML Datei ' . $xmlFile);

@@ -4,13 +4,6 @@
 
 # Wetterwarnung Downloader Script
 
-> **Wichtiger Hinweis:**
->
-> Aufgrund der Überarbeitung zur Version 3.0 des WetterwarnungDownloader und des deutlich gestiegenen Programmumfangs wurde es notwendig, die Konfigurationsdatei deutlich zu erweitern. Teilweise waren auch eine Änderungen an den bestehenden Konfigurationsparameter notwendig, sodass eine Rückwärts-Kompatiblität nicht durchgehend besteht.
->
-> Daher empfehlen wir die Konfigurationsdatei nach dem Upgrade anhand der Vorlage ```config.sample.php``` entsprechend anzupassen.
-
-
 ## Einleitung
 
 Bei dem Wetterwarnung-Downloader handelt es sich um ein Tool zum automatischen herunterladen aktueller Wetterwarnungen für eine bestimmte Warnregion. Die Wetterwarnungen werden im Rahmen der OpenData-Initiative des DWD bereitgestellt. Details hierzu finden sich auf der [NeuthardWetterScripts Hauptseite](https://github.com/Blog404DE/NeuthardWetter-Scripts).
@@ -24,12 +17,12 @@ Bitte beachtet: es handelt sich um eine erste Vorab-Version des Scripts. Auch we
 ### Vorraussetzungen:
 
 - Linux oder macOS (unter Debian und macOS 10.13.2 getestet)
-- PHP 7.4, PHP 8.0 (oder neuer - inkl. PHP 8.2)
+- PHP 8.0 (oder neuer - inkl. PHP 8.2)
 - Folgende PHP Module werden benötigt: simplexml, json, ftp, pdo, zip, libxml, curl
 - (optional) MySQL-Datenbank
 - wget
 
-> **Hinweis:** PHP 7.4 wird mit dieser Version ein letztes mal unterstützt. PHP 7.4 ist EOL und wird von den Entwicklern nicht mehr unterstützt (auch keine Sicherheitsupdates).
+> **Hinweis:** PHP 7.4 wird mit dieser Version nicht mehr unterstützt. PHP 7.4 ist EOL und wird von den Entwicklern nicht mehr unterstützt (auch keine Sicherheitsupdates). Dies bedeutet nicht, dass PHP 7.4 nicht mit diesem Projekt funktionieren wird, sondern, dass wir nicht mehr gegen PHP 7.4 prüfen. 
 
 ## Installationsanleitung:
 

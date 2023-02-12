@@ -216,10 +216,15 @@ try {
     echo PHP_EOL;
 } catch (RuntimeException|\Exception $e) {
     // Fehler-Handling
-    if (\is_object($warnBot)) {
-        $logger->logError($e, $warnBot->getTmpFolder());
+    if (\is_object($logger)) {
+        if (\is_object($warnBot)) {
+            $logger->logError($e, $warnBot->getTmpFolder());
+        } else {
+            $logger->logError($e);
+        }
     } else {
-        $logger->logError($e);
+        fwrite(STDERR, 'Unbekannter Laufzeitfehler in ' . __FILE__ . ': ' . $e->getMessage() . PHP_EOL);
+        fwrite(STDERR, $e->getTraceAsString());
     }
 
     exit(-1);

@@ -296,14 +296,16 @@ class SendToTwitter implements SendToInterface {
         try {
             // Länge des Tweets ermitteln und ersetze URL durch Dummy-Text mit der Länge des URL Short
             // Service von Twitter
-            return mb_strlen(
-                preg_replace(
-                    '~https?://([^\\s]*)~',
-                    str_repeat('*', 23),
-                    $tweet
-                ),
-                'UTF-8'
+            $prettyText = preg_replace(
+                '~https?://([^\\s]*)~',
+                str_repeat('*', 23),
+                $tweet
             );
+            if (!\is_string($prettyText)) {
+                throw new RuntimeException('Fehler beim ermitten der Text-Länge');
+            }
+
+            return mb_strlen($prettyText, 'UTF-8');
         } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
