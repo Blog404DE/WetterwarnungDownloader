@@ -18,6 +18,7 @@ namespace blog404de\WetterWarnung\Network;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use FTP\Connection;
 use RuntimeException;
 
 /**
@@ -26,7 +27,7 @@ use RuntimeException;
  * FTP Server.
  */
 class Network {
-    /** @var resource|false Link identifier der FTP Verbindung */
+    /** @var resource|Connection|false Link identifier der FTP Verbindung */
     private $ftpConnectionId;
 
     /** @var bool Verwende eine passive Verbindung zum FTP Server */
