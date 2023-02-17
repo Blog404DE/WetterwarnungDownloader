@@ -1,5 +1,11 @@
 # Changelog
 
+2022-02-11, 3.3.0 unstable
+----------
+* Unterstützung für PHP 8.2 hinzugefügt und wegfall von PHP 7.4 vorbereitet
+* CI-Integration angepasst (u.a. Umstellung auf phpstan zur Qualitäts-Prüfung)
+* Twitter-Erweiterung als "veraltet" erklärt
+
 2022-04-07, 3.2.0 stable
 ----------
 * Korrekturen für Unterstützung von PHP 8.1

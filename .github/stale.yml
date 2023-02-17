@@ -1,0 +1,21 @@
+# Configuration for probot-stale - https://github.com/probot/stale
+
+daysUntilStale: 60
+daysUntilClose: 7
+
+exemptLabels:
+    - bug
+    - duplicate
+    - enhancement
+    - help wanted
+    - invalid
+    - question
+    - wontfix
+
+markComment: >
+    This topic has been automatically marked as obsolete because it has no
+    activity. It will be closed if there is no further activity.
+    We thank you for your contributions.
+closeComment: false
+staleLabel: stale
+exemptAssignees: true

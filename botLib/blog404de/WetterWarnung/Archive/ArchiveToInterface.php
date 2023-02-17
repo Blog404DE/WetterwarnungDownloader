@@ -29,7 +29,7 @@ interface ArchiveToInterface {
      *
      * @throws Exception|RuntimeException
      */
-    public function setConfig(array $config);
+    public function setConfig(array $config): void;
 
     /**
      * Getter-Methode für das Konfigurations-Array.
@@ -43,5 +43,5 @@ interface ArchiveToInterface {
      *
      * @throws Exception|RuntimeException
      */
-    public function saveToArchive(array $parsedWarnInfo);
+    public function saveToArchive(array $parsedWarnInfo): void;
 }

@@ -39,7 +39,7 @@ interface SendToInterface {
      *
      * @throws Exception|RuntimeException
      */
-    public function setConfig(array $config);
+    public function setConfig(array $config): void;
 
     /**
      * Getter-Methode für das Konfigurations-Array.

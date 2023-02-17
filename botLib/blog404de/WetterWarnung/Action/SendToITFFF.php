@@ -19,11 +19,11 @@ use Exception;
 use RuntimeException;
 
 /**
- * Action-Klasse für WetterWarnung Downloader zum senden eines Tweets bei einer neuen Nachricht.
+ * Action-Klasse für WetterWarnung Downloader zum Senden eines Tweets bei einer neuen Nachricht.
  */
 class SendToITFFF implements SendToInterface {
     /** @var array Konfigurationsdaten für die Action */
-    private $config = [];
+    private array $config = [];
 
     /**
      * Prüfe System-Vorraussetzungen.
@@ -54,10 +54,10 @@ class SendToITFFF implements SendToInterface {
      */
     public function startAction(array $parsedWarnInfo, bool $warnExists): int {
         try {
-            // Prüfe ob alles konfiguriert ist
+            // Prüfe, ob alles konfiguriert ist
             if ($this->getConfig()) {
                 if (!\is_array($parsedWarnInfo)) {
-                    // Keine Warnwetter-Daten zum senden an IFTTT vorhanden -> harter Fehler
+                    // Keine Warnwetter-Daten zum Senden an IFTTT vorhanden → harter Fehler
                     throw new RuntimeException('Die im Archiv zu speicherenden Wetter-Informationen sind ungültig');
                 }
 
@@ -68,8 +68,8 @@ class SendToITFFF implements SendToInterface {
                 if (!$warnExists) {
                     // Stelle Parameter zusammen die an IFTTT gesendet werden
                     $message = $this->composeMessage($parsedWarnInfo);
-                    $jsonMessage = json_encode($message, JSON_UNESCAPED_UNICODE);
-                    if (false === $jsonMessage) {
+                    $jsonMessage = json_encode($message, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+                    if (!\is_string($jsonMessage)) {
                         // Nachricht konnte nicht konvertiert werden
                         throw new RuntimeException(
                             'Konvertieren der WetterWarnung als JSON Nachricht für IFFFT ist fehlgeschlagen'
@@ -106,7 +106,7 @@ class SendToITFFF implements SendToInterface {
                         );
                     }
 
-                    // Prüfe ob Befehl erfolgreich abgesetzt wurde
+                    // Prüfe, ob Befehl erfolgreich abgesetzt wurde
                     if (200 !== curl_getinfo($curl, CURLINFO_HTTP_CODE)) {
                         throw new RuntimeException(
                             'IFTTT  Webhook API Liefert ein Fehler zurück (' .
@@ -178,7 +178,7 @@ class SendToITFFF implements SendToInterface {
      */
     private function composeMessage(array $parsedWarnInfo): array {
         try {
-            // Typ der Warnung ermitteln ,Leerzeichen entfernen und daraus ein Hashtag erzeugen
+            // Typ der Warnung ermitteln, Leerzeichen entfernen und daraus ein Hashtag erzeugen
             $message = $parsedWarnInfo['severity'];
 
             // Gebiet einfügen

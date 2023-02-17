@@ -23,7 +23,7 @@ use RuntimeException;
 use SimpleXMLElement;
 
 /**
- * Haupt-Klasse des Parser - beinhaltet alle internen Methoden die zum parsen der Wetterwarnungen benötigt werden.
+ * Haupt-Klasse des Parser - beinhaltet alle internen Methoden, die zum Parsen der Wetterwarnungen benötigt werden.
  */
 class Parser extends Network {
     use ParserAlert;
@@ -36,7 +36,7 @@ class Parser extends Network {
      *
      * @param SimpleXMLElement $xml        XML-Datei des DWD mit den Wetterwarnungen
      * @param int              $warnCellId WarnCellID für die eine Warnung ermittelt werden soll
-     * @param string           $stateCode  Die Abkürzung des Bundesland in dem sich die WarnCellID befindet
+     * @param string           $stateCode  Die Abkürzung das Bundesland in dem sich die WarnCellID befindet
      *
      * @throws RuntimeException(
      */
@@ -52,12 +52,14 @@ class Parser extends Network {
                 );
             }
 
-            // Prüfe ob die Warndatei verarbeitet werden muss
+            // Prüfe, ob die Warndatei verarbeitet werden muss
             $valid = $this->shouldParseWetterwarnung($xml);
             if ($valid) {
                 // Da keine Test-Warnung: beginne Suche nach WarnCellID
                 // $info = $xml->{"info"};
                 $warnRegionFound = $this->searchForWarnArea($xml, $warnCellId, $stateCode);
+
+                /** @noinspection IsEmptyFunctionUsageInspection */
                 if (!empty($warnRegionFound)) {
                     // Treffer gefunden
                     echo sprintf(
@@ -97,7 +99,7 @@ class Parser extends Network {
     final protected function collectWarnArray(array $rawWarnung): array {
         try {
             $parsedWarnInfo = [];
-            // Existieren alle benötigten Array-Elemente zum parsen?
+            // Existieren alle benötigten Array-Elemente zum Parsen?
             if (!\array_key_exists('warnung', $rawWarnung)
                 || !\array_key_exists('region', $rawWarnung)
                 || !\array_key_exists('identifier', $rawWarnung)
@@ -123,9 +125,8 @@ class Parser extends Network {
             $dateCurrent = new DateTime('now', new DateTimeZone('Europe/Berlin'));
 
             // Prüfe ob Warnung bereits abgelaufen ist und übersprungen werden kann
-            /** @noinspection NotOptimalIfConditionsInspection */
-            if ($objEndzeit->getTimestamp() <= $dateCurrent->getTimestamp()
-                && $objEndzeit->getTimestamp() !== $objStartzeit->getTimestamp()
+            if (($objEndzeit->getTimestamp() <= $dateCurrent->getTimestamp())
+                && ($objEndzeit->getTimestamp() !== $objStartzeit->getTimestamp())
             ) {
                 // Warnung ist bereits abgelaufen
                 echo "\t\t* Hinweis: Warnung über " . $parsedWarnInfo['event'] .
@@ -138,15 +139,15 @@ class Parser extends Network {
             }
 
             // Warnung ist nicht abgelaufen, setze ermitteln der Daten fort
-            $parsedWarnInfo['startzeit'] = (string)serialize($objStartzeit);
-            $parsedWarnInfo['endzeit'] = (string)serialize($objEndzeit);
+            $parsedWarnInfo['startzeit'] = serialize($objStartzeit);
+            $parsedWarnInfo['endzeit'] = serialize($objEndzeit);
 
             // Ermittle Daten aus Header
             $parsedWarnInfo['identifier'] = (string)$rawWarnung['identifier'];
             $parsedWarnInfo['reference'] = (string)$rawWarnung['reference'];
             $parsedWarnInfo['msgType'] = (string)$rawWarnung['msgType'];
 
-            // Ermittle Sonstige Informationen der Wetterwarnung
+            // Ermittle sonstige Informationen der Wetterwarnung
             $parsedWarnInfo['severity'] = $this->getAlertSeverity($rawWarnung['warnung']);
             $parsedWarnInfo['urgency'] = $this->getAlertUrgency($rawWarnung['warnung']);
             $parsedWarnInfo['warnstufe'] = $this->getAlertWarnstufe($rawWarnung['warnung']);
@@ -184,7 +185,7 @@ class Parser extends Network {
     }
 
     /**
-     * Prüfe ob es sich um eine Test-Warnung handelt.
+     * Prüfe, ob es sich um eine Test-Warnung handelt.
      *
      * @param SimpleXMLElement $eventCodeElement Event-Code Element
      *
@@ -219,7 +220,7 @@ class Parser extends Network {
     }
 
     /**
-     * Prüfe ob die Wetterwarnung verarbeitet werden muss.
+     * Prüfe, ob die Wetterwarnung verarbeitet werden muss.
      *
      * @param SimpleXMLElement $xml XML-Datei des DWD mit den Wetterwarnungen
      *
@@ -229,11 +230,10 @@ class Parser extends Network {
         $readWarnfile = false;
 
         // Prüfe um welche Art von Wetter-Warnung es sich handelt (Alert oder Cancel)
-        /** @noinspection NotOptimalIfConditionsInspection */
         if ('alert' === mb_strtolower((string)$xml->{'msgType'}) || 'update' === mb_strtolower((string)$xml->{'msgType'})) {
             // Verarbeite Inhalt der XML Datei (Typ: Alert)
             $wetterWarnung = $xml->{'info'};
-            // Prüfe ob es sich um eine Testwarnung handelt
+            // Prüfe, ob es sich um eine Testwarnung handelt
             if (!property_exists($wetterWarnung, 'eventCode')) {
                 throw new RuntimeException(
                     "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'eventCode'-Node."

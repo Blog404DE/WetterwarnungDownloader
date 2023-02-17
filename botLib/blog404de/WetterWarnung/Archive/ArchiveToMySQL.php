@@ -20,15 +20,15 @@ use PDO;
 use RuntimeException;
 
 /**
- * Klasse für die Archiv-Anbindung des WarnParser
+ * Klasse für die Archiv-Anbindung des Warnparsers
  * unter Verwendung einer MySQL-Datenbank.
  */
 class ArchiveToMySQL implements ArchiveToInterface {
     /** @var PDO MySQL Connection ResourceID */
-    private $connectionId;
+    private PDO $connectionId;
 
     /** @var array MySQL-Konfiguration */
-    private $config = [];
+    private array $config = [];
 
     /**
      * Setter für MySQL Zugangsdaten.
@@ -104,7 +104,7 @@ class ArchiveToMySQL implements ArchiveToInterface {
                 echo "\t* Wetterwarnung über " . $parsedWarnInfo['event'] . ' für ' .
                     $parsedWarnInfo['area'] . ' -> ';
 
-                // Prüfe ob die bereits in der Datenbank ist
+                // Prüfe, ob die bereits in der Datenbank ist
                 $sth = $this->connectionId->prepare(
                     'SELECT count(id) FROM warnarchiv WHERE identifier = :identifier LIMIT 1',
                     [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]

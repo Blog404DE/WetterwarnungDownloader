@@ -20,20 +20,22 @@ use Exception;
 use RuntimeException;
 
 /**
- * Action-Klasse für WetterWarnung Downloader zum senden eines Tweets bei einer neuen Nachricht.
+ * Action-Klasse für WetterWarnung Downloader zum Senden eines Tweets bei einer neuen Nachricht.
+ *
+ * @deprecated
  */
 class SendToTwitter implements SendToInterface {
     /** @var TwitterOAuth Twitter-Klasse */
-    private $connectionId;
+    private TwitterOAuth $connectionId;
 
     /** @var array Twitter-OAUTH Schlüssel */
-    private $config = [];
+    private array $config = [];
 
     /** @var array Twitter PlaceID */
-    private $placeid = [];
+    private array $placeid = [];
 
     /** @var string Twitter ScreenName */
-    private $screenname;
+    private string $screenname;
 
     /**
      * SendToTwitter constructor.
@@ -46,17 +48,16 @@ class SendToTwitter implements SendToInterface {
             $composerAutoloader = \dirname(__DIR__, 4) . '/vendor/abraham/twitteroauth/autoload.php';
 
             // Prüfen ob Source-Code existiert
-            if (false === $composerAutoloader) {
+            if (false === file_exists($composerAutoloader)) {
                 throw new RuntimeException(
                     'TwitterOAuth-Library ist nicht im System vorhanden - ' .
                     'zur Installation lesen Sie bitte readme.md'
                 );
             }
 
-            /** @noinspection PhpIncludeInspection */
             require_once $composerAutoloader;
 
-            // Prüfe ob entsprechende Klasse geladen ist
+            // Prüfe, ob entsprechende Klasse geladen ist
             if (!class_exists(TwitterOAuth::class, true)) {
                 throw new RuntimeException(
                     'TwitterOAuth-Library wurde nicht erfolgreich geladen - ' .
@@ -79,10 +80,10 @@ class SendToTwitter implements SendToInterface {
      */
     public function startAction(array $parsedWarnInfo, bool $warnExists): int {
         try {
-            // Prüfe ob alles konfiguriert ist
+            // Prüfe, ob alles konfiguriert ist
             if ($this->getConfig()) {
                 if (!\is_array($parsedWarnInfo)) {
-                    // Keine Warnwetter-Daten zum twittern vorhanden -> harter Fehler
+                    // Keine Warnwetter-Daten zum Twittern vorhanden → harter Fehler
                     throw new RuntimeException('Die im Archiv zu speicherenden Wetter-Informationen sind ungültig');
                 }
 
@@ -91,53 +92,42 @@ class SendToTwitter implements SendToInterface {
                     $parsedWarnInfo['area'] . PHP_EOL;
 
                 // Aktiviere Verbindung zu Twitter
-                if (!\is_object($this->connectionId)) {
-                    echo "\t\t-> Baue neue Verbindung zu Twitter auf: ";
+                echo "\t\t-> Baue neue Verbindung zu Twitter auf: ";
 
-                    $this->connectionId = new TwitterOAuth(
-                        $this->config['consumerKey'],
-                        $this->config['consumerSecret'],
-                        $this->config['oauthToken'],
-                        $this->config['oauthTokenSecret']
+                $this->connectionId = new TwitterOAuth(
+                    $this->config['consumerKey'],
+                    $this->config['consumerSecret'],
+                    $this->config['oauthToken'],
+                    $this->config['oauthTokenSecret']
+                );
+
+                // UserAgent setzen
+                $this->connectionId->setUserAgent('WetterwarnngDownloader (+http://www.neuthardwetter.de');
+
+                // Ermittle ScreenName
+                /** @var object $getScreenname */
+                $getScreenname = $this->connectionId->get(
+                    'account/verify_credentials',
+                    ['include_entities' => true,
+                        'skip_status' => true,
+                        'include_email' => false, ]
+                );
+                if (200 !== $this->connectionId->getLastHttpCode()) {
+                    throw new RuntimeException(
+                        'Fehler beim ermitteln des Account-Namen: ' .
+                        $this->getErrorText($this->connectionId->getLastHttpCode()) . PHP_EOL
                     );
-                    if (!$this->connectionId) {
-                        throw new RuntimeException(
-                            'Twitter API Anmeldung fehlgeschlagen: ' .
-                            $this->getErrorText($this->connectionId->getLastHttpCode()) . PHP_EOL
-                        );
-                    }
-
-                    // UserAgent setzen
-                    $this->connectionId->setUserAgent('WetterwarnngDownloader (+http://www.neuthardwetter.de');
-
-                    // Ermittle ScreenName
-                    $getScreenname = $this->connectionId->get(
-                        'account/verify_credentials',
-                        ['include_entities' => true,
-                            'skip_status' => true,
-                            'include_email' => false, ]
-                    );
-                    if (200 !== $this->connectionId->getLastHttpCode()) {
-                        throw new RuntimeException(
-                            'Fehler beim ermitteln des Account-Namen: ' .
-                            $this->getErrorText($this->connectionId->getLastHttpCode()) . PHP_EOL
-                        );
-                    }
-                    if (!property_exists($getScreenname, 'screen_name')) {
-                        throw new RuntimeException(
-                            'Fehler beim ermitteln des Account-Namen ' .
-                             '(Account-Name in der API Rückmeldung nicht vorhanden)' . PHP_EOL
-                        );
-                    }
-                    $this->screenname = $getScreenname->{'screen_name'};
-
-                    // Status Ausgabe:
-                    echo 'Benutzername @' . $this->screenname . PHP_EOL;
-                } else {
-                    // Verbindung twitter besteht bereits
-                    echo "\t\t -> Verwende bestehende Verbindung zu Twitter auf: ";
-                    echo 'Benutzername @' . $this->screenname . PHP_EOL;
                 }
+                if (!property_exists($getScreenname, 'screen_name')) {
+                    throw new RuntimeException(
+                        'Fehler beim ermitteln des Account-Namen ' .
+                        '(Account-Name in der API Rückmeldung nicht vorhanden)' . PHP_EOL
+                    );
+                }
+                $this->screenname = $getScreenname->{'screen_name'};
+
+                // Status Ausgabe:
+                echo 'Benutzername @' . $this->screenname . PHP_EOL;
 
                 if (!$warnExists) {
                     // Stelle Tweet zusammen
@@ -241,6 +231,8 @@ class SendToTwitter implements SendToInterface {
             if (!empty($this->config['TweetPlace']) && false !== $this->config['TweetPlace']) {
                 if (empty($this->placeid)) {
                     echo "\t\t -> Suche (einmalig) nach angegebener PlaceID für hinterlegten Ort: ";
+
+                    /** @var object $geoSearch */
                     $geoSearch = $this->connectionId->get(
                         'geo/search',
                         ['query' => $this->config['TweetPlace'], 'granularity' => 'city']
@@ -294,7 +286,7 @@ class SendToTwitter implements SendToInterface {
     }
 
     /**
-     * Länge des Tweet ermitteln.
+     * Länge der Tweet ermitteln.
      *
      * @param string $tweet Inhalt des Tweets
      *
@@ -304,14 +296,16 @@ class SendToTwitter implements SendToInterface {
         try {
             // Länge des Tweets ermitteln und ersetze URL durch Dummy-Text mit der Länge des URL Short
             // Service von Twitter
-            return mb_strlen(
-                preg_replace(
-                    '~https?://([^\\s]*)~',
-                    str_repeat('*', 23),
-                    $tweet
-                ),
-                'UTF-8'
+            $prettyText = preg_replace(
+                '~https?://([^\\s]*)~',
+                str_repeat('*', 23),
+                $tweet
             );
+            if (!\is_string($prettyText)) {
+                throw new RuntimeException('Fehler beim ermitten der Text-Länge');
+            }
+
+            return mb_strlen($prettyText, 'UTF-8');
         } catch (RuntimeException|Exception $e) {
             // Fehler an Hauptklasse weitergeben
             throw $e;
@@ -330,7 +324,7 @@ class SendToTwitter implements SendToInterface {
             $message = '';
 
             //
-            // Attachment mit Icon hinzufügen sofern vorhanden
+            // Attachment mit Icon hinzufügen, sofern vorhanden
             //
             if (!empty($parsedWarnInfo['eventicon'])) {
                 // Stelle Pfad zusammen
@@ -338,6 +332,7 @@ class SendToTwitter implements SendToInterface {
                     $parsedWarnInfo['eventicon'];
 
                 // Lade Icon auf Twitter hoch
+                /** @var mixed $attachment */
                 $attachment = $this->connectionId->upload('media/upload', ['media' => $filename]);
                 $message = $attachment->{'media_id_string'};
             }
@@ -368,7 +363,7 @@ class SendToTwitter implements SendToInterface {
                 $tweetParameter['display_coordinates'] = true;
             }
 
-            // Typ der Warnung ermitteln,Leerzeichen entfernen und daraus ein Hashtag erzeugen
+            // Typ der Warnung ermitteln, Leerzeichen entfernen und daraus ein Hashtag erzeugen
             $severity = '#' . preg_replace('/\\s+/m', '', $parsedWarnInfo['severity']);
             $tweet = $severity . ' des #DWD';
 
@@ -398,7 +393,7 @@ class SendToTwitter implements SendToInterface {
                 $tweet = mb_substr(
                     $tweet,
                     0,
-                    (280 - $this->getTweetLength($tweet . ' ...' . $postfix))
+                    280 - $this->getTweetLength($tweet . ' ...' . $postfix)
                 ) . ' ...';
             }
             $tweet .= $postfix;
@@ -407,7 +402,7 @@ class SendToTwitter implements SendToInterface {
             // Attachment zusammenstellen
             $attachment = $this->composeAttachment($parsedWarnInfo);
             if (!empty($attachment)) {
-                // Attachment vorhanden -> füge es zu den Parameter hinzu
+                // Attachment vorhanden → füge es zu dem Parameter hinzu
                 $tweetParameter['media_ids'] = $attachment;
             }
 
