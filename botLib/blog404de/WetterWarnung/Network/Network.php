@@ -26,8 +26,8 @@ use RuntimeException;
  * FTP Server.
  */
 class Network {
-    /** @var resource|false Link identifier der FTP Verbindung */
-    private $ftpConnectionId;
+    /** @var resource|bool Link identifier der FTP Verbindung */
+    private mixed $ftpConnectionId;
 
     /** @var bool Verwende eine passive Verbindung zum FTP Server */
     private bool $ftpPassiv = false;
@@ -44,16 +44,11 @@ class Network {
      * @throws Exception
      */
     public function disconnectFromFTP(): void {
-        try {
-            // Schließe Verbindung, sofern notwendig
-            if ($this->ftpConnectionId) {
-                echo PHP_EOL . '*** Schließe Verbindung zum DWD-FTP Server' . PHP_EOL;
-                ftp_close($this->ftpConnectionId);
-                echo "\t-> Verbindung zu erfolgreich geschlossen." . PHP_EOL;
-            }
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
+        // Schließe Verbindung, sofern notwendig
+        if ($this->ftpConnectionId) {
+            echo PHP_EOL . '*** Schließe Verbindung zum DWD-FTP Server' . PHP_EOL;
+            ftp_close($this->ftpConnectionId);
+            echo "\t-> Verbindung zu erfolgreich geschlossen." . PHP_EOL;
         }
     }
 
@@ -67,36 +62,31 @@ class Network {
      * @throws Exception
      */
     public function connectToFTP(string $host, string $username, string $password): void {
-        try {
-            echo '*** Baue Verbindung zum DWD-FTP Server auf.' . PHP_EOL;
+        echo '*** Baue Verbindung zum DWD-FTP Server auf.' . PHP_EOL;
 
-            // FTP-Verbindung aufbauen
-            $this->ftpConnectionId = ftp_connect($host);
-            if (false === $this->ftpConnectionId) {
-                throw new RuntimeException(
-                    'FTP Verbindungsaufbau zu ' . $host . ' ist fehlgeschlagen' . PHP_EOL
-                );
-            }
+        // FTP-Verbindung aufbauen
+        $this->ftpConnectionId = ftp_connect($host);
+        if (false === $this->ftpConnectionId) {
+            throw new RuntimeException(
+                'FTP Verbindungsaufbau zu ' . $host . ' ist fehlgeschlagen' . PHP_EOL
+            );
+        }
 
-            // Login mit Benutzername und Passwort
-            $loginResult = ftp_login($this->ftpConnectionId, $username, $password);
+        // Login mit Benutzername und Passwort
+        $loginResult = ftp_login($this->ftpConnectionId, $username, $password);
 
-            // Verbindung überprüfen
-            if (!$loginResult) {
-                throw new RuntimeException(
-                    'Verbindungsaufbau zu zu ' . $host . ' mit Benutzername ' . $username . ' fehlgeschlagen.'
-                );
-            }
-            echo "\t-> Verbindungsaufbau zu " . $host . ' mit Benutzername ' . $username . ' erfolgreich' . PHP_EOL;
+        // Verbindung überprüfen
+        if (!$loginResult) {
+            throw new RuntimeException(
+                'Verbindungsaufbau zu zu ' . $host . ' mit Benutzername ' . $username . ' fehlgeschlagen.'
+            );
+        }
+        echo "\t-> Verbindungsaufbau zu " . $host . ' mit Benutzername ' . $username . ' erfolgreich' . PHP_EOL;
 
-            // Auf passive Nutzung umschalten
-            if (true === $this->ftpPassiv) {
-                echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
-                ftp_pasv($this->ftpConnectionId, true);
-            }
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
+        // Auf passive Nutzung umschalten
+        if (true === $this->ftpPassiv) {
+            echo "\t-> Schalte auf Passive Verbindung" . PHP_EOL;
+            ftp_pasv($this->ftpConnectionId, true);
         }
     }
 
@@ -106,64 +96,59 @@ class Network {
      * @throws Exception
      */
     public function updateFromFTP(): void {
-        try {
-            // Starte Verarbeitung der Dateien
-            echo PHP_EOL . '*** Verarbeite alle Dateien auf dem DWD FTP Server' . PHP_EOL;
+        // Starte Verarbeitung der Dateien
+        echo PHP_EOL . '*** Verarbeite alle Dateien auf dem DWD FTP Server' . PHP_EOL;
 
-            // Prüfe ob Verbindung aktiv ist
-            if (!$this->ftpConnectionId) {
-                throw new RuntimeException('FTP Verbindung steht nicht mehr zur Verfügung.');
-            }
-
-            // Versuche, in das benötigte Verzeichnis zu wechseln
-            echo '-> Wechsle in das Verzeichnis: ' . ftp_pwd($this->ftpConnectionId) . PHP_EOL;
-            if (!ftp_chdir($this->ftpConnectionId, $this->remoteFolder)) {
-                throw new RuntimeException(
-                    "Fehler beim Wechsel in das Verzeichnis '" . $this->remoteFolder . "' auf dem DWD FTP-Server."
-                );
-            }
-
-            // Verzeichnisliste auslesen und sortieren
-            $arrFTPContent = ftp_nlist($this->ftpConnectionId, '.');
-            if (false === $arrFTPContent) {
-                throw new RuntimeException(
-                    'Fehler beim auslesen des Verezichnis ' . $this->remoteFolder . ' auf dem DWD FTP-Server.'
-                );
-            }
-            echo '-> Liste der auf dem DWD Server vorhandenen Wetterdaten herunterladen' . PHP_EOL;
-
-            // Erstelle Download-Liste
-            $arrDownloadList = [];
-            if (\count($arrFTPContent) > 0) {
-                $defaultfilename = 'Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_DE.zip';
-                if (\in_array($defaultfilename, $arrFTPContent, true)) {
-                    // Verwende vom DWD erzeugte Symlink
-                    echo '-> Erzeuge Download-Liste im Standard-Modus:' . PHP_EOL;
-
-                    $fileDate = ftp_mdtm($this->ftpConnectionId, $defaultfilename);
-                    $detectMode = 'via FTP';
-                    if (!$fileDate) {
-                        throw new RuntimeException(
-                            'Fehler beim ermitteln des Änderungs-Zeitpunkts der Datei ' . $defaultfilename
-                        );
-                    }
-
-                    echo "\t" . $defaultfilename . ' => ' . date('d.m.Y H:i', $fileDate) .
-                        ' (DE / ' . $detectMode . ')' . PHP_EOL;
-                    $arrDownloadList[$defaultfilename] = $fileDate;
-                } else {
-                    // Fall-Back: Symlink zur aktuellsten Besser
-                    echo '-> Erzeuge Download-Liste im Fail-Safe Modus:' . PHP_EOL;
-                    $arrDownloadList = $this->getCurrentWetterwarnungViaFallback($arrFTPContent);
-                }
-            }
-
-            // Starte Download der Liste
-            $this->downloadFromFTP($arrDownloadList);
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
+        // Prüfe ob Verbindung aktiv ist
+        if (!$this->ftpConnectionId) {
+            throw new RuntimeException('FTP Verbindung steht nicht mehr zur Verfügung.');
         }
+
+        // Versuche, in das benötigte Verzeichnis zu wechseln
+        echo '-> Wechsle in das Verzeichnis: ' . ftp_pwd($this->ftpConnectionId) . PHP_EOL;
+        if (!ftp_chdir($this->ftpConnectionId, $this->remoteFolder)) {
+            throw new RuntimeException(
+                "Fehler beim Wechsel in das Verzeichnis '" . $this->remoteFolder . "' auf dem DWD FTP-Server."
+            );
+        }
+
+        // Verzeichnisliste auslesen und sortieren
+        $arrFTPContent = ftp_nlist($this->ftpConnectionId, '.');
+        if (false === $arrFTPContent) {
+            throw new RuntimeException(
+                'Fehler beim auslesen des Verezichnis ' . $this->remoteFolder . ' auf dem DWD FTP-Server.'
+            );
+        }
+        echo '-> Liste der auf dem DWD Server vorhandenen Wetterdaten herunterladen' . PHP_EOL;
+
+        // Erstelle Download-Liste
+        $arrDownloadList = [];
+        if (\count($arrFTPContent) > 0) {
+            $defaultfilename = 'Z_CAP_C_EDZW_LATEST_PVW_STATUS_PREMIUMDWD_COMMUNEUNION_DE.zip';
+            if (\in_array($defaultfilename, $arrFTPContent, true)) {
+                // Verwende vom DWD erzeugte Symlink
+                echo '-> Erzeuge Download-Liste im Standard-Modus:' . PHP_EOL;
+
+                $fileDate = ftp_mdtm($this->ftpConnectionId, $defaultfilename);
+                $detectMode = 'via FTP';
+                if (!$fileDate) {
+                    throw new RuntimeException(
+                        'Fehler beim ermitteln des Änderungs-Zeitpunkts der Datei ' . $defaultfilename
+                    );
+                }
+
+                echo "\t" . $defaultfilename . ' => ' . date('d.m.Y H:i', $fileDate) .
+                    ' (DE / ' . $detectMode . ')' . PHP_EOL;
+                $arrDownloadList[$defaultfilename] = $fileDate;
+            } else {
+                // Fall-Back: Symlink zur aktuellsten Besser
+                echo '-> Erzeuge Download-Liste im Fail-Safe Modus:' . PHP_EOL;
+                $arrDownloadList = $this->getCurrentWetterwarnungViaFallback($arrFTPContent);
+            }
+        }
+
+        // Starte Download der Liste
+        $this->downloadFromFTP($arrDownloadList);
     }
 
     /**
@@ -172,56 +157,51 @@ class Network {
      * @throws Exception
      */
     public function cleanLocalDownloadFolder(): void {
-        try {
-            // Starte Verarbeitung der Dateien
-            echo PHP_EOL . '*** Lösche veraltete Wetterwarnungen aus Cache-Ordner.' . PHP_EOL;
+        // Starte Verarbeitung der Dateien
+        echo PHP_EOL . '*** Lösche veraltete Wetterwarnungen aus Cache-Ordner.' . PHP_EOL;
 
-            // Erzeuge Array mit allen bereits vorhandenen Dateien und bestimmte das Alter der Datei
-            $localFiles = [];
-            $localZipFiles = glob($this->localFolder . \DIRECTORY_SEPARATOR . '*.zip');
-            if (\is_array($localZipFiles)) {
-                foreach ($localZipFiles as $filename) {
-                    $createtime = filectime($filename);
-                    if (false !== $createtime && is_file($filename)) {
-                        // Übertrage Datei in Array
-                        $localFiles[filectime($filename)] = basename($filename);
-                    } else {
-                        // Zeitpunkt der Datei kann nicht festgestellt werden
-                        throw new RuntimeException(
-                            'Fehler beim ermitteln des alters der Datei ' . basename($filename) .
-                            ' im Download-Cache Ordner oder der Datei-Typ kann nicht bestimmt werden.'
-                        );
-                    }
+        // Erzeuge Array mit allen bereits vorhandenen Dateien und bestimmte das Alter der Datei
+        $localFiles = [];
+        $localZipFiles = glob($this->localFolder . \DIRECTORY_SEPARATOR . '*.zip');
+        if (\is_array($localZipFiles)) {
+            foreach ($localZipFiles as $filename) {
+                $createtime = filectime($filename);
+                if (false !== $createtime && is_file($filename)) {
+                    // Übertrage Datei in Array
+                    $localFiles[filectime($filename)] = basename($filename);
+                } else {
+                    // Zeitpunkt der Datei kann nicht festgestellt werden
+                    throw new RuntimeException(
+                        'Fehler beim ermitteln des alters der Datei ' . basename($filename) .
+                        ' im Download-Cache Ordner oder der Datei-Typ kann nicht bestimmt werden.'
+                    );
                 }
-
-                // Dateiliste sortieren
-                ksort($localFiles, SORT_NUMERIC);
-                $localFiles = array_reverse($localFiles);
             }
 
-            // Array $localFiles aufsplitten um zu löschenende Dateien zu ermitteln (alle bis auf die älteste Datei)
-            $obsoletFiles = array_splice($localFiles, 1);
+            // Dateiliste sortieren
+            ksort($localFiles, SORT_NUMERIC);
+            $localFiles = array_reverse($localFiles);
+        }
 
-            // Starte Löschvorgang
-            if (\count($obsoletFiles) > 0) {
-                echo '-> Starte Löschvorgang ' . PHP_EOL;
-                foreach ($obsoletFiles as $filename) {
-                    echo "\tLösche veraltete Wetterwarnung-Datei " . $filename . ': ';
-                    if (!unlink($this->localFolder . \DIRECTORY_SEPARATOR . $filename)) {
-                        throw new RuntimeException(
-                            "Fehler beim aufräumen des Caches: '" .
-                            $this->localFolder . \DIRECTORY_SEPARATOR . $filename .
-                            "'' konnte nicht erfolgreich gelöscht werden."
-                        );
-                    }
-                    echo '-> Datei gelöscht.' . PHP_EOL;
+        // Array $localFiles aufsplitten um zu löschenende Dateien zu ermitteln (alle bis auf die älteste Datei)
+        $obsoletFiles = array_splice($localFiles, 1);
+
+        // Starte Löschvorgang
+        if (\count($obsoletFiles) > 0) {
+            echo '-> Starte Löschvorgang ' . PHP_EOL;
+            foreach ($obsoletFiles as $filename) {
+                echo "\tLösche veraltete Wetterwarnung-Datei " . $filename . ': ';
+                if (!unlink($this->localFolder . \DIRECTORY_SEPARATOR . $filename)) {
+                    throw new RuntimeException(
+                        "Fehler beim aufräumen des Caches: '" .
+                        $this->localFolder . \DIRECTORY_SEPARATOR . $filename .
+                        "'' konnte nicht erfolgreich gelöscht werden."
+                    );
                 }
-            } else {
-                echo "\t-> Es muss keine Datei gelöscht werden" . PHP_EOL;
+                echo '-> Datei gelöscht.' . PHP_EOL;
             }
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
+        } else {
+            echo "\t-> Es muss keine Datei gelöscht werden" . PHP_EOL;
         }
     }
 
@@ -274,65 +254,56 @@ class Network {
      * @throws Exception
      */
     private function getCurrentWetterwarnungViaFallback(array $arrFTPContent): array {
-        try {
-            // Filter erzeugen, um die Dateien zu ermitteln, die heute erzeugt wurden
-            $searchTime = new DateTime('now', new DateTimeZone('GMT'));
-            $fileFilter = $searchTime->format('Ymd');
+        // Filter erzeugen, um die Dateien zu ermitteln, die heute erzeugt wurden
+        $searchTime = new DateTime('now', new DateTimeZone('GMT'));
+        $fileFilter = $searchTime->format('Ymd');
 
-            // Ermittle das Datum für die Dateien
-            $arrDownloadList = [];
-            foreach ($arrFTPContent as $filename) {
-                // Filtere nach den Wetterwarnungen vom heutigen Tag
-                if (false !== mb_strpos($filename, $fileFilter)) {
-                    // Übernehme Datei in zu-bearbeiten Liste
-                    $regs = [];
-                    $extractFileInfo = preg_match(
-                        '/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})' .
-                        '(?<Postfix>_\w{3}_STATUS_PREMIUMDWD_COMMUNEUNION_)' .
-                        '(?<Language>DE|EN)(?<Filetype>.zip)$/',
-                        $filename,
-                        $regs
-                    );
+        // Ermittle das Datum für die Dateien
+        $arrDownloadList = [];
+        foreach ($arrFTPContent as $filename) {
+            // Filtere nach den Wetterwarnungen vom heutigen Tag
+            if (str_contains($filename, $fileFilter)) {
+                // Übernehme Datei in zu-bearbeiten Liste
+                $regs = [];
+                $extractFileInfo = preg_match(
+                    '/^(?<Prefix>\w_\w{3}_\w_\w{4}_)(?<Datum>\d{14})' .
+                    '(?<Postfix>_\w{3}_STATUS_PREMIUMDWD_COMMUNEUNION_)' .
+                    '(?<Language>DE|EN)(?<Filetype>.zip)$/',
+                    $filename,
+                    $regs
+                );
 
-                    if (!\is_resource($this->ftpConnectionId)) {
-                        throw new RuntimeException('Verbindung zum FTP Server unterbrochen');
-                    }
-
-                    if ($extractFileInfo) {
-                        $dateTimeFormater = new DateTime();
-                        $dateFileM = $dateTimeFormater::createFromFormat('YmdHis', $regs['Datum'], new DateTimeZone('UTC'));
-                        if (false === $dateFileM) {
-                            $fileDate = ftp_mdtm($this->ftpConnectionId, $filename);
-                            $detectMode = 'via FTP / Lesen des Datums fehlgeschlagen';
-                        } else {
-                            $fileDate = $dateFileM->getTimestamp();
-                            $detectMode = 'via RegExp';
-                        }
+                if ($extractFileInfo) {
+                    $dateTimeFormater = new DateTime();
+                    $dateFileM = $dateTimeFormater::createFromFormat('YmdHis', $regs['Datum'], new DateTimeZone('UTC'));
+                    if (false !== $dateFileM) {
+                        $fileDate = $dateFileM->getTimestamp();
+                        $detectMode = 'via RegExp';
                     } else {
                         $fileDate = ftp_mdtm($this->ftpConnectionId, $filename);
-                        $detectMode = 'via FTP / Lesen des Dateinamens fehlgeschlagen';
+                        $detectMode = 'via FTP / Lesen des Datums fehlgeschlagen';
                     }
+                } else {
+                    $fileDate = ftp_mdtm($this->ftpConnectionId, $filename);
+                    $detectMode = 'via FTP / Lesen des Dateinamens fehlgeschlagen';
+                }
 
-                    // Sprache feststellen
-                    $language = $regs['Language'];
+                // Sprache feststellen
+                $language = $regs['Language'];
 
-                    // Bei deutscher Sprache → verarbeiten
-                    if ('DE' === mb_strtoupper($language)) {
-                        echo "\t" . $filename . ' => ' . date('d.m.Y H:i', $fileDate) . ' (' . $language . ' / ' . $detectMode . ')' . PHP_EOL;
-                        $arrDownloadList[$filename] = $fileDate;
-                    }
+                // Bei deutscher Sprache → verarbeiten
+                if ('DE' === mb_strtoupper($language)) {
+                    echo "\t" . $filename . ' => ' . date('d.m.Y H:i', $fileDate) . ' (' . $language . ' / ' . $detectMode . ')' . PHP_EOL;
+                    $arrDownloadList[$filename] = $fileDate;
                 }
             }
-
-            // Dateiliste sortieren
-            arsort($arrDownloadList, SORT_NUMERIC);
-            array_splice($arrDownloadList, 1);
-
-            return $arrDownloadList;
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
         }
+
+        // Dateiliste sortieren
+        arsort($arrDownloadList, SORT_NUMERIC);
+        array_splice($arrDownloadList, 1);
+
+        return $arrDownloadList;
     }
 
     /**
@@ -343,61 +314,60 @@ class Network {
      * @throws Exception
      */
     private function downloadFromFTP(array $arrDownloadList): void {
-        try {
-            // Starte Download der aktuellsten Warn-Datei
-            if (\count($arrDownloadList) > 0) {
-                // Beginne Download
-                echo '-> Starte den Download der aktuellsten Warn-Datei:' . PHP_EOL;
+        // Starte Download der aktuellsten Warn-Datei
+        if (\count($arrDownloadList) > 0) {
+            // Beginne Download
+            echo '-> Starte den Download der aktuellsten Warn-Datei:' . PHP_EOL;
 
-                foreach ($arrDownloadList as $filename => $remoteFileMTime) {
-                    $localFile = $this->localFolder . \DIRECTORY_SEPARATOR . $filename;
+            foreach ($arrDownloadList as $filename => $remoteFileMTime) {
+                $localFile = $this->localFolder . \DIRECTORY_SEPARATOR . $filename;
 
-                    // Ermittle Zeitpunkt der letzten Modifikation der lokalen Datei
-                    $localFileMTime = filemtime($localFile);
+                // Ermittle Zeitpunkt der letzten Modifikation der lokalen Datei
+                $localFileMTime = filemtime($localFile);
 
-                    if (false === $localFileMTime) {
-                        // Da keine lokale Datei existiert, Zeitpunkt in die Vergangenheit setzen
-                        $localFileMTime = -1;
+                if (false === $localFileMTime) {
+                    // Da keine lokale Datei existiert, Zeitpunkt in die Vergangenheit setzen
+                    $localFileMTime = -1;
+                }
+
+                if ($remoteFileMTime !== $localFileMTime) {
+                    // Öffne lokale Datei
+                    /** @noinspection FopenBinaryUnsafeUsageInspection */
+                    $localFileHandle = fopen($localFile, 'w');
+                    if (!$localFileHandle) {
+                        throw new RuntimeException('Kann ' . $localFile . ' nicht zum schreiben öffnen');
                     }
 
-                    if ($remoteFileMTime !== $localFileMTime) {
-                        // Öffne lokale Datei
-                        /** @noinspection FopenBinaryUnsafeUsageInspection */
-                        $localFileHandle = fopen($localFile, 'w');
-                        if (!$localFileHandle) {
-                            throw new RuntimeException('Kann ' . $localFile . ' nicht zum schreiben öffnen');
-                        }
+                    /*
+                     *   Reserved for PHP 8.1 and later:
+                     *
+                     *   if (!\is_resource($this->ftpConnectionId) && !$this->ftpConnectionId instanceof FTP/Connection) {
+                     *    throw new RuntimeException('Verbindung zum FTP Server unterbrochen');
+                     *   }
+                    */
 
-                        if (!\is_resource($this->ftpConnectionId)) {
-                            throw new RuntimeException('Verbindung zum FTP Server unterbrochen');
-                        }
-
-                        if (ftp_fget($this->ftpConnectionId, $localFileHandle, $filename, FTP_BINARY)) {
-                            if (-1 === $localFileMTime) {
-                                echo "\tDatei " . basename($localFile) . ' wurde erfolgreich heruntergeladen ' .
-                                    '(Remote: ' . date('d.m.Y H:i:s', $remoteFileMTime) . ').' . PHP_EOL;
-                            } else {
-                                echo "\tDatei " . basename($localFile) . ' wurde erneut erfolgreich heruntergeladen ' .
-                                    '(Lokal: ' . date('d.m.Y H:i:s', $localFileMTime) . ' / ' .
-                                    'Remote: ' . date('d.m.Y H:i:s', $remoteFileMTime) . ').' . PHP_EOL;
-                            }
+                    if (ftp_fget($this->ftpConnectionId, $localFileHandle, $filename)) {
+                        if (-1 === $localFileMTime) {
+                            echo "\tDatei " . basename($localFile) . ' wurde erfolgreich heruntergeladen ' .
+                                '(Remote: ' . date('d.m.Y H:i:s', $remoteFileMTime) . ').' . PHP_EOL;
                         } else {
-                            throw new RuntimeException(sprintf("\tDatei %s war nicht erfolgreich.", $localFile));
+                            echo "\tDatei " . basename($localFile) . ' wurde erneut erfolgreich heruntergeladen ' .
+                                '(Lokal: ' . date('d.m.Y H:i:s', $localFileMTime) . ' / ' .
+                                'Remote: ' . date('d.m.Y H:i:s', $remoteFileMTime) . ').' . PHP_EOL;
                         }
-
-                        // Schließe Datei-Handle
-                        fclose($localFileHandle);
-
-                        // Zeitstempel der lokalen Datei identisch zur Remote-Datei setzen (für Cache-Funktion)
-                        touch($localFile, $remoteFileMTime);
                     } else {
-                        echo sprintf("\tDatei %s existiert bereits im lokalen Download-Ordner.", $localFile) . PHP_EOL;
+                        throw new RuntimeException(sprintf("\tDatei %s war nicht erfolgreich.", $localFile));
                     }
+
+                    // Schließe Datei-Handle
+                    fclose($localFileHandle);
+
+                    // Zeitstempel der lokalen Datei identisch zur Remote-Datei setzen (für Cache-Funktion)
+                    touch($localFile, $remoteFileMTime);
+                } else {
+                    echo sprintf("\tDatei %s existiert bereits im lokalen Download-Ordner.", $localFile) . PHP_EOL;
                 }
             }
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
         }
     }
 }
