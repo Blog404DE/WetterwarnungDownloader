@@ -182,8 +182,7 @@ class SaveToFile extends Parser {
     private function shouldSaveFile(string $jsonWetterWarnung, string $localJsonFile): bool {
         // Ermittle MD5-Hashes der bisherigen und ehemaligen Wetterwarnungen
         echo "\t* Ermittle MD5-Hashs der bisherigen Wetterwarnung und " .
-            'der neuen Wetterwarnung um Änderungen festzustellen' . PHP_EOL
-        ;
+            'der neuen Wetterwarnung um Änderungen festzustellen' . PHP_EOL;
         $md5hashes = [];
         $md5hashes['new'] = md5($jsonWetterWarnung);
         if (empty($md5hashes['new'])) {

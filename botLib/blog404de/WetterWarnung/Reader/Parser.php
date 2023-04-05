@@ -125,8 +125,7 @@ class Parser extends Network {
             echo "\t\t* Hinweis: Warnung über " . $parsedWarnInfo['event'] .
                 ' ist bereits am ' .
                 $objEndzeit->format('d.m.Y H:i:s') .
-                ' abgelaufen und wird ingoriert' . PHP_EOL
-            ;
+                ' abgelaufen und wird ingoriert' . PHP_EOL;
 
             return [];
         }

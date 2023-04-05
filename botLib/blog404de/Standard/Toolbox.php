@@ -52,8 +52,7 @@ class Toolbox {
             echo "\tEntpacke ZIP-Datei: " .
                 basename($source) . ' (' . $zip->numFiles . ' Datei' .
                 ($zip->numFiles > 1 ? 'en' : '') . ')' .
-                PHP_EOL
-            ;
+                PHP_EOL;
 
             $zip->extractTo($destination);
             $zip->close();

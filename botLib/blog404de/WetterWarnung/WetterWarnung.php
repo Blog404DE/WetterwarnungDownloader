@@ -185,8 +185,7 @@ class WetterWarnung extends Save\SaveToFile {
                 // Status-Ausgabe der aktuellen Wetterwarnung
                 echo "\t\t* Wetterwarnung über " . $parsedWarnInfo['event'] .
                     ' für ' .
-                    $parsedWarnInfo['area'] . ' verarbeitet' . PHP_EOL
-                ;
+                    $parsedWarnInfo['area'] . ' verarbeitet' . PHP_EOL;
 
                 // Wetterwarnung übernehmen und neu sortieren
                 $this->wetterWarnungen[$parsedWarnInfo['hash']] = $parsedWarnInfo;

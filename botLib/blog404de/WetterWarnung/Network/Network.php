@@ -26,7 +26,7 @@ use RuntimeException;
  * FTP Server.
  */
 class Network {
-    /** @var resource|bool Link identifier der FTP Verbindung */
+    /** @var mixed Link identifier der FTP Verbindung */
     private mixed $ftpConnectionId;
 
     /** @var bool Verwende eine passive Verbindung zum FTP Server */
