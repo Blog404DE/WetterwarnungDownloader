@@ -465,12 +465,10 @@ trait ParserAlert {
             // Prüfe ob WarnFile existiert
             if (empty($warnIconFilename)) {
                 echo "\t\t* Warnung: Für den Warn-Event Code  " . $eventcode .
-                    ' wurde in der zuordnung.json noch kein Warn-Icon zugeordnet (ggf. neuer Warn-Code?)' . PHP_EOL
-                ;
+                    ' wurde in der zuordnung.json noch kein Warn-Icon zugeordnet (ggf. neuer Warn-Code?)' . PHP_EOL;
             } elseif (!is_readable($this->getLocalIconFolder() . \DIRECTORY_SEPARATOR . $warnIconFilename)) {
                 echo "\t\t* Warnung: Zugeordnetes Wetter-Icon " .
-                    $warnIconFilename . ' steht nicht zur Verfügung. Verwende daher kein Warn-Icon' . PHP_EOL
-                ;
+                    $warnIconFilename . ' steht nicht zur Verfügung. Verwende daher kein Warn-Icon' . PHP_EOL;
                 $warnIconFilename = '';
             }
 

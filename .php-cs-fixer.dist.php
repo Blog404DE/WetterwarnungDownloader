@@ -50,11 +50,6 @@ $config->setRules([
     'cast_spaces' => [
         'space' => 'none',
     ],
-    'braces' => [
-        'position_after_control_structures' => 'same',
-        'position_after_functions_and_oop_constructs' => 'same',
-        'position_after_anonymous_constructs' => 'same',
-    ],
     'backtick_to_shell_exec' => true,
     'mb_str_functions' => true,
     'no_php4_constructor' => true,
@@ -68,6 +63,13 @@ $config->setRules([
     ],
     'no_superfluous_phpdoc_tags' => false,
     'global_namespace_import' => true,
+    'curly_braces_position' => [
+        'control_structures_opening_brace' => 'same_line',
+        'functions_opening_brace' => 'same_line',
+        'anonymous_functions_opening_brace' => 'same_line',
+        'classes_opening_brace' => 'same_line',
+        'anonymous_classes_opening_brace' => 'same_line',
+    ],
 ])
     ->setFinder($finder)
     ->setRiskyAllowed(true)
