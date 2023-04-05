@@ -48,24 +48,19 @@ trait Extensions {
      * @throws Exception
      */
     public function startExtensions(bool $archive, bool $action): void {
-        try {
-            if (0 === \count($this->wetterWarnungen)) {
-                // Keine Wetterwarnungen vorhanden
-                echo PHP_EOL . '*** Archiv/Action-Ausführung wird nicht gestartet, ' .
-                    'da keine Wetterwarnungen vorhanden sind' . PHP_EOL;
-            } else {
-                // Führe Action/Archiv aus.
-                if ($archive) {
-                    $this->startExtensionArchive();
-                }
-
-                if ($action) {
-                    $this->startExtensionAction();
-                }
+        if (0 === \count($this->wetterWarnungen)) {
+            // Keine Wetterwarnungen vorhanden
+            echo PHP_EOL . '*** Archiv/Action-Ausführung wird nicht gestartet, ' .
+                'da keine Wetterwarnungen vorhanden sind' . PHP_EOL;
+        } else {
+            // Führe Action/Archiv aus.
+            if ($archive) {
+                $this->startExtensionArchive();
             }
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
+
+            if ($action) {
+                $this->startExtensionAction();
+            }
         }
     }
 
@@ -79,42 +74,37 @@ trait Extensions {
      * @throws Exception
      */
     public function setActionConfig(array $systemConfig, array $actionConfig, bool $forceAction): void {
-        try {
-            // Prüfe ob actionConfig Parameter valid sind
-            $actionParameter = [
-                'MessagePrefix',
-                'MessagePostfix',
-                'ignoreForceUpdate',
-            ];
+        // Prüfe ob actionConfig Parameter valid sind
+        $actionParameter = [
+            'MessagePrefix',
+            'MessagePostfix',
+            'ignoreForceUpdate',
+        ];
 
-            foreach ($actionParameter as $parameter) {
-                if (!\array_key_exists($parameter, current($actionConfig))) {
-                    throw new RuntimeException(
-                        'Der Konfigurationsparamter ["ActionConfig"]["' . $parameter . '"] wurde nicht gesetzt.'
-                    );
-                }
+        foreach ($actionParameter as $parameter) {
+            if (!\array_key_exists($parameter, current($actionConfig))) {
+                throw new RuntimeException(
+                    'Der Konfigurationsparamter ["ActionConfig"]["' . $parameter . '"] wurde nicht gesetzt.'
+                );
             }
-
-            // Prüfe ob systemConfig-Parameter valid sind
-            $systemParameter = [
-                'localIconFolder',
-            ];
-
-            foreach ($systemParameter as $parameter) {
-                if (!\array_key_exists($parameter, $systemConfig)) {
-                    throw new RuntimeException(
-                        'Der Konfigurationsparamter ["localIconFolder"] wurde nicht gesetzt.'
-                    );
-                }
-            }
-
-            $this->actionConfig = $actionConfig;
-            $this->systemConfig = $systemConfig;
-            $this->forceAction = $forceAction;
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
         }
+
+        // Prüfe ob systemConfig-Parameter valid sind
+        $systemParameter = [
+            'localIconFolder',
+        ];
+
+        foreach ($systemParameter as $parameter) {
+            if (!\array_key_exists($parameter, $systemConfig)) {
+                throw new RuntimeException(
+                    'Der Konfigurationsparamter ["localIconFolder"] wurde nicht gesetzt.'
+                );
+            }
+        }
+
+        $this->actionConfig = $actionConfig;
+        $this->systemConfig = $systemConfig;
+        $this->forceAction = $forceAction;
     }
 
     /**
@@ -132,29 +122,24 @@ trait Extensions {
      * @throws Exception
      */
     private function startExtensionArchive(): void {
-        try {
-            // Durchlaufe alle definiertne Archive-Klassen
-            foreach ($this->archiveConfig as $archiveClassName => $archiveConfig) {
-                echo PHP_EOL . "*** Starte Archivierung der Wetterwarnungen mit '" . $archiveClassName .
-                    "' Modul:" . PHP_EOL;
+        // Durchlaufe alle definiertne Archive-Klassen
+        foreach ($this->archiveConfig as $archiveClassName => $archiveConfig) {
+            echo PHP_EOL . "*** Starte Archivierung der Wetterwarnungen mit '" . $archiveClassName .
+                "' Modul:" . PHP_EOL;
 
-                // Instanziere Klasse
-                /** @var ArchiveToInterface $archiveClassPath */
-                $archiveClassPath = '\\blog404de\\WetterWarnung\\Archive\\' . $archiveClassName;
-                $this->archiveClass = new $archiveClassPath();
+            // Instanziere Klasse
+            /** @var ArchiveToInterface $archiveClassPath */
+            $archiveClassPath = '\\blog404de\\WetterWarnung\\Archive\\' . $archiveClassName;
+            $this->archiveClass = new $archiveClassPath();
 
-                // Konfiguriere Action-Klasse
-                $this->archiveClass->setConfig($archiveConfig);
+            // Konfiguriere Action-Klasse
+            $this->archiveClass->setConfig($archiveConfig);
 
-                // Verarbeite jede Wetterwarnung
-                foreach ($this->wetterWarnungen as $parsedWarnInfo) {
-                    // Speichere Wetterwarnung in das Archiv
-                    $this->archiveClass->saveToArchive($parsedWarnInfo);
-                }
+            // Verarbeite jede Wetterwarnung
+            foreach ($this->wetterWarnungen as $parsedWarnInfo) {
+                // Speichere Wetterwarnung in das Archiv
+                $this->archiveClass->saveToArchive($parsedWarnInfo);
             }
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
         }
     }
 
@@ -164,45 +149,40 @@ trait Extensions {
      * @throws Exception
      */
     private function startExtensionAction(): void {
-        try {
-            // Durchlaufe alle definiertne Action-Klassen
-            foreach ($this->actionConfig as $actionClassName => $actionConfig) {
-                echo PHP_EOL . "*** Starte Action-Funktion '" . $actionClassName . "' der Wetterdaten ";
+        // Durchlaufe alle definiertne Action-Klassen
+        foreach ($this->actionConfig as $actionClassName => $actionConfig) {
+            echo PHP_EOL . "*** Starte Action-Funktion '" . $actionClassName . "' der Wetterdaten ";
 
-                if (true === $this->forceAction && false === $actionConfig['ignoreForceUpdate']) {
-                    echo '(alle Meldungen):' . PHP_EOL;
-                    $warnExists = false;
-                } elseif (true === $this->forceAction && true === $actionConfig['ignoreForceUpdate']) {
-                    echo '(neue Meldungen / forceUpdate ignoriert):' . PHP_EOL;
-                    $warnExists = null;
-                } else {
-                    echo '(neue Meldungen):' . PHP_EOL;
-                    $warnExists = null;
-                }
-                // Instanziere Klasse
-                /** @var SendToInterface $actionClassPath */
-                $actionClassPath = '\\blog404de\\WetterWarnung\\Action\\' . $actionClassName;
-                $actionClass = new $actionClassPath();
-
-                // Konfiguriere Action-Klasse
-                // -> füge System-Konfiguration und Konfiguration der Action-Klasse zusammen
-                $actionClass->setConfig(array_merge($this->systemConfig, $actionConfig));
-
-                // Verarbeite jede Wetterwarnung
-                foreach ($this->wetterWarnungen as $parsedWarnInfo) {
-                    // Wetterwarnung an Action übergeben, sofern sich etwas geändert hatte
-                    if (null === $warnExists) {
-                        // Prüfe ob Action ausgeführt werden muss
-                        $warnExists = $this->didWetterWarnungExist($parsedWarnInfo);
-                    }
-
-                    // Warnmeldung existiert nicht und führe Action aus
-                    $actionClass->startAction($parsedWarnInfo, $warnExists);
-                }
+            if (true === $this->forceAction && false === $actionConfig['ignoreForceUpdate']) {
+                echo '(alle Meldungen):' . PHP_EOL;
+                $warnExists = false;
+            } elseif (true === $this->forceAction && true === $actionConfig['ignoreForceUpdate']) {
+                echo '(neue Meldungen / forceUpdate ignoriert):' . PHP_EOL;
+                $warnExists = null;
+            } else {
+                echo '(neue Meldungen):' . PHP_EOL;
+                $warnExists = null;
             }
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
+            // Instanziere Klasse
+            /** @var SendToInterface $actionClassPath */
+            $actionClassPath = '\\blog404de\\WetterWarnung\\Action\\' . $actionClassName;
+            $actionClass = new $actionClassPath();
+
+            // Konfiguriere Action-Klasse
+            // -> füge System-Konfiguration und Konfiguration der Action-Klasse zusammen
+            $actionClass->setConfig(array_merge($this->systemConfig, $actionConfig));
+
+            // Verarbeite jede Wetterwarnung
+            foreach ($this->wetterWarnungen as $parsedWarnInfo) {
+                // Wetterwarnung an Action übergeben, sofern sich etwas geändert hatte
+                if (null === $warnExists) {
+                    // Prüfe ob Action ausgeführt werden muss
+                    $warnExists = $this->didWetterWarnungExist($parsedWarnInfo);
+                }
+
+                // Warnmeldung existiert nicht und führe Action aus
+                $actionClass->startAction($parsedWarnInfo, $warnExists);
+            }
         }
     }
 }

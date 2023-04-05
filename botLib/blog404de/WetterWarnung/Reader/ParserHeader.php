@@ -20,7 +20,7 @@ use RuntimeException;
 use SimpleXMLElement;
 
 /**
- * Traint zum Auslesen diverser Header-Elemente aus der Roh-XML Datei.
+ * Traint zum Auslesen diverser Header-Elemente aus der Roh-XML-Datei.
  */
 trait ParserHeader {
     /**
@@ -39,7 +39,7 @@ trait ParserHeader {
         int $warnCellId,
         string $stateCode
     ): SimpleXMLElement {
-        // Prüfen, ob die entsprechenden Felder in der XML Datei existieren
+        // Prüfen, ob die entsprechenden Felder in der XML-Datei existieren
         if (!property_exists($xml, 'info')) {
             throw new RuntimeException(
                 "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'info'-Node."
@@ -98,18 +98,13 @@ trait ParserHeader {
      * @throws Exception
      */
     final protected function getHeaderIdentifier(SimpleXMLElement $xml): string {
-        try {
-            if (!property_exists($xml, 'identifier')) {
-                throw new RuntimeException(
-                    "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'identifier'-Node."
-                );
-            }
-
-            return $xml->{'identifier'}->__toString();
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
+        if (!property_exists($xml, 'identifier')) {
+            throw new RuntimeException(
+                "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'identifier'-Node."
+            );
         }
+
+        return $xml->{'identifier'}->__toString();
     }
 
     /**
@@ -120,18 +115,13 @@ trait ParserHeader {
      * @throws Exception
      */
     final protected function getHeaderMsgType(SimpleXMLElement $xml): string {
-        try {
-            if (!property_exists($xml, 'msgType')) {
-                throw new RuntimeException(
-                    "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'identifier'-Node."
-                );
-            }
-
-            return mb_strtolower($xml->{'msgType'}->__toString());
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
+        if (!property_exists($xml, 'msgType')) {
+            throw new RuntimeException(
+                "Fehler beim parsen der Wetterwarnung: Die XML Datei beinhaltet kein 'identifier'-Node."
+            );
         }
+
+        return mb_strtolower($xml->{'msgType'}->__toString());
     }
 
     /**
@@ -142,24 +132,19 @@ trait ParserHeader {
      * @throws Exception
      */
     final protected function getHeaderReference(SimpleXMLElement $xml): string {
-        try {
-            if ('update' === $this->getHeaderMsgType($xml)) {
-                if (!property_exists($xml, 'references')) {
-                    throw new RuntimeException(
-                        "Fehler beim parsen der Wetterwarnung: Die XML Datei mit Typ 'update' " .
-                        "beinhaltet kein 'references'-Node."
-                    );
-                }
-                $reference = $xml->{'references'}->__toString();
-            } else {
-                $reference = '';
+        if ('update' === $this->getHeaderMsgType($xml)) {
+            if (!property_exists($xml, 'references')) {
+                throw new RuntimeException(
+                    "Fehler beim parsen der Wetterwarnung: Die XML Datei mit Typ 'update' " .
+                    "beinhaltet kein 'references'-Node."
+                );
             }
-
-            return $reference;
-        } catch (RuntimeException|Exception $e) {
-            // Fehler an Hauptklasse weitergeben
-            throw $e;
+            $reference = $xml->{'references'}->__toString();
+        } else {
+            $reference = '';
         }
+
+        return $reference;
     }
 
     /**
