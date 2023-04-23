@@ -96,7 +96,7 @@ class ArchiveToMySQL implements ArchiveToInterface {
 
             // Prüfe, ob die bereits in der Datenbank ist
             $sth = $this->connectionId->prepare(
-                'SELECT count(id) FROM warnarchiv WHERE identifier = :identifier LIMIT 1',
+                'SELECT identifier FROM warnarchiv WHERE identifier = :identifier LIMIT 1',
                 [PDO::ATTR_CURSOR => PDO::CURSOR_FWDONLY]
             );
             $sth->bindParam(':identifier', $parsedWarnInfo['identifier'], PDO::PARAM_STR, 32);
@@ -107,7 +107,7 @@ class ArchiveToMySQL implements ArchiveToInterface {
             }
 
             // Prüfe ob Warnung bereits verarbeitet wurde
-            if (0 === $sth->fetchColumn()) {
+            if (0 === $sth->fetchColumn() || false === $sth->fetchColumn()) {
                 // Wetterwarnung ist noch nicht im Archiv
 
                 // Start-/Enddatum verarbeiten

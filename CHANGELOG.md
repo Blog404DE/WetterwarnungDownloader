@@ -1,4 +1,7 @@
 # Changelog
+2022-04-23, 3.3.1 unstable
+----------
+* Bugfix: Fehler bei der Prüfung ob Wettermeldung bereits im Archiv ist unter PHP 8 und neuer korrigiert
 
 2022-02-11, 3.3.0 unstable
 ----------
