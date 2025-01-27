@@ -36,7 +36,7 @@
         "roave/security-advisories": "dev-latest",
         "friendsofphp/php-cs-fixer": "^3.0",
         "squizlabs/php_codesniffer": "^3.6",
-        "phpstan/phpstan": "^1.9"
+        "phpstan/phpstan": "^2.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
